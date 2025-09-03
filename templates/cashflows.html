@@ -1,0 +1,122 @@
+{%extends 'base.html'%}
+
+{% block title %}cashflows - Budget Manager{% endblock %}
+
+
+{% block content %}
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-adjust"></i> cashflows</h1>
+        <a href="{{ url_for('add_cashflow') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Add cashflow
+        </a>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            {% if cashflows %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr>
+                            <th></th>
+                            <th></th>
+                            <th>Expense</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th>Income</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th class=""></th>
+                        </thead></tr>
+                        <thead><tr>
+                            <th>Edit</th>
+                            <th>Type</th>
+                            <th> Date</th>
+                            <th> Account</th>
+                            <th> Category</th>
+                            <th> Description</th>
+                            <th> Amount</th>
+                            <th> Date</th>
+                            <th> Account</th>
+                            <th> Category</th>
+                            <th> Description</th>
+                            <th class="text-end"> Amount</th>
+                        </tr></thead>
+                        <tbody>
+                            {% for cashflow in cashflows %}
+                                <tr>
+                                    <td>
+                                        {% set edit_url = url_for('edit_cashflow') %}
+                                        {% set edit_value = None %}
+                                        {% include 'edit_button.html' %}
+                                    </td>
+                                    <td>{{cashflow.type_}}</td>
+                                    <td>{{ cashflow.expensedate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ cashflow.expenseacct }}</td>
+                                    <td>{{ cashflow.expensecat }}</td>
+                                    <td>{{ cashflow.expensedscr }}</td>
+                                    <td>
+                                        <span class="{{ 'balance-positive' if cashflow.expenseamount > 0 else 'balance-negative' }}">
+                                            {{ '+' if cashflow.expenseamount > 0 else '' }}${{ "{:,.2f}".format(cashflow.expenseamount) }}
+                                        </span>
+                                    </td>
+                                    <td>{{ cashflow.incomedate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ cashflow.incomeacct }}</td>
+                                    <td>{{ cashflow.incomecat }}</td>
+                                    <td>{{ cashflow.incomedscr }}</td>
+                                    <td class="text-end">
+                                        <span class="{{ 'balance-positive' if cashflow.incomeamount > 0 else 'balance-negative' }}">
+                                            {{ '+' if cashflow.incomeamount > 0 else '' }}${{ "{:,.2f}".format(cashflow.incomeamount) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="cashflow pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('cashflows', page=page-1) }}">Previous</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">{{ page }}</span>
+                        </li>
+                        
+                        {% if has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('cashflows', page=page+1) }}">Next</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% else %}
+                <div class="text-center">
+                    <i class="fas fa-adjust"></i>
+                    <h5>No cashflows found</h5>
+                    <p class="text-muted">Start by adding your first cashflow.</p>
+                    <a href="{{ url_for('add_cashflow') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add cashflow
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

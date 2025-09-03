@@ -1,0 +1,125 @@
+<!-- budgets.html -->
+{% extends "base.html" %}
+
+{% block title %}Budgets - Budget Manager{% endblock %}
+{% block content %}
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-chart-pie me-2"></i>Budgets</h1>
+        <a href="{{ url_for('add_budget') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Add Budget
+        </a>
+    </div>
+
+    <!-- Month/Year Selector -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-4">
+                    <label for="month" class="form-label">Month</label>
+                    <select class="form-select" id="month" name="month" onchange="this.form.submit()">
+                        {% for i in range(1, 13) %}
+                            <option value="{{ i }}" {% if i == month %}selected{% endif %}>
+                                {{ datetime(2024, i, 1).strftime('%B') }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label for="year" class="form-label">Year</label>
+                    <select class="form-select" id="year" name="year" onchange="this.form.submit()">
+                        {% for y in range(2020, 2030) %}
+                            <option value="{{ y }}" {% if y == year %}selected{% endif %}>{{ y }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Budget Overview -->
+    <div class="row">
+        {% if budgets %}
+            {% for budget in budgets %}
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <h6 class="card-title mb-0">{{ budget.categoryname }}</h6>
+                                <span class="badge bg-secondary">{{ budget.type_ }}</span>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">Budget: ${{ "{:,.2f}".format(budget.budget_amount) }}</small><br>
+                                <small class="text-muted">Spent: ${{ "{:,.2f}".format(budget.actual) }}</small><br>
+                                <small class="text-muted">
+                                    Remaining: 
+                                    <span class="{{ 'text-success' if budget.remaining >= 0 else 'text-danger' }}">
+                                        ${{ "{:,.2f}".format(budget.remaining) }}
+                                    </span>
+                                </small>
+                            </div>
+                            
+                            <!-- Progress Bar -->
+                            {% set percentage = (budget.actual / budget.budget_amount * 100) if budget.budget_amount > 0 else 0 %}
+                            <div class="progress mb-2" style="height: 10px;">
+                                <div class="progress-bar {{ 'bg-danger' if percentage > 100 else 'bg-success' if percentage < 80 else 'bg-warning' }}" 
+                                     style="width: {{ [percentage, 100]|min }}%"></div>
+                            </div>
+                            <small class="text-muted">{{ "{:.1f}".format(percentage) }}% used</small>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                        <h5>No budgets found</h5>
+                        <p class="text-muted">Create budgets for {{ datetime(year, month, 1).strftime('%B %Y') }}.</p>
+                        <a href="{{ url_for('add_budget') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Add Budget
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Spending Summary -->
+    {% if budgets %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Spending Summary - {{ datetime(year, month, 1).strftime('%B %Y') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        {% set total_budgeted = budgets|sum(attribute='budget_amount') %}
+                        {% set total_spent = budgets|sum(attribute='actual') %}
+                        {% set total_remaining = total_budgeted - total_spent %}
+                        
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h4 class="text-primary">${{ "{:,.2f}".format(total_budgeted) }}</h4>
+                                <small class="text-muted">Total Budgeted</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-warning">${{ "{:,.2f}".format(total_spent) }}</h4>
+                                <small class="text-muted">Total Spent</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="{{ 'text-success' if total_remaining >= 0 else 'text-danger' }}">
+                                    ${{ "{:,.2f}".format(total_remaining) }}
+                                </h4>
+                                <small class="text-muted">Remaining</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

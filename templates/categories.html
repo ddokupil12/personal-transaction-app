@@ -1,0 +1,76 @@
+<!-- categories.html -->
+{% extends "base.html" %}
+
+{% block title %}Categories - Budget Manager{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-tags me-2"></i>Categories</h1>
+        <a href="{{ url_for('add_category') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Add Category
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-arrow-up me-2"></i>Income Categories</h5>
+                </div>
+                <div class="card-body">
+                    {% set income_categories = categories|selectattr("type_", "equalto", "Income")|list %}
+                    {% if income_categories %}
+                        {% for category in income_categories %}
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <span>{{ category.categoryname }}</span>
+                                <span class="badge bg-success">Income</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No income categories found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-arrow-down me-2"></i>Expense Categories</h5>
+                </div>
+                <div class="card-body">
+                    {% set expense_categories = categories|selectattr("type_", "equalto", "Expense")|list %}
+                    {% if expense_categories %}
+                        {% for category in expense_categories %}
+                            <div class="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                <span>{{ category.categoryname }}</span>
+                                <span class="badge bg-danger">Expense</span>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted">No expense categories found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if not categories %}
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                        <h5>No categories found</h5>
+                        <p class="text-muted">Get started by adding income and expense categories.</p>
+                        <a href="{{ url_for('add_category') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Add Category
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

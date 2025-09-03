@@ -1,0 +1,72 @@
+<!-- add_transaction.html -->
+{% extends "base.html" %}
+
+{% block title %}Add Transaction - Budget Manager{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Add New Transaction</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="accountid" class="form-label">Account</label>
+                                <select class="form-select" id="accountid" name="accountid" required>
+                                    <option value="">Select account...</option>
+                                    {% for account in accounts %}
+                                        <option value="{{ account.accountid }}">{{ account.accountname }} ({{ account.accounttype }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="categoryid" class="form-label">Category</label>
+                                <select class="form-select" id="categoryid" name="categoryid" required>
+                                    <option value="">Select category...</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.categoryid }}">{{ category.categoryname }} ({{ category.type_ }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="amount" class="form-label">Amount</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">$</span>
+                                    <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
+                                </div>
+                                <small class="form-text text-muted">Use negative values for expenses</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="transactiondate" class="form-label">Transaction Date</label>
+                                <input type="date" class="form-control" id="transactiondate" name="transactiondate" 
+                                       value="{{ datetime.now().strftime('%Y-%m-%d') }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="dscr" class="form-label">Description</label>
+                            <input type="text" class="form-control" id="dscr" name="dscr" maxlength="50">
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Save Transaction
+                            </button>
+                            <a href="{{ url_for('transactions') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

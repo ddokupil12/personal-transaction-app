@@ -1,0 +1,92 @@
+<!-- transactions.html -->
+{% extends "base.html" %}
+
+{% block title %}Transactions - Budget Manager{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-exchange-alt me-2"></i>Transactions</h1>
+        <a href="{{ url_for('add_transaction') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Add Transaction
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            {% if transactions %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr>
+                            <th>Edit</th>
+                            <th>Date</th>
+                            <th>Account</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th class="text-end">Amount</th>
+                        </tr></thead>
+                        <tbody>
+                            {% for transaction in transactions %}
+                                <tr>
+                                    <td>
+                                        {% set edit_url = url_for('edit_transaction') %}
+                                        {% set edit_value = transaction.transactionid %}
+                                        {% include 'edit_button.html' %}
+                                    </td>
+                                    <td>{{ transaction.transactiondate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ transaction.accountname }}</td>
+                                    <td>{{ transaction.categoryname }}</td>
+                                    <td>{{ transaction.dscr or '-' }}</td>
+                                    <td class="text-end">
+                                        <span class="{{ 'balance-positive' if transaction.amount > 0 else 'balance-negative' }}">
+                                            {{ '+' if transaction.amount > 0 else '' }}${{ "{:,.2f}".format(transaction.amount) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav aria-label="Transaction pagination">
+                    <ul class="pagination justify-content-center">
+                        {% if has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('transactions', page=page-1) }}">Previous</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">{{ page }}</span>
+                        </li>
+                        
+                        {% if has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('transactions', page=page+1) }}">Next</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% else %}
+                <div class="text-center">
+                    <i class="fas fa-exchange-alt fa-3x text-muted mb-3"></i>
+                    <h5>No transactions found</h5>
+                    <p class="text-muted">Start by adding your first transaction.</p>
+                    <a href="{{ url_for('add_transaction') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add Transaction
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

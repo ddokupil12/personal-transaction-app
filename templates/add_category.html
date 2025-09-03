@@ -1,0 +1,42 @@
+<!-- add_category.html -->
+{% extends "base.html" %}
+
+{% block title %}Add Category - Budget Manager{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Add New Category</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="categoryname" class="form-label">Category Name</label>
+                            <input type="text" class="form-control" id="categoryname" name="categoryname" maxlength="50" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="type_" class="form-label">Category Type</label>
+                            <select class="form-select" id="type_" name="type_" required>
+                                <option value="">Select type...</option>
+                                <option value="Income">Income</option>
+                                <option value="Expense">Expense</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Save Category
+                            </button>
+                            <a href="{{ url_for('categories') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
