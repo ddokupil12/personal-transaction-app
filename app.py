@@ -270,16 +270,17 @@ def add_transaction():
             amount = Decimal(request.form['amount'])
             transaction_date = request.form['transactiondate']
             description = request.form['dscr']     
-            db_commit(("""
+            db_commit("""
                 INSERT INTO transact (accountid, categoryid, amount, transactiondate, dscr) 
                 VALUES (%s, %s, %s, %s, %s)
-            """, (account_id, category_id, amount, transaction_date, description)))
+            """, (account_id, category_id, amount, transaction_date, description))
 
             flash('Transaction added successfully!', 'success')
             return redirect(url_for('transactions'))
         except Exception as e:
             flash('Error adding transaction', 'error')
             print("err:", e)
+            return render_template('add_transaction.html', accounts=[], categories=[], datetime=datetime)
     else:
         try:
             accounts = get_accounts()
@@ -288,6 +289,7 @@ def add_transaction():
         except Exception as e:
             flash('Error loading form data', 'error')
             print("err:", e)
+            return render_template('add_transaction.html', accounts=[], categories=[], datetime=datetime)
     
 @app.route('/transactions/edit', methods=['GET', 'POST'])
 def edit_transaction():
