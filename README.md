@@ -9,8 +9,9 @@ This code has not been tested with any other versions.
 - `pip install -r requirements.txt`
     - Check for Python version compatibility
     - Installs all required modules
-- Install [MySQL Community Server 9.4.0](https://dev.mysql.com/downloads/mysql/)
+- Install [MySQL Community Server](https://dev.mysql.com/downloads/mysql/) 9.4.0
     - This is the database I use, but other versions might be compatible as well
+    - Version 9.4.0 is the latest at the time of this writing.
 
 # Legal stuff
 Made with Claude and Copilot, although most of the abstraction and some features were entirely written by me.
