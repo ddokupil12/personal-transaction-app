@@ -40,7 +40,7 @@ def db_fetchall(*args):
             query = args[0]
             cursor.execute(query)
         else:
-            raise ValueError("Can't accept multiple queries or arguments yet")
+            raise ValueError("Can't accept multiple queries or arguments")
         
         return cursor.fetchall()
 
@@ -55,7 +55,7 @@ def db_fetchone(*args):
             dbArgs = args[1]
             cursor.execute(query, dbArgs)
         else:
-            raise ValueError("Can't accept multiple queries yet")
+            raise ValueError("Can't accept multiple queries")
         
         return cursor.fetchone()
 
@@ -83,11 +83,14 @@ def get_categories():
 
 def get_account_balance(account_id):
     """Calculate account balance using relational method"""
+
     result = db_fetchone("""
-        SELECT COALESCE(SUM(amount), 0) as balance
-        FROM transact
-        WHERE accountid = %s
-        """, (account_id,))['balance'] # db_fetchone() returns dict with only key 'balance'
+                         SELECT COALESCE(SUM(amount), 0) as balance
+                         FROM transact
+                         WHERE accountid = %s
+                        """, (account_id,))['balance'] 
+    # db_fetchone() returns dict with only key 'balance'
+
     return result
 
 
@@ -230,16 +233,14 @@ def transactions():
         
         with get_db_connection() as conn:
             cursor = conn.cursor(dictionary=True)
-            cursor.execute(
-                """
-                    SELECT t.*, a.accountname, c.categoryname 
-                    FROM transact t
-                    JOIN acct a ON t.accountid = a.accountid
-                    JOIN category c ON t.CategoryID = c.CategoryID
-                    ORDER BY t.transactiondate DESC, t.transactionid DESC
-                    LIMIT %s OFFSET %s
-                """, (per_page, offset)
-                )
+            cursor.execute("""
+                           SELECT t.*, a.accountname, c.categoryname 
+                           FROM transact t
+                           JOIN acct a ON t.accountid = a.accountid
+                           JOIN category c ON t.CategoryID = c.CategoryID
+                           ORDER BY t.transactiondate DESC, t.transactionid DESC
+                           LIMIT %s OFFSET %s
+                           """, (per_page, offset))
             transactions = cursor.fetchall()
             
             # Get total count for pagination
