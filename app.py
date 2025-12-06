@@ -396,7 +396,12 @@ def budgets():
                 budget['remaining'] = budget['budget_amount'] - absActual
                 if budget['type_'] == 'Expense':
                     budgetSpending += budget['budget_amount']
-                    totalSpent += absActual
+                    if actual > 0:
+                        totalSpent += actual
+                        budget['actual'] = 0 - actual
+                        budget['remaining'] = budget['budget_amount'] + absActual
+                    else:
+                        totalSpent += absActual
                 else:
                     budgetIncome += budget['budget_amount']
                     
