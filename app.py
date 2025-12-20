@@ -270,6 +270,9 @@ def add_transaction():
             category_id = request.form['categoryid']
             amount = Decimal(request.form['amount'])
             transaction_date = request.form['transactiondate']
+            date_dateObj = datetime.strptime(transaction_date, 
+                                             "%Y-%m-%d").date()
+            assert date_dateObj < datetime.today().date()
             description = request.form['dscr']     
             db_commit(
                 """
@@ -284,6 +287,11 @@ def add_transaction():
             )
             flash('Transaction added successfully!', 'success')
             return redirect(url_for('transactions'))
+        except AssertionError as e:
+            flash('Date must not be in the future', 'error')
+            print('err:', e)
+            return render_template('add_transaction.html', accounts=[], 
+                                   categories=[], datetime=datetime)
         except Exception as e:
             flash('Error adding transaction', 'error')
             print('err:', e)
@@ -312,6 +320,9 @@ def edit_transaction():
             category_id = request.form['categoryid']
             dscr = request.form['dscr']
             transaction_date = request.form['transactiondate']
+            date_dateObj = datetime.strptime(transaction_date, 
+                                             "%Y-%m-%d").date()
+            assert date_dateObj < datetime.today().date()
             amount = request.form['amount']
             db_commit(
                 """
@@ -352,6 +363,11 @@ def edit_transaction():
             return render_template('edit_transaction.html', 
                                    transaction=transaction, datetime=datetime, 
                                    accounts=accounts, categories=categories)
+    except AssertionError as e:
+        flash('Date must not be in the future', 'error')
+        print('err:', e)
+        return render_template('add_transaction.html', accounts=[], 
+                                categories=[], datetime=datetime)
     except Exception as e:
         flash('Error editing transaction', 'error')
         print("err:", e)
