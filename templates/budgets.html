@@ -51,22 +51,40 @@
                             
                             <div class="mb-2">
                                 <small class="text-muted">Budget: ${{ "{:,.2f}".format(budget.budget_amount) }}</small><br>
-                                <small class="text-muted">Spent: ${{ "{:,.2f}".format(budget.actual) }}</small><br>
-                                <small class="text-muted">
-                                    Remaining: 
-                                    <span class="{{ 'text-success' if budget.remaining >= 0 else 'text-danger' }}">
-                                        ${{ "{:,.2f}".format(budget.remaining) }}
-                                    </span>
-                                </small>
+                                {% if budget.type_ == "Expense" %}
+                                    <small class="text-muted">Spent: ${{ "{:,.2f}".format(budget.actual) }}</small><br>
+                                    <small class="text-muted">
+                                        Remaining: 
+                                        <span class="{{ 'text-success' if budget.remaining >= 0 else 'text-danger' }}">
+                                            ${{ "{:,.2f}".format(budget.remaining) }}
+                                        </span>
+                                    </small>
+                                {% else %}
+                                    <small class="text-muted">Paid: ${{ "{:,.2f}".format(budget.actual) }}</small><br>
+                                    <small class="text-muted">
+                                        Remaining: 
+                                        <span class="{{ 'text-warning' if budget.remaining >= 0 else 'text-success' }}">
+                                            ${{ "{:,.2f}".format(budget.remaining) }}
+                                        </span>
+                                    </small>
+                                {% endif %}
                             </div>
                             
                             <!-- Progress Bar -->
                             {% set percentage = (budget.actual / budget.budget_amount * 100) if budget.budget_amount > 0 else 0 %}
-                            <div class="progress mb-2" style="height: 10px;">
-                                <div class="progress-bar {{ 'bg-danger' if percentage > 100 else 'bg-success' if percentage < 80 else 'bg-warning' }}" 
-                                     style="width: {{ [percentage, 100]|min }}%"></div>
-                            </div>
-                            <small class="text-muted">{{ "{:.1f}".format(percentage) }}% used</small>
+                            {% if budget.type_ == "Expense" %}
+                                <div class="progress mb-2" style="height: 10px;">
+                                    <div class="progress-bar {{ 'bg-danger' if percentage > 100 else 'bg-success' if percentage < 80 else 'bg-warning' }}" 
+                                    style="width: {{ [percentage, 100]|min }}%"></div>
+                                </div>
+                                <small class="text-muted">{{ "{:.1f}".format(percentage) }}% used</small>
+                            {% else %}
+                                <div class="progress mb-2" style="height: 10px;">
+                                    <div class="progress-bar {{ 'bg-success' if percentage >= 100 else 'bg-warning' }}" 
+                                    style="width: {{ [percentage, 100]|min }}%"></div>
+                                </div>
+                                <small class="text-muted">{{ "{:.1f}".format(percentage) }}% paid</small>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -88,7 +106,7 @@
     </div>
 
     <!-- Spending Summary -->
-    {% if budgets %}
+    {% if summary %}
         <div class="row mt-4">
             <div class="col-12">
                 <div class="card">
@@ -96,22 +114,18 @@
                         <h5 class="mb-0">Spending Summary - {{ datetime(year, month, 1).strftime('%B %Y') }}</h5>
                     </div>
                     <div class="card-body">
-                        {% set total_budgeted = budgets|sum(attribute='budget_amount') %}
-                        {% set total_spent = budgets|sum(attribute='actual') %}
-                        {% set total_remaining = total_budgeted - total_spent %}
-                        
                         <div class="row text-center">
                             <div class="col-md-4">
-                                <h4 class="text-primary">${{ "{:,.2f}".format(total_budgeted) }}</h4>
+                                <h4 class="text-primary">${{ "{:,.2f}".format(summary.total_budgeted) }}</h4>
                                 <small class="text-muted">Total Budgeted</small>
                             </div>
                             <div class="col-md-4">
-                                <h4 class="text-warning">${{ "{:,.2f}".format(total_spent) }}</h4>
+                                <h4 class="text-warning">${{ "{:,.2f}".format(summary.total_spent) }}</h4>
                                 <small class="text-muted">Total Spent</small>
                             </div>
                             <div class="col-md-4">
-                                <h4 class="{{ 'text-success' if total_remaining >= 0 else 'text-danger' }}">
-                                    ${{ "{:,.2f}".format(total_remaining) }}
+                                <h4 class="{{ 'text-success' if summary.total_remaining >= 0 else 'text-danger' }}">
+                                    ${{ "{:,.2f}".format(summary.total_remaining) }}
                                 </h4>
                                 <small class="text-muted">Remaining</small>
                             </div>

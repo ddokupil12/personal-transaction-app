@@ -16,6 +16,33 @@
         .btn-primary:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
         .sidebar { background: #f8f9fa; min-height: 100vh; padding-top: 20px; }
         .main-content { padding: 20px; }
+        
+        /* Updated Footer Styles */
+        footer {
+            color: black;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+            border: none;
+        }
+        .footer-button {
+            color: #676767;
+            font-size: 14px;
+            margin-left: 10px;
+            padding: 1px;
+        }
+        .footer-button:hover {
+            color: blue; /* Turn black on hover */
+            text-decoration: underline;
+        }
+        .footer-text {
+            font-size: 14px;
+            padding: 1px;
+            margin-right: 20px;
+            border: none;
+        }
     </style>
 </head>
 <body>
@@ -88,5 +115,12 @@
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     {% block scripts %}{% endblock %}
+    <footer>
+        <span class="footer-text text-muted">Version 4</span>
+        <span class="footer-text text-muted">Open source under AGPLv3</span>
+        <span>
+            <button class="btn footer-button" onclick="window.open('https:/\/github.com/ddokupil12/personal-transaction-app', '_blank')">GitHub</button>
+        </span>
+    </footer>
 </body>
 </html>

@@ -270,6 +270,9 @@ def add_transaction():
             category_id = request.form['categoryid']
             amount = Decimal(request.form['amount'])
             transaction_date = request.form['transactiondate']
+            date_dateObj = datetime.strptime(transaction_date, 
+                                             "%Y-%m-%d").date()
+            assert date_dateObj <= datetime.today().date()
             description = request.form['dscr']     
             db_commit(
                 """
@@ -284,6 +287,11 @@ def add_transaction():
             )
             flash('Transaction added successfully!', 'success')
             return redirect(url_for('transactions'))
+        except AssertionError as e:
+            flash('Date must not be in the future', 'error')
+            print('err:', e)
+            return render_template('add_transaction.html', accounts=[], 
+                                   categories=[], datetime=datetime)
         except Exception as e:
             flash('Error adding transaction', 'error')
             print('err:', e)
@@ -312,6 +320,9 @@ def edit_transaction():
             category_id = request.form['categoryid']
             dscr = request.form['dscr']
             transaction_date = request.form['transactiondate']
+            date_dateObj = datetime.strptime(transaction_date, 
+                                             "%Y-%m-%d").date()
+            assert date_dateObj <= datetime.today().date()
             amount = request.form['amount']
             db_commit(
                 """
@@ -352,6 +363,11 @@ def edit_transaction():
             return render_template('edit_transaction.html', 
                                    transaction=transaction, datetime=datetime, 
                                    accounts=accounts, categories=categories)
+    except AssertionError as e:
+        flash('Date must not be in the future', 'error')
+        print('err:', e)
+        return render_template('add_transaction.html', accounts=[], 
+                                categories=[], datetime=datetime)
     except Exception as e:
         flash('Error editing transaction', 'error')
         print("err:", e)
@@ -364,6 +380,9 @@ def budgets():
     try:
         year = request.args.get('year', datetime.now().year, type=int)
         month = request.args.get('month', datetime.now().month, type=int)
+        totalSpent = 0
+        budgetSpending = 0
+        budgetIncome = 0
         
         with get_db_connection() as conn:
             cursor = conn.cursor(dictionary=True)
@@ -379,7 +398,7 @@ def budgets():
             # Calculate actual spending for each budget
             for budget in budgets:
                 cursor.execute("""
-                               SELECT COALESCE(SUM(ABS(amount)), 0) as actual
+                               SELECT COALESCE(SUM(amount), 0) as actual
                                FROM transact t
                                WHERE t.categoryid = %s 
                                AND YEAR(t.transactiondate) = %s 
@@ -388,18 +407,33 @@ def budgets():
                 
                 # execute() returns dict with only key 'actual'
                 actual = cursor.fetchone()['actual']
-
-                budget['actual'] = actual
-                budget['remaining'] = budget['budget_amount'] - actual
+                absActual = abs(actual)
+                budget['actual'] = absActual
+                budget['remaining'] = budget['budget_amount'] - absActual
+                if budget['type_'] == 'Expense':
+                    budgetSpending += budget['budget_amount']
+                    if actual > 0:
+                        totalSpent += actual
+                        budget['actual'] = 0 - actual
+                        budget['remaining'] = budget['budget_amount'] + absActual
+                    else:
+                        totalSpent += absActual
+                else:
+                    budgetIncome += budget['budget_amount']
+                    
         
+        summary = {'total_budgeted': budgetSpending,
+                   'total_spent': totalSpent,
+                   'total_remaining': budgetSpending - totalSpent
+                   }
         return render_template('budgets.html', budgets=budgets, year=year, 
-                               month=month, datetime=datetime)
+                               month=month, datetime=datetime, summary=summary)
     except Exception as e:
         flash('Error loading budgets', 'error')
         print('err:', e)
         now = datetime.now()
         return render_template('budgets.html', budgets=[], year=now.year, 
-                               month=now.month, datetime=datetime)
+                               month=now.month, datetime=datetime, abs=abs)
 
 @app.route('/budgets/add', methods=['GET', 'POST'])
 def add_budget():

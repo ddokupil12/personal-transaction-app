@@ -10,14 +10,26 @@ Uses Python 3.13, Flask, Jinja2, MySQL 9.4.0
 This code has not been tested with any other versions.
 
 # Installation
+- Clone the repository
 - `pip install -r requirements.txt`
     - Check for Python version compatibility
     - Installs all required modules
 - Install [MySQL Community Server](https://dev.mysql.com/downloads/mysql/) 9.4.0
     - This is the version I use, but other versions might be compatible as well
     - Version 9.4.0 is the latest at the time of this writing.
+- Add a new database and use `budget.sql` to create the tables.
+- Write `./.env` file with:
+    - DB_HOST -- name of the server, usually `localhost`
+    - DB_PORT -- the server's port, usually 3306
+    - DB_NAME -- name of the database
+    - DB_USER -- your username, usually `root`
+    - DB_PASSWORD -- your password, which should be secure
+- Launch server using `python app.py` (use `python3` if applicable)
 
 # Usage
+- Use nav bar to switch between sections of the website
+- Click the "Edit" buttons to edit those particular rows of their respective tables.
+    - For example, click "Edit" on the `/transactions` page to edit a transaction.
 
 # Acknowledgements
 - Made with Claude and Copilot, although most of the abstraction and some features were entirely written by me.
