@@ -7,6 +7,8 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 from mysql.connector import Error, connect
 from dotenv import load_dotenv
 
+from models import DBConnection
+
 ##### Setup
 config_name = 'development'
 load_dotenv()
@@ -19,19 +21,7 @@ DB_CONFIG = app.config['DB_CONFIG']
 ##### Helper functions
 @contextmanager
 def get_db_connection():
-    """Context manager for database connections"""
-    connection = None
-    try:
-        connection = connect(**DB_CONFIG)
-        yield connection
-    except Error as e:
-        print(f'Error connecting to MySQL: {e}')
-        if connection:
-            connection.rollback()
-        raise Exception(e)
-    finally:
-        if connection and connection.is_connected():
-            connection.close()
+    yield DBConnection.get_db_connection()
 
 def db_fetchall(*args):
     with get_db_connection() as conn:
