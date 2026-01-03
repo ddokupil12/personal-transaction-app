@@ -272,7 +272,7 @@ def add_transaction():
             transaction_date = request.form['transactiondate']
             date_dateObj = datetime.strptime(transaction_date, 
                                              "%Y-%m-%d").date()
-            assert date_dateObj < datetime.today().date()
+            assert date_dateObj <= datetime.today().date()
             description = request.form['dscr']     
             db_commit(
                 """
@@ -322,7 +322,7 @@ def edit_transaction():
             transaction_date = request.form['transactiondate']
             date_dateObj = datetime.strptime(transaction_date, 
                                              "%Y-%m-%d").date()
-            assert date_dateObj < datetime.today().date()
+            assert date_dateObj <= datetime.today().date()
             amount = request.form['amount']
             db_commit(
                 """
