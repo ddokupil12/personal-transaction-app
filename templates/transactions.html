@@ -53,7 +53,7 @@
                     <ul class="pagination justify-content-center">
                         {% if has_prev %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('transactions', page=page-1) }}">Previous</a>
+                                <a class="page-link" href="{{ url_for('transactions', p=p-1) }}">Previous</a>
                             </li>
                         {% else %}
                             <li class="page-item disabled">
@@ -62,12 +62,12 @@
                         {% endif %}
                         
                         <li class="page-item active">
-                            <span class="page-link">{{ page }}</span>
+                            <span class="page-link">{{ p }}</span>
                         </li>
                         
                         {% if has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('transactions', page=page+1) }}">Next</a>
+                                <a class="page-link" href="{{ url_for('transactions', p=p+1) }}">Next</a>
                             </li>
                         {% else %}
                             <li class="page-item disabled">

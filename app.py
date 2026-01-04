@@ -1,115 +1,27 @@
 from datetime import datetime
 from decimal import Decimal
 from config import config
-from contextlib import contextmanager
+import traceback
 
-from flask import Flask, render_template, request, redirect, url_for, flash
-from mysql.connector import Error, connect
-from dotenv import load_dotenv
+from flask import render_template, request, redirect, url_for, flash
 
-from models import DBConnection
-
-##### Setup
-config_name = 'development'
-load_dotenv()
-app = Flask(__name__)
-app.config.from_object(config.get(config_name, config['default']))
-app.secret_key = app.config['SECRET_KEY']
-DB_CONFIG = app.config['DB_CONFIG']
-
-
-##### Helper functions
-@contextmanager
-def get_db_connection():
-    yield DBConnection.get_db_connection()
-
-def db_fetchall(*args):
-    with get_db_connection() as conn:
-        cursor = conn.cursor(dictionary=True)
-        if len(args) == 1:
-            query = args[0]
-            cursor.execute(query)
-        else:
-            raise ValueError("Can't accept multiple queries or arguments")
-        
-        return cursor.fetchall()
-
-def db_fetchone(*args):
-    with get_db_connection() as conn:
-        cursor = conn.cursor(dictionary=True)
-        if len(args) == 1:
-            query = args[0]
-            cursor.execute(query)
-        elif len(args) == 2:
-            query = args[0]
-            dbArgs = args[1]
-            cursor.execute(query, dbArgs)
-        else:
-            raise ValueError("Can't accept multiple queries")
-        
-        return cursor.fetchone()
-
-def db_commit(*args):
-    with get_db_connection() as conn:
-        cursor = conn.cursor()
-        lenArgs = len(args)
-        if lenArgs % 2 == 0:
-            for i in range(0, lenArgs, 2):
-                query = args[i]
-                dbArgs = args[i + 1]
-                cursor.execute(query, dbArgs)
-        else:
-            raise ValueError("Expected an even number of arguments")
-        
-        conn.commit()
-
-def get_accounts():
-    """Fetch all accounts"""
-    return db_fetchall('SELECT * FROM acct ORDER BY accountname')
-
-def get_categories():
-    """Fetch all categories"""
-    return db_fetchall('SELECT * FROM category ORDER BY categoryname')
-
-def get_account_balance(account_id):
-    """Calculate account balance using relational method"""
-
-    result = db_fetchone("""
-                         SELECT COALESCE(SUM(amount), 0) as balance
-                         FROM transact
-                         WHERE accountid = %s
-                        """, (account_id,))['balance'] 
-    # db_fetchone() returns dict with only key 'balance'
-
-    return result
-
-
+from models import CategoryModel
+from controllers import GeneralController, AcctController, CatController, TransactController
+from context import app
+from db import get_db_connection, db_commit, db_fetchall, db_fetchone
 
 ##### Routes
 @app.route('/')
 def dashboard():
     """Main dashboard showing accounts and recent transactions"""
     try:
-        accounts = get_accounts()
-        
-        # Add balance to each account
-        for account in accounts:
-            account['balance'] = get_account_balance(account['accountid'])
-        
-        # Get recent transactions
-        recent_transactions = db_fetchall("""
-            SELECT t.*, a.accountname, c.categoryname 
-            FROM transact t
-            JOIN acct a ON t.accountid = a.accountid
-            JOIN category c ON t.CategoryID = c.CategoryID
-            ORDER BY t.TransactionDate DESC, t.TransactionID DESC
-            LIMIT 10
-        """)
+        accounts, recent_transactions = GeneralController.dashboard()
         return render_template('dashboard.html', accounts=accounts, 
                                recent_transactions=recent_transactions)
     except Exception as e:
         flash('Error loading dashboard', 'error')
         print('err:', e)
+        traceback.print_exc()
         return render_template('dashboard.html', accounts=[], 
                                recent_transactions=[])
 
@@ -117,14 +29,12 @@ def dashboard():
 def accounts():
     """Manage accounts"""
     try:
-        accounts = get_accounts()
-        for account in accounts:
-            account['balance'] = get_account_balance(account['accountid'])
-            # print(account['balance'])
+        accounts = AcctController.accounts()
         return render_template('accounts.html', accounts=accounts)
     except Exception as e:
         flash('Error loading accounts', 'error')
         print('err:', e)
+        traceback.print_exc()
         return render_template('accounts.html', accounts=[])
 
 @app.route('/accounts/add', methods=['GET', 'POST'])
@@ -134,15 +44,13 @@ def add_account():
         try:
             name = request.form['accountname']
             account_type = request.form['accounttype']
-            db_commit("""
-                      INSERT INTO acct (accountname, accounttype) VALUES 
-                      (%s, %s)""", 
-                      (name, account_type))
+            AcctController.add_account(name, account_type)
             flash('Account added successfully!', 'success')
             return redirect(url_for('accounts'))
         except Exception as e:
             flash('Error adding account', 'error')
-        print('err:', e)
+            print('err:', e)
+            traceback.print_exc()
     
     return render_template('add_account.html')
 
@@ -154,44 +62,30 @@ def edit_account():
             account_id = request.form['accountid']
             account_name = request.form['accountname']
             account_type = request.form['accounttype']
-            db_commit(
-                """
-                    UPDATE acct
-                    SET accountname = %s
-                    WHERE accountid = %s
-                """, (account_name, account_id),
-                """
-                    UPDATE acct
-                    SET accounttype = %s
-                    WHERE accountid = %s
-                """, (account_type, account_id)
-                )
-            account = {'accountid': account_id, 'accountname': account_name, 'accounttype': account_type}
+            AcctController.edit_account(account_id, account_name, account_type)
             flash('Account edited successfully!', 'success')
             return redirect(url_for('accounts'))
         else:
             account_id = request.args['id']
-            account = db_fetchone("""
-                                  SELECT * 
-                                  FROM acct
-                                  WHERE accountid = %s
-                                  """, [account_id])
+            account = AcctController.get_account(account_id)
             return render_template('edit_account.html', account=account)        
 
     except Exception as e:
         flash('Error editing account', 'error')
         print('err:', e)
+        traceback.print_exc()
         return render_template('edit_account.html', account=None) 
 
 @app.route('/categories')
 def categories():
     """Manage categories"""
     try:
-        categories = get_categories()
+        categories = CatController.categories()
         return render_template('categories.html', categories=categories)
     except Exception as e:
         flash('Error loading categories', 'error')
         print('err:', e)
+        traceback.print_exc()
         return render_template('categories.html', categories=[])
 
 @app.route('/categories/add', methods=['GET', 'POST'])
@@ -201,15 +95,13 @@ def add_category():
         try:
             name = request.form['categoryname']
             cat_type = request.form['type_']
-            db_commit("""
-                      INSERT INTO category (categoryname, type_) 
-                      VALUES (%s, %s)
-                      """, (name, cat_type))
+            CatController.add_category(name, cat_type)
             flash('Category added successfully!', 'success')
             return redirect(url_for('categories'))
         except Exception as e:
             flash('Error adding category', 'error')
             print('err:', e)
+            traceback.print_exc()
     
     return render_template('add_category.html')
 
@@ -217,37 +109,21 @@ def add_category():
 def transactions():
     """View all transactions"""
     try:
-        page = request.args.get('page', 1, type=int)
+        page = request.args.get('p', 1, type=int)
         per_page = 20
         offset = (page - 1) * per_page
-        
-        with get_db_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("""
-                           SELECT t.*, a.accountname, c.categoryname 
-                           FROM transact t
-                           JOIN acct a ON t.accountid = a.accountid
-                           JOIN category c ON t.CategoryID = c.CategoryID
-                           ORDER BY t.transactiondate DESC, t.transactionid DESC
-                           LIMIT %s OFFSET %s
-                           """, (per_page, offset))
-            transactions = cursor.fetchall()
-            
-            # Get total count for pagination
-            cursor.execute("SELECT COUNT(*) as total FROM transact")
-            total = cursor.fetchone()['total']
-        
+        transactions, total = TransactController.transactions(per_page, offset)
         has_next = offset + per_page < total
         has_prev = page > 1
-        
         return render_template('transactions.html', 
                                transactions=transactions,
-                               page=page, 
+                               p=page, 
                                has_next=has_next, 
                                has_prev=has_prev)
     except Exception as e:
         flash('Error loading transactions', 'error')
         print("err:", e)
+        traceback.print_exc()
         return render_template('transactions.html', transactions=[], page=1, 
                                has_next=False, has_prev=False)
 
@@ -260,101 +136,65 @@ def add_transaction():
             category_id = request.form['categoryid']
             amount = Decimal(request.form['amount'])
             transaction_date = request.form['transactiondate']
-            date_dateObj = datetime.strptime(transaction_date, 
-                                             "%Y-%m-%d").date()
-            assert date_dateObj <= datetime.today().date()
-            description = request.form['dscr']     
-            db_commit(
-                """
-                    INSERT INTO transact (accountid, categoryid, amount, 
-                        transactiondate, dscr) 
-                    VALUES (%s, %s, %s, %s, %s)
-                """, 
-                (
-                    account_id, category_id,amount, transaction_date, 
-                    description
-                )
-            )
+            dscr = request.form['dscr']
+            TransactController.add_transaction(account_id, category_id, amount, 
+                                               transaction_date, dscr)
             flash('Transaction added successfully!', 'success')
             return redirect(url_for('transactions'))
         except AssertionError as e:
-            flash('Date must not be in the future', 'error')
-            print('err:', e)
+            flash(e, 'error')
+            print('AssertionError:', e)
             return render_template('add_transaction.html', accounts=[], 
                                    categories=[], datetime=datetime)
         except Exception as e:
             flash('Error adding transaction', 'error')
             print('err:', e)
+            traceback.print_exc()
             return render_template('add_transaction.html', accounts=[], 
                                    categories=[], datetime=datetime)
     else:
         try:
-            accounts = get_accounts()
-            categories = get_categories()
+            accounts = AcctController.accounts(balance=False)
+            categories = CatController.categories()
             return render_template('add_transaction.html', accounts=accounts, 
                                    categories=categories, datetime=datetime)
         except Exception as e:
             flash('Error loading form data', 'error')
             print('err:', e)
+            traceback.print_exc()
             return render_template('add_transaction.html', accounts=[], 
                                    categories=[], datetime=datetime)
     
 @app.route('/transactions/edit', methods=['GET', 'POST'])
 def edit_transaction():
     try:
-        accounts = get_accounts()
-        categories = get_categories()
         if request.method == 'POST':
             transaction_id = request.form['transactionid']
             account_id = request.form['accountid']
             category_id = request.form['categoryid']
             dscr = request.form['dscr']
             transaction_date = request.form['transactiondate']
-            date_dateObj = datetime.strptime(transaction_date, 
-                                             "%Y-%m-%d").date()
-            assert date_dateObj <= datetime.today().date()
             amount = request.form['amount']
-            db_commit(
-                """
-                    UPDATE transact 
-                    SET accountid = %s 
-                    WHERE transactionid = %s
-                """, (account_id, transaction_id),
-                """
-                    UPDATE transact
-                    SET categoryid = %s
-                    WHERE transactionid = %s
-                """, (category_id, transaction_id),
-                """
-                    UPDATE transact
-                    SET dscr = %s
-                    WHERE transactionid = %s
-                """, (dscr, transaction_id),
-                """
-                    UPDATE transact
-                    SET transactiondate = %s
-                    WHERE transactionid = %s
-                """, (transaction_date, transaction_id),
-                """
-                    UPDATE transact
-                    SET amount = %s
-                    WHERE transactionid = %s
-                """, (amount, transaction_id)
-                )
+            TransactController.edit_transaction(
+                account_id, 
+                category_id, 
+                amount, 
+                transaction_date, 
+                dscr, 
+                transaction_id
+            )
             flash('Transaction edited successfully!', 'success')
             return redirect(url_for('transactions')) 
         else:
             transaction_id = request.args['id']
-            transaction = db_fetchone("""
-                                      SELECT * 
-                                      FROM transact 
-                                      WHERE transactionid = %s
-                                      """, [transaction_id])
+            accounts = AcctController.accounts(balance=False)
+            categories = CatController.categories()
+            transaction = TransactController.get_transaction(transaction_id)
             return render_template('edit_transaction.html', 
                                    transaction=transaction, datetime=datetime, 
                                    accounts=accounts, categories=categories)
     except AssertionError as e:
-        flash('Date must not be in the future', 'error')
+        flash(e, 'error')
         print('err:', e)
         return render_template('add_transaction.html', accounts=[], 
                                 categories=[], datetime=datetime)
@@ -457,7 +297,7 @@ def add_budget():
     
     else:
         try:
-            categories = get_categories()
+            categories = CategoryModel.get_categories()
             return render_template('add_budget.html', categories=categories, 
                                    datetime=datetime)
         except Exception as e:

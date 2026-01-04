@@ -2,7 +2,8 @@ import os
 
 class Config:
     """Base configuration class"""
-    SECRET_KEY = os.environ.get('SECRET_KEY') # or 'your-secret-key-change-this-in-production'
+    SECRET_KEY = os.environ.get('SECRET_KEY')
+    DEBUG = True
     
     # Database configuration
     DB_CONFIG = {
@@ -12,10 +13,6 @@ class Config:
         'password': os.environ.get('DB_PASSWORD'), # or 'your_password',
         'port': int(os.environ.get('DB_PORT', 3306))
     }
-
-class DevelopmentConfig(Config):
-    """Development configuration"""
-    DEBUG = True
 
 class ProductionConfig(Config):
     """Production configuration"""
@@ -31,7 +28,7 @@ class ProductionConfig(Config):
 
 # Configuration dictionary
 config = {
-    'development': DevelopmentConfig,
     'production': ProductionConfig,
-    'default': DevelopmentConfig
+    'development': Config,
+    'default': Config,
 }

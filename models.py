@@ -1,60 +1,138 @@
-from contextlib import contextmanager
-from mysql.connector import Error, connect
+from db import db_fetchone, db_fetchall, db_commit, get_db_connection
 
+class AccountModel:
+    @staticmethod
+    def get_accounts():
+        """Fetch all accounts"""
+        return db_fetchall('SELECT * FROM acct ORDER BY accountname')
+    
+    @staticmethod
+    def get_account_balance(account_id):
+        """Calculate account balance using relational method"""
+        result = db_fetchone("""
+                            SELECT COALESCE(SUM(amount), 0) as balance
+                            FROM transact
+                            WHERE accountid = %s
+                            """, (account_id,))['balance'] 
+        # db_fetchone() returns dict with only key 'balance'
 
-class DBConnection:
-    @contextmanager
-    def get_db_connection(self):
-        """Context manager for database connections"""
-        connection = None
-        try:
-            connection = connect(**DB_CONFIG)
-            yield connection
-        except Error as e:
-            print(f'Error connecting to MySQL: {e}')
-            if connection:
-                connection.rollback()
-            raise Exception(e)
-        finally:
-            if connection and connection.is_connected():
-                connection.close()
-
-    def db_fetchall(self, *args):
-        with self.get_db_connection() as conn:
+        return result
+    
+    @staticmethod
+    def get_account(account_id):
+        return db_fetchone("""
+                           SELECT * 
+                           FROM acct
+                           WHERE accountid = %s
+                           """, [account_id])
+    
+    @staticmethod
+    def add_account(name, account_type):
+        db_commit("""
+                  INSERT INTO acct (accountname, accounttype) 
+                  VALUES (%s, %s)
+                  """, (name, account_type))
+    
+    @staticmethod
+    def edit_account(account_id, account_name, account_type):
+        db_commit(
+            """
+                UPDATE acct
+                SET accountname = %s
+                WHERE accountid = %s
+            """, (account_name, account_id),
+            """
+                UPDATE acct
+                SET accounttype = %s
+                WHERE accountid = %s
+            """, (account_type, account_id)
+        )
+    
+class CategoryModel:
+    @staticmethod
+    def get_categories():
+        """Fetch all categories"""
+        return db_fetchall('SELECT * FROM category ORDER BY categoryname')
+    
+    @staticmethod
+    def add_category(name, cat_type):
+        db_commit("""
+                  INSERT INTO category (categoryname, type_) 
+                  VALUES (%s, %s)
+                  """, (name, cat_type))
+    
+class TransactModel:
+    @staticmethod
+    def get_transactions(per_page, offset):
+        with get_db_connection() as conn:
             cursor = conn.cursor(dictionary=True)
-            if len(args) == 1:
-                query = args[0]
-                cursor.execute(query)
-            else:
-                raise ValueError("Can't accept multiple queries or arguments")
+            cursor.execute("""
+                           SELECT t.*, a.accountname, c.categoryname 
+                           FROM transact t
+                           JOIN acct a ON t.accountid = a.accountid
+                           JOIN category c ON t.CategoryID = c.CategoryID
+                           ORDER BY t.transactiondate DESC, t.transactionid DESC
+                           LIMIT %s OFFSET %s
+                           """, (per_page, offset))
+            transactions = cursor.fetchall()
             
-            return cursor.fetchall()
+            # Get total count for pagination
+            cursor.execute("SELECT COUNT(*) as total FROM transact")
+            total = cursor.fetchone()['total']
 
-    def db_fetchone(self, *args):
-        with self.get_db_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            if len(args) == 1:
-                query = args[0]
-                cursor.execute(query)
-            elif len(args) == 2:
-                query = args[0]
-                dbArgs = args[1]
-                cursor.execute(query, dbArgs)
-            else:
-                raise ValueError("Can't accept multiple queries")
-            
-            return cursor.fetchone()
+            return transactions, total
+        
 
-    def db_commit(self, *args):
-        with self.get_db_connection() as conn:
-            cursor = conn.cursor()
-            lenArgs = len(args)
-            if lenArgs % 2 == 0:
-                for i in range(0, lenArgs, 2):
-                    query = args[i]
-                    dbArgs = args[i + 1]
-                    cursor.execute(query, dbArgs)
-            else:
-                raise ValueError("Expected an even number of arguments")
-            
-            conn.commit()
+    @staticmethod
+    def get_transaction(transaction_id):
+        return db_fetchone("""
+                           SELECT * 
+                           FROM transact 
+                           WHERE transactionid = %s
+                           """, [transaction_id])
+        
+    @staticmethod
+    def add_transaction(account_id, category_id, amount, transaction_date, 
+                        description):
+        db_commit(
+            """
+                INSERT INTO transact (accountid, categoryid, amount, 
+                    transactiondate, dscr) 
+                VALUES (%s, %s, %s, %s, %s)
+            """, 
+            (
+                account_id, category_id,amount, transaction_date, 
+                description
+            )
+        )
+
+    @staticmethod
+    def edit_transaction(account_id, category_id, amount, transaction_date,
+                         dscr, transaction_id):
+        db_commit(
+            """
+                UPDATE transact 
+                SET accountid = %s 
+                WHERE transactionid = %s
+            """, (account_id, transaction_id),
+            """
+                UPDATE transact
+                SET categoryid = %s
+                WHERE transactionid = %s
+            """, (category_id, transaction_id),
+            """
+                UPDATE transact
+                SET dscr = %s
+                WHERE transactionid = %s
+            """, (dscr, transaction_id),
+            """
+                UPDATE transact
+                SET transactiondate = %s
+                WHERE transactionid = %s
+            """, (transaction_date, transaction_id),
+            """
+                UPDATE transact
+                SET amount = %s
+                WHERE transactionid = %s
+            """, (amount, transaction_id)
+        )
