@@ -1,9 +1,8 @@
 from datetime import datetime
 from decimal import Decimal
 
-from models import AccountModel, CategoryModel, TransactModel
-from config import Config
-from db import db_fetchall, db_commit
+from models import AccountModel, CategoryModel, TransactModel, BudgetModel, CashflowModel
+from db import db_fetchall, db_commit, get_db_connection
 
 class GeneralController:
     @staticmethod
@@ -81,7 +80,7 @@ class TransactController:
     def add_transaction(cls, account_id, category_id, amount, transaction_date,
                         description):
         cls.check_date(transaction_date) 
-        TransactModel.add_transaction(account_id, category_id, amount, 
+        TransactModel.add_transaction(account_id, category_id, Decimal(amount),
                                       transaction_date, description)
         
     @classmethod
@@ -91,3 +90,54 @@ class TransactController:
         TransactModel.edit_transaction(account_id, category_id, amount,
                                        transaction_date, description, 
                                        transaction_id)
+        
+
+class BudgetController:
+    @staticmethod
+    def budgets(year, month):
+        totalSpent = 0
+        budgetSpending = 0
+        budgetIncome = 0
+        budgets = BudgetModel.get_budgets(year, month)
+        for budget in budgets:
+            actual = budget['actual']
+            absActual = abs(actual)
+            budget['remaining'] = budget['budget_amount'] - absActual
+            if budget['type_'] == 'Expense':
+                budgetSpending += budget['budget_amount']
+                if actual > 0:
+                    totalSpent += actual
+                    budget['actual'] = 0 - actual
+                    budget['remaining'] = budget['budget_amount'] + absActual
+                else:
+                    totalSpent += absActual
+            else:
+                budgetIncome += budget['budget_amount']
+            
+            summary = {'total_budgeted': budgetSpending,
+                    'total_spent': totalSpent,
+                    'total_remaining': budgetSpending - totalSpent
+                    }
+            
+        return budgets, summary
+        
+    @staticmethod
+    def add_budget(category_id, budget_year, budget_month, amount):
+        budget_amount = Decimal(amount)
+        BudgetModel.add_budget(category_id, budget_year, budget_month, 
+                               budget_amount)
+        
+
+
+class CashflowController:
+    @staticmethod
+    def cashflows():
+        return CashflowModel.get_cashflows()
+    
+    @staticmethod
+    def add_cashflow(expenseid, incomeid, type_):
+        CashflowModel.add_cashflow(expenseid, incomeid, type_)
+
+    @staticmethod
+    def get_cashflow_types():
+        return ['Business', 'Transfer']

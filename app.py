@@ -1,14 +1,10 @@
 from datetime import datetime
-from decimal import Decimal
-from config import config
 import traceback
 
 from flask import render_template, request, redirect, url_for, flash
 
-from models import CategoryModel
-from controllers import GeneralController, AcctController, CatController, TransactController
+from controllers import GeneralController, AcctController, CatController, TransactController, BudgetController, CashflowController
 from context import app
-from db import get_db_connection, db_commit, db_fetchall, db_fetchone
 
 ##### Routes
 @app.route('/')
@@ -134,7 +130,7 @@ def add_transaction():
         try:
             account_id = request.form['accountid']
             category_id = request.form['categoryid']
-            amount = Decimal(request.form['amount'])
+            amount = request.form['amount']
             transaction_date = request.form['transactiondate']
             dscr = request.form['dscr']
             TransactController.add_transaction(account_id, category_id, amount, 
@@ -175,14 +171,10 @@ def edit_transaction():
             dscr = request.form['dscr']
             transaction_date = request.form['transactiondate']
             amount = request.form['amount']
-            TransactController.edit_transaction(
-                account_id, 
-                category_id, 
-                amount, 
-                transaction_date, 
-                dscr, 
-                transaction_id
-            )
+            TransactController.edit_transaction(account_id, category_id, 
+                                                amount, transaction_date, dscr, 
+                                                transaction_id
+                                                )
             flash('Transaction edited successfully!', 'success')
             return redirect(url_for('transactions')) 
         else:
@@ -210,52 +202,7 @@ def budgets():
     try:
         year = request.args.get('year', datetime.now().year, type=int)
         month = request.args.get('month', datetime.now().month, type=int)
-        totalSpent = 0
-        budgetSpending = 0
-        budgetIncome = 0
-        
-        with get_db_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("""
-                           SELECT b.*, c.categoryname, c.type_
-                           FROM budget b
-                           JOIN category c ON b.categoryid = c.categoryid
-                           WHERE b.budget_year = %s AND b.budget_month = %s
-                           ORDER BY c.categoryname
-                           """, (year, month))
-            budgets = cursor.fetchall()
-            
-            # Calculate actual spending for each budget
-            for budget in budgets:
-                cursor.execute("""
-                               SELECT COALESCE(SUM(amount), 0) as actual
-                               FROM transact t
-                               WHERE t.categoryid = %s 
-                               AND YEAR(t.transactiondate) = %s 
-                               AND MONTH(t.transactiondate) = %s
-                               """, (budget['categoryid'], year, month))
-                
-                # execute() returns dict with only key 'actual'
-                actual = cursor.fetchone()['actual']
-                absActual = abs(actual)
-                budget['actual'] = absActual
-                budget['remaining'] = budget['budget_amount'] - absActual
-                if budget['type_'] == 'Expense':
-                    budgetSpending += budget['budget_amount']
-                    if actual > 0:
-                        totalSpent += actual
-                        budget['actual'] = 0 - actual
-                        budget['remaining'] = budget['budget_amount'] + absActual
-                    else:
-                        totalSpent += absActual
-                else:
-                    budgetIncome += budget['budget_amount']
-                    
-        
-        summary = {'total_budgeted': budgetSpending,
-                   'total_spent': totalSpent,
-                   'total_remaining': budgetSpending - totalSpent
-                   }
+        budgets, summary = BudgetController.budgets(year, month)
         return render_template('budgets.html', budgets=budgets, year=year, 
                                month=month, datetime=datetime, summary=summary)
     except Exception as e:
@@ -273,19 +220,9 @@ def add_budget():
             category_id = request.form['categoryid']
             budget_year = request.form['budget_year']
             budget_month = request.form['budget_month']
-            budget_amount = Decimal(request.form['budget_amount'])
-            db_commit(
-                """
-                    INSERT INTO budget (categoryid, budget_year, 
-                    budget_month, budget_amount) 
-                    VALUES (%s, %s, %s, %s)
-                    ON DUPLICATE KEY UPDATE budget_amount = %s
-                """, 
-                (
-                    category_id, budget_year, budget_month, budget_amount, 
-                    budget_amount
-                )
-            )
+            budget_amount = request.form['budget_amount']
+            BudgetController.add_budget(category_id, budget_year, budget_month, 
+                                        budget_amount)
             flash('Budget saved successfully!', 'success')
             return redirect(url_for('budgets', year=budget_year, 
                                     month=budget_month))
@@ -297,7 +234,7 @@ def add_budget():
     
     else:
         try:
-            categories = CategoryModel.get_categories()
+            categories = CatController.categories()
             return render_template('add_budget.html', categories=categories, 
                                    datetime=datetime)
         except Exception as e:
@@ -310,17 +247,7 @@ def add_budget():
 def cashflows():
     """View cashflows"""
     try:
-        cashflows = db_fetchall("""
-            SELECT t.transactionid as expensetransactionid, a.accountname as expenseacct, c.categoryname as expensecat, t.transactiondate as expensedate, t.amount as expenseamount, t.dscr as expensedscr, r1.*, t2.transactionid as incometransactionid, a2.accountname as incomeacct, c2.categoryname as incomecat, t2.amount as incomeamount, t2.transactiondate as incomedate, t2.dscr as incomedscr
-            FROM transact t
-            JOIN acct a ON t.accountid = a.accountid
-            JOIN category c ON t.CategoryID = c.CategoryID
-            JOIN cashflow r1 on t.transactionid = r1.expense
-            JOIN transact t2 on r1.income = t2.transactionid
-            JOIN acct a2 on t2.accountid = a2.accountid
-            JOIN category c2 on t2.categoryid = c2.categoryid
-            ORDER BY t.transactiondate DESC, t.transactionid DESC;
-        """)
+        cashflows = CashflowController.cashflows()
         return render_template('cashflows.html', cashflows=cashflows)
     except Exception as e:
         flash('Error loading cashflows', 'error')
@@ -329,28 +256,17 @@ def cashflows():
 
 @app.route('/cashflows/add', methods=['GET', 'POST'])
 def add_cashflow():
-    types = ['Business', 'Transfer']
+    types = CashflowController.get_cashflow_types()
     try:
         if request.method == 'POST':
             incomeid = request.form['incomeid']
             expenseid = request.form['expenseid']
             type_ = request.form['type']
-            db_commit("""
-                INSERT INTO cashflow (expense, income, type_) VALUES
-                (%s, %s, %s)
-            """, (expenseid, incomeid, type_))
+            CashflowController.add_cashflow(expenseid, incomeid, type_)
             flash('Cashflow saved successfully!', 'success')
             return redirect(url_for('cashflows'))
         else:
-            transactions = db_fetchall("""
-                SELECT *
-                FROM transact t
-                INNER JOIN acct a
-                ON t.accountid = a.accountid
-                INNER JOIN category c
-                ON t.categoryid = c.categoryid
-                ORDER BY t.transactiondate DESC
-            """)
+            transactions = TransactController.get_transactions()
             return render_template('add_cashflow.html', 
                                    transactions=transactions, 
                                    cashflow_types=types)

@@ -63,24 +63,36 @@ class CategoryModel:
     
 class TransactModel:
     @staticmethod
-    def get_transactions(per_page, offset):
-        with get_db_connection() as conn:
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("""
-                           SELECT t.*, a.accountname, c.categoryname 
-                           FROM transact t
-                           JOIN acct a ON t.accountid = a.accountid
-                           JOIN category c ON t.CategoryID = c.CategoryID
-                           ORDER BY t.transactiondate DESC, t.transactionid DESC
-                           LIMIT %s OFFSET %s
-                           """, (per_page, offset))
-            transactions = cursor.fetchall()
-            
-            # Get total count for pagination
-            cursor.execute("SELECT COUNT(*) as total FROM transact")
-            total = cursor.fetchone()['total']
+    def get_transactions(per_page=None, offset=None):
+        if per_page and offset:
+            with get_db_connection() as conn:
+                cursor = conn.cursor(dictionary=True)
+                cursor.execute("""
+                    SELECT t.*, a.accountname, c.categoryname 
+                    FROM transact t
+                    JOIN acct a ON t.accountid = a.accountid
+                    JOIN category c ON t.Categoryid = c.Categoryid
+                    ORDER BY t.transactiondate DESC, t.transactionid DESC
+                    LIMIT %s OFFSET %s
+                """, (per_page, offset))
+                transactions = cursor.fetchall()
+                
+        else:
+            transactions = db_fetchall("""
+                SELECT *
+                FROM transact t
+                INNER JOIN acct a
+                ON t.accountid = a.accountid
+                INNER JOIN category c
+                ON t.categoryid = c.categoryid
+                ORDER BY t.transactiondate DESC
+            """)
 
-            return transactions, total
+
+        # Get total count for pagination
+        total = db_fetchone("SELECT COUNT(*) as total FROM transact")['total']
+
+        return transactions, total
         
 
     @staticmethod
@@ -136,3 +148,80 @@ class TransactModel:
                 WHERE transactionid = %s
             """, (amount, transaction_id)
         )
+
+
+class BudgetModel:
+    @staticmethod
+    def get_budgets(year, month):
+        with get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+            cursor.execute("""
+                           SELECT b.*, c.categoryname, c.type_
+                           FROM budget b
+                           JOIN category c ON b.categoryid = c.categoryid
+                           WHERE b.budget_year = %s AND b.budget_month = %s
+                           ORDER BY c.categoryname
+                           """, (year, month))
+            budgets = cursor.fetchall()
+            # Calculate actual spending for each budget
+            for budget in budgets:
+                cursor.execute("""
+                               SELECT COALESCE(SUM(amount), 0) as actual
+                               FROM transact t
+                               WHERE t.categoryid = %s 
+                               AND YEAR(t.transactiondate) = %s 
+                               AND MONTH(t.transactiondate) = %s
+                               """, (budget['categoryid'], year, month))
+                
+                # execute() returns dict with only key 'actual'
+                actual = cursor.fetchone()['actual']
+                budget['actual'] = actual
+
+            return budgets
+        
+    
+    @staticmethod
+    def add_budget(category_id, budget_year, budget_month, budget_amount):
+        db_commit(
+            """
+                INSERT INTO budget (categoryid, budget_year, 
+                budget_month, budget_amount) 
+                VALUES (%s, %s, %s, %s)
+                ON DUPLICATE KEY UPDATE budget_amount = %s
+            """,
+            (
+                category_id, budget_year, budget_month, budget_amount, 
+                budget_amount
+            )
+        )
+
+
+        
+class CashflowModel:
+    @staticmethod
+    def get_cashflows():
+        return db_fetchall("""
+            SELECT t.transactionid as expensetransactionid, 
+                a.accountname as expenseacct, c.categoryname as expensecat, 
+                t.transactiondate as expensedate, t.amount as expenseamount, 
+                t.dscr as expensedscr, r1.*, 
+                t2.transactionid as incometransactionid, 
+                a2.accountname as incomeacct, c2.categoryname as incomecat, 
+                t2.amount as incomeamount, t2.transactiondate as incomedate, 
+                t2.dscr as incomedscr
+            FROM transact t
+            JOIN acct a ON t.accountid = a.accountid
+            JOIN category c ON t.CategoryID = c.CategoryID
+            JOIN cashflow r1 on t.transactionid = r1.expense
+            JOIN transact t2 on r1.income = t2.transactionid
+            JOIN acct a2 on t2.accountid = a2.accountid
+            JOIN category c2 on t2.categoryid = c2.categoryid
+            ORDER BY t.transactiondate DESC, t.transactionid DESC;
+        """)
+
+    @staticmethod
+    def add_cashflow(expenseid, incomeid, type_):
+        db_commit("""
+            INSERT INTO cashflow (expense, income, type_) VALUES
+            (%s, %s, %s)
+        """, (expenseid, incomeid, type_))
