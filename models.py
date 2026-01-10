@@ -76,7 +76,7 @@ class TransactModel:
                     LIMIT %s OFFSET %s
                 """, (per_page, offset))
                 transactions = cursor.fetchall()
-                
+
         else:
             transactions = db_fetchall("""
                 SELECT *
@@ -85,7 +85,7 @@ class TransactModel:
                 ON t.accountid = a.accountid
                 INNER JOIN category c
                 ON t.categoryid = c.categoryid
-                ORDER BY t.transactiondate DESC
+                ORDER BY t.transactiondate DESC, t.transactionid DESC
             """)
 
 
