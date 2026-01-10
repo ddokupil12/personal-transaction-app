@@ -262,8 +262,8 @@ def edit_cashflow():
     return 'Hello world'
 
 @app.route('/verify', methods=['GET'])
-def verify_integrity():
+def verify():
     return 'Hello world'
 
 if __name__ == '__main__':
-    app.run(debug=app.config['DEBUG'])
+    app.run(debug=app.config['DEBUG'], port=app.config['PORT'])
