@@ -1,29 +1,29 @@
-import os
+from os import environ
 
 class Config:
     """Base configuration class"""
-    SECRET_KEY = os.environ.get('SECRET_KEY')
+    SECRET_KEY = environ.get('SECRET_KEY')
     DEBUG = True
+    PORT = environ.get('PORT')
     
     # Database configuration
     DB_CONFIG = {
-        'host': os.environ.get('DB_HOST'), # or 'localhost',
-        'database': os.environ.get('DB_NAME'), # or 'budget_db',
-        'user': os.environ.get('DB_USER'), # or 'your_username',
-        'password': os.environ.get('DB_PASSWORD'), # or 'your_password',
-        'port': int(os.environ.get('DB_PORT', 3306))
+        'host': environ.get('DB_HOST'),
+        'database': environ.get('DB_NAME'),
+        'user': environ.get('DB_USER'),
+        'password': environ.get('DB_PASSWORD'),
+        'port': int(environ.get('DB_PORT', 3306))
     }
 
 class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
-    # In production, these should come from environment variables
     DB_CONFIG = {
-        'host': os.environ.get('DB_HOST'),
-        'database': os.environ.get('DB_NAME'),
-        'user': os.environ.get('DB_USER'),
-        'password': os.environ.get('DB_PASSWORD'),
-        'port': int(os.environ.get('DB_PORT', 3306))
+        'host': environ.get('DB_HOST'),
+        'database': environ.get('DB_NAME'),
+        'user': environ.get('DB_USER'),
+        'password': environ.get('DB_PASSWORD'),
+        'port': int(environ.get('DB_PORT', 3306))
     }
 
 # Configuration dictionary
