@@ -60,7 +60,7 @@ class CatController:
     
 class TransactController:
     @staticmethod
-    def transactions(per_page, offset):
+    def transactions(per_page=None, offset=None):
         return TransactModel.get_transactions(per_page, offset)
     
     @staticmethod
@@ -111,13 +111,17 @@ class BudgetController:
                     budget['remaining'] = budget['budget_amount'] + absActual
                 else:
                     totalSpent += absActual
+                    budget['actual'] = absActual
+
             else:
                 budgetIncome += budget['budget_amount']
-            
-            summary = {'total_budgeted': budgetSpending,
-                    'total_spent': totalSpent,
-                    'total_remaining': budgetSpending - totalSpent
-                    }
+                budget['actual'] = absActual
+
+
+        summary = {'total_budgeted': budgetSpending,
+                'total_spent': totalSpent,
+                'total_remaining': budgetSpending - totalSpent
+                }
             
         return budgets, summary
         
