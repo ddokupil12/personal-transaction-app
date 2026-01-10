@@ -33,7 +33,7 @@ def accounts():
         accounts = AcctController.accounts()
         return render_template('accounts.html', accounts=accounts)
     except Exception as e:
-        logError('Error loading accounts')
+        logError('Error loading accounts', e)
         return render_template('accounts.html', accounts=[])
 
 @app.route('/accounts/add', methods=['GET', 'POST'])
@@ -47,7 +47,7 @@ def add_account():
             flash('Account added successfully!', 'success')
             return redirect(url_for('accounts'))
         except Exception as e:
-            logError('Error adding account')
+            logError('Error adding account', e)
     
     return render_template('add_account.html')
 
@@ -68,7 +68,7 @@ def edit_account():
             return render_template('edit_account.html', account=account)        
 
     except Exception as e:
-        logError('Error editing account')
+        logError('Error editing account', e)
         return render_template('edit_account.html', account=None) 
 
 @app.route('/categories')
@@ -78,7 +78,7 @@ def categories():
         categories = CatController.categories()
         return render_template('categories.html', categories=categories)
     except Exception as e:
-        logError('Error loading categories')
+        logError('Error loading categories', e)
         return render_template('categories.html', categories=[])
 
 @app.route('/categories/add', methods=['GET', 'POST'])
@@ -92,7 +92,7 @@ def add_category():
             flash('Category added successfully!', 'success')
             return redirect(url_for('categories'))
         except Exception as e:
-            logError('Error adding category')
+            logError('Error adding category', e)
     
     return render_template('add_category.html')
 
@@ -112,7 +112,7 @@ def transactions():
                                has_next=has_next, 
                                has_prev=has_prev)
     except Exception as e:
-        logError('Error loading transactions')
+        logError('Error loading transactions', e)
         return render_template('transactions.html', transactions=[], page=1, 
                                has_next=False, has_prev=False)
 
@@ -144,7 +144,7 @@ def add_transaction():
         return render_template('add_transaction.html', accounts=[], 
                                 categories=[], datetime=datetime)
     except Exception as e:
-        logError(errorMessage)
+        logError(errorMessage, e)
         return render_template('add_transaction.html', accounts=[], 
                                categories=[], datetime=datetime)
     
@@ -178,7 +178,7 @@ def edit_transaction():
         return render_template('add_transaction.html', accounts=[], 
                                 categories=[], datetime=datetime)
     except Exception as e:
-        logError('Error editing transaction')
+        logError('Error editing transaction', e)
         return render_template('edit_transaction.html', transaction=None, 
                                datetime=datetime, accounts=[], categories=[])
         
@@ -193,7 +193,7 @@ def budgets():
         return render_template('budgets.html', budgets=budgets, year=year, 
                                month=month, datetime=datetime, summary=summary)
     except Exception as e:
-        logError('Error loading budgets')
+        logError('Error loading budgets', e)
         return render_template('budgets.html', budgets=[], year=now.year, 
                                month=now.month, datetime=datetime, abs=abs)
 
@@ -219,7 +219,7 @@ def add_budget():
                                    datetime=datetime)
         
     except Exception as e:
-        logError(errorMessage)
+        logError(errorMessage, e)
         return render_template('add_budget.html', categories=[], 
                                 datetime=datetime)    
     
@@ -231,8 +231,7 @@ def cashflows():
         cashflows = CashflowController.cashflows()
         return render_template('cashflows.html', cashflows=cashflows)
     except Exception as e:
-        flash('Error loading cashflows', 'error')
-        print("err:", e)
+        logError('Error loading cashflows', e)
         return render_template('cashflows.html', cashflows=[])
 
 @app.route('/cashflows/add', methods=['GET', 'POST'])
@@ -247,13 +246,13 @@ def add_cashflow():
             flash('Cashflow saved successfully!', 'success')
             return redirect(url_for('cashflows'))
         else:
-            transactions = TransactController.get_transactions()
+            transactions = TransactController.transactions()
             return render_template('add_cashflow.html', 
                                    transactions=transactions, 
                                    cashflow_types=types)
         
     except Exception as e:
-        logError('Error adding cashflow')
+        logError('Error adding cashflow', e)
         return render_template('add_cashflow.html', transactions=[], 
                                cashflow_types=types)
 
