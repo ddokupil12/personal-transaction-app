@@ -1,6 +1,6 @@
-# context.py
-from config import config
 from flask import Flask
+
+from config import config
 
 config_name = 'development'
 app = Flask(__name__)

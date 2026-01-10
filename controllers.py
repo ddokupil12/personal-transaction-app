@@ -2,7 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 
 from models import AccountModel, CategoryModel, TransactModel, BudgetModel, CashflowModel
-from db import db_fetchall, db_commit, get_db_connection
+from db import db_fetchall
 
 class GeneralController:
     @staticmethod
