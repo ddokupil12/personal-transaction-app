@@ -15,15 +15,8 @@
                     <form method="POST">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="categoryid" class="form-label">Category</label>
-                                <select class="form-select" id="categoryid" name="categoryid" required>
-                                    <option value="">Select category...</option>
-                                    {% for category in categories %}
-                                        <option value="{{ category.categoryid }}">{{ category.categoryname }}</option>
-                                    {% endfor %}
-                                </select>
+                                {% include 'category_select.html' %}
                             </div>
-                            
                             <div class="col-md-6 mb-3">
                                 <label for="budget_amount" class="form-label">Budget Amount</label>
                                 <div class="input-group">
