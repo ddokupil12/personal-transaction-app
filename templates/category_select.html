@@ -1,7 +1,7 @@
 <label for="categoryid" class="form-label">Category</label>
 <select class="form-select" id="categoryid" name="categoryid" required>
-    <option value="">Select category...</option>
+    <option value="" >Select category...</option>
     {% for category in categories %}
-        <option value="{{ category.categoryid }}">{{ category.categoryname }} ({{ category.type_ }})</option>
+        <option value="{{ category.categoryid }}" {%if transaction and category.categoryid == transaction.categoryid %} selected {% endif %}>{{ category.categoryname }} ({{ category.type_ }})</option>
     {% endfor %}
 </select>
