@@ -135,18 +135,17 @@ def add_transaction():
             errorMessage = 'Error loading form data'
             accounts = AcctController.accounts(balance=False)
             categories = CatController.categories()
-            return render_template('add_transaction.html', accounts=accounts, 
-                                   categories=categories, datetime=datetime)
+            return render_template('edit_transaction.html', accounts=accounts, 
+                                   categories=categories, datetime=datetime, mode='Add')
 
     except AssertionError as e:
-        flash(e, 'error')
-        print('AssertionError:', e)
-        return render_template('add_transaction.html', accounts=[], 
-                                categories=[], datetime=datetime)
+        logError(e, e)
+        return render_template('edit_transaction.html', accounts=[], 
+                                categories=[], datetime=datetime, mode='Add')
     except Exception as e:
         logError(errorMessage, e)
-        return render_template('add_transaction.html', accounts=[], 
-                               categories=[], datetime=datetime)
+        return render_template('edit_transaction.html', accounts=[], 
+                               categories=[], datetime=datetime, mode='Add')
     
 @app.route('/transactions/edit', methods=['GET', 'POST'])
 def edit_transaction():
@@ -173,9 +172,8 @@ def edit_transaction():
                                    transaction=transaction, datetime=datetime, 
                                    accounts=accounts, categories=categories)
     except AssertionError as e:
-        flash(e, 'error')
-        print('err:', e)
-        return render_template('add_transaction.html', accounts=[], 
+        logError(e, e)
+        return render_template('edit_transaction.html', accounts=[], 
                                 categories=[], datetime=datetime)
     except Exception as e:
         logError('Error editing transaction', e)
