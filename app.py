@@ -49,7 +49,7 @@ def add_account():
         except Exception as e:
             logError('Error adding account', e)
     
-    return render_template('add_account.html')
+    return render_template('add_edit_account.html', mode='Add')
 
 @app.route('/accounts/edit', methods=['GET', 'POST'])
 def edit_account():
@@ -65,11 +65,11 @@ def edit_account():
         else:
             account_id = request.args['id']
             account = AcctController.get_account(account_id)
-            return render_template('edit_account.html', account=account)        
+            return render_template('add_edit_account.html', account=account, mode='Edit')
 
     except Exception as e:
         logError('Error editing account', e)
-        return render_template('edit_account.html', account=None) 
+        return render_template('add_edit_account.html', account=None, mode='Edit')
 
 @app.route('/categories')
 def categories():
