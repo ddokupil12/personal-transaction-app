@@ -22,7 +22,7 @@ def dashboard():
         return render_template('dashboard.html', accounts=accounts, 
                                recent_transactions=recent_transactions)
     except Exception as e:
-        logError('Error loading dashboard')
+        logError('Error loading dashboard', e)
         return render_template('dashboard.html', accounts=[], 
                                recent_transactions=[])
 
@@ -206,7 +206,7 @@ def add_budget():
             category_id = request.form['categoryid']
             budget_year = request.form['budget_year']
             budget_month = request.form['budget_month']
-            budget_amount = request.form['budget_amount']
+            budget_amount = request.form['amount']
             BudgetController.add_budget(category_id, budget_year, budget_month, 
                                         budget_amount)
             flash('Budget saved successfully!', 'success')
