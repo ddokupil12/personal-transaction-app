@@ -3,7 +3,12 @@ import traceback
 
 from flask import render_template, request, redirect, url_for, flash
 
-from controllers import GeneralController, AcctController, CatController, TransactController, BudgetController, CashflowController
+from controllers.acct_controller import AcctController
+from controllers.budget_controller import BudgetController
+from controllers.cashflow_controller import CashflowController
+from controllers.cat_controller import CatController
+from controllers.general_controller import GeneralController
+from controllers.transact_controller import TransactController
 from context import app
 
 ##### Helper functions
