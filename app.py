@@ -1,10 +1,19 @@
 from datetime import datetime
+import traceback
 
 from flask import render_template, request, redirect, url_for, flash
 
 from controllers import GeneralController, AcctController, CatController, TransactController, BudgetController, CashflowController
-from context import app, logError
+from context import app
 
+##### Helper functions
+def logError(message, e):
+    flash(message, 'error')
+    print('err:', e)
+    traceback.print_exc()
+
+
+##### Routes
 @app.route('/')
 def dashboard():
     """Main dashboard showing accounts and recent transactions"""
