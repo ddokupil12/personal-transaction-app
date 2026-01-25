@@ -102,6 +102,17 @@ class TransactModel:
                            FROM transact 
                            WHERE transactionid = %s
                            """, [transaction_id])
+    
+    @staticmethod
+    def get_recent_transactions():
+        return db_fetchall("""
+            SELECT t.*, a.accountname, c.categoryname 
+            FROM transact t
+            JOIN acct a ON t.accountid = a.accountid
+            JOIN category c ON t.CategoryID = c.CategoryID
+            ORDER BY t.TransactionDate DESC, t.TransactionID DESC
+            LIMIT 10
+        """)
         
     @staticmethod
     def add_transaction(account_id, category_id, amount, transaction_date, 

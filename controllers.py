@@ -15,14 +15,7 @@ class GeneralController:
             account['balance'] = AccountModel.get_account_balance(account['accountid'])
         
         # Get recent transactions
-        recent_transactions = db_fetchall("""
-            SELECT t.*, a.accountname, c.categoryname 
-            FROM transact t
-            JOIN acct a ON t.accountid = a.accountid
-            JOIN category c ON t.CategoryID = c.CategoryID
-            ORDER BY t.TransactionDate DESC, t.TransactionID DESC
-            LIMIT 10
-        """)
+        recent_transactions = TransactModel.get_recent_transactions()
         return (accounts, recent_transactions)
     
 class AcctController:
