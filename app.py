@@ -17,6 +17,9 @@ def logError(message, e):
     print('err:', e)
     traceback.print_exc()
 
+def logSuccess(message, rte):
+    flash(message, 'success')
+    return redirect(rte)
 
 ##### Routes
 @app.route('/')
@@ -49,8 +52,8 @@ def add_account():
             name = request.form['accountname']
             account_type = request.form['accounttype']
             AcctController.add_account(name, account_type)
-            flash('Account added successfully!', 'success')
-            return redirect(url_for('accounts'))
+            message = 'Account saved successfully!'
+            return logSuccess(message, url_for('accounts'))
         except Exception as e:
             logError('Error adding account', e)
     
@@ -65,8 +68,8 @@ def edit_account():
             account_name = request.form['accountname']
             account_type = request.form['accounttype']
             AcctController.edit_account(account_id, account_name, account_type)
-            flash('Account edited successfully!', 'success')
-            return redirect(url_for('accounts'))
+            message = 'Account edited successfully!'
+            return logSuccess(message, url_for('accounts'))
         else:
             account_id = request.args['id']
             account = AcctController.get_account(account_id)
@@ -94,8 +97,7 @@ def add_category():
             name = request.form['categoryname']
             cat_type = request.form['type_']
             CatController.add_category(name, cat_type)
-            flash('Category added successfully!', 'success')
-            return redirect(url_for('categories'))
+            logSuccess('Category saved successfully!', url_for('categories'))
         except Exception as e:
             logError('Error adding category', e)
     
@@ -138,8 +140,8 @@ def add_transaction():
             dscr = request.form['dscr']
             TransactController.add_transaction(account_id, category_id, amount, 
                                                transaction_date, dscr)
-            flash('Transaction added successfully!', 'success')
-            return redirect(url_for('transactions'))
+            message = 'Transaction saved successfully!'
+            logSuccess(message, url_for('transactions'))
         else:
             errorMessage = 'Error loading form data'
             accounts = AcctController.accounts(balance=False)
@@ -170,8 +172,8 @@ def edit_transaction():
                                                 amount, transaction_date, dscr, 
                                                 transaction_id
                                                 )
-            flash('Transaction edited successfully!', 'success')
-            return redirect(url_for('transactions')) 
+            message = 'Transaction edited successfully!'
+            logSuccess(message, url_for('transactions'))
         else:
             transaction_id = request.args['id']
             accounts = AcctController.accounts(balance=False)
@@ -216,9 +218,8 @@ def add_budget():
             budget_amount = request.form['amount']
             BudgetController.add_budget(category_id, budget_year, budget_month, 
                                         budget_amount)
-            flash('Budget saved successfully!', 'success')
-            return redirect(url_for('budgets', year=budget_year, 
-                                    month=budget_month))
+            logSuccess('Budget saved successfully!', 
+                       url_for('budgets', year=budget_year, month=budget_month))
         else:
             errorMessage = 'Error loading categories'
             categories = CatController.categories()
@@ -254,8 +255,7 @@ def add_cashflow():
             expenseid = request.form['expenseid']
             type_ = request.form['type']
             CashflowController.add_cashflow(expenseid, incomeid, type_)
-            flash('Cashflow saved successfully!', 'success')
-            return redirect(url_for('cashflows'))
+            logSuccess('Cashflow saved successfully!', url_for('cashflows'))
         else:
             transactions = TransactController.transactions()
             return render_template('add_edit_cashflow.html', 
