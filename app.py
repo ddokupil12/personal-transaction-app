@@ -99,7 +99,11 @@ def add_category():
         except Exception as e:
             logError('Error adding category', e)
     
-    return render_template('add_category.html')
+    return render_template('add_edit_category.html')
+
+@app.route('/categories/edit', methods=['GET', 'POST'])
+def edit_category():
+    return 'Hello World'
 
 @app.route('/transactions')
 def transactions():
@@ -218,14 +222,18 @@ def add_budget():
         else:
             errorMessage = 'Error loading categories'
             categories = CatController.categories()
-            return render_template('add_budget.html', categories=categories, 
+            return render_template('add_edit_budget.html', categories=categories, 
                                    datetime=datetime)
         
     except Exception as e:
         logError(errorMessage, e)
-        return render_template('add_budget.html', categories=[], 
+        return render_template('add_edit_budget.html', categories=[], 
                                 datetime=datetime)    
     
+
+@app.route('/budgets/edit', methods=['GET', 'POST'])
+def edit_budget():
+    return 'Hello World'
     
 @app.route('/cashflows')
 def cashflows():
@@ -250,13 +258,13 @@ def add_cashflow():
             return redirect(url_for('cashflows'))
         else:
             transactions = TransactController.transactions()
-            return render_template('add_cashflow.html', 
+            return render_template('add_edit_cashflow.html', 
                                    transactions=transactions, 
                                    cashflow_types=types)
         
     except Exception as e:
         logError('Error adding cashflow', e)
-        return render_template('add_cashflow.html', transactions=[], 
+        return render_template('add_edit_cashflow.html', transactions=[], 
                                cashflow_types=types)
 
 # Before doing this method, the code needs to be abstracted
