@@ -13,15 +13,20 @@ from context import app
 
 ##### Helper functions
 def logError(message, e):
+    """Sends an error message to the top of the screen"""
+    """and logs the traceback"""
     flash(message, 'error')
     print('err:', e)
     traceback.print_exc()
 
 def logSuccess(message, rte, **kwargs):
+    """Sends a success message to the top of the screen """
+    """and redirects to `rte`"""
     flash(message, 'success')
     return redirect(url_for(rte, **kwargs))
 
 def checkLogAssertionErr(message, e):
+    """Changes message if there's an AssertionError"""
     if isinstance(e, AssertionError):
         message = 'Date must not be in the future'
 
@@ -112,6 +117,8 @@ def add_category():
 
 @app.route('/categories/edit', methods=['GET', 'POST'])
 def edit_category():
+    """Edit a selected category"""
+    """For future implementation"""
     return 'Hello World'
 
 @app.route('/transactions')
@@ -160,6 +167,7 @@ def add_transaction():
     
 @app.route('/transactions/edit', methods=['GET', 'POST'])
 def edit_transaction():
+    """Edit a selected transaction"""
     try:
         if request.method == 'POST':
             errorMessage = 'Error editing transaction'
@@ -184,8 +192,11 @@ def edit_transaction():
                                    transaction=transaction, datetime=datetime, 
                                    accounts=accounts, categories=categories)
 
-    except Exception as e:
-        checkLogAssertionErr(errorMessage, e) 
+    except Exception as e: 
+        
+        # An AssertionError will be raised if the date is in the future
+        checkLogAssertionErr(errorMessage, e)
+
         return render_template('add_edit_transaction.html', transaction=None, 
                                datetime=datetime, accounts=[], categories=[])
         
@@ -232,6 +243,11 @@ def add_budget():
 
 @app.route('/budgets/edit', methods=['GET', 'POST'])
 def edit_budget():
+    """Edit a selected budget"""
+    """For future implementation"""
+    # This functionality exists in add_budget(). If you try to add 
+    # a budget with a category that already has a budget, the existing 
+    # budget will be updated.
     return 'Hello World'
     
 @app.route('/cashflows')
@@ -246,6 +262,7 @@ def cashflows():
 
 @app.route('/cashflows/add', methods=['GET', 'POST'])
 def add_cashflow():
+    """Add new cashflow"""
     types = CashflowController.get_cashflow_types()
     try:
         if request.method == 'POST':
@@ -268,10 +285,14 @@ def add_cashflow():
 # Before doing this method, the code needs to be abstracted
 @app.route('/cashflows/edit', methods=['GET', 'POST'])
 def edit_cashflow():
+    """Edit a selected cashflow"""
+    """For future implementation"""
     return 'Hello world'
 
 @app.route('/verify', methods=['GET'])
 def verify():
+    """Verify that the sum of all account transfers is 0 and that all"""
+    """cashflows have 2 equal sides"""
     return 'Hello world'
 
 if __name__ == '__main__':
