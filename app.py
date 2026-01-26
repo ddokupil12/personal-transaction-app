@@ -161,7 +161,10 @@ def add_transaction():
                                    datetime=datetime, mode='Add')
 
     except Exception as e:
+             
+        # An AssertionError will be raised if the date is in the future
         checkLogAssertionErr(errorMessage, e)
+
         return render_template('add_edit_transaction.html', accounts=[], 
                                categories=[], datetime=datetime, mode='Add')
     
