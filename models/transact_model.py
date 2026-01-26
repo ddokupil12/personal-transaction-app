@@ -63,7 +63,7 @@ class TransactModel:
                 VALUES (%s, %s, %s, %s, %s)
             """, 
             (
-                account_id, category_id,amount, transaction_date, 
+                account_id, category_id, amount, transaction_date, 
                 description
             )
         )

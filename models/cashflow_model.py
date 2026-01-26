@@ -25,6 +25,6 @@ class CashflowModel:
     @staticmethod
     def add_cashflow(expenseid, incomeid, type_):
         db_commit("""
-            INSERT INTO cashflow (expense, income, type_) VALUES
-            (%s, %s, %s)
+            INSERT INTO cashflow (expense, income, type_) 
+            VALUES (%s, %s, %s)
         """, (expenseid, incomeid, type_))

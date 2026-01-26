@@ -14,12 +14,8 @@ class TransactController:
 
     @staticmethod
     def check_date(transaction_date):
-        try:
-            dateObj = datetime.strptime(transaction_date, '%Y-%m-%d').date()
-            assert dateObj <= datetime.today().date()
-        except AssertionError:
-            message = 'Date must not be in the future'
-            raise AssertionError(message)
+        dateObj = datetime.strptime(transaction_date, '%Y-%m-%d').date()
+        assert dateObj <= datetime.today().date()
 
     @classmethod
     def add_transaction(cls, account_id, category_id, amount, transaction_date,
