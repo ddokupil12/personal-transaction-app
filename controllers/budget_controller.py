@@ -59,8 +59,10 @@ class BudgetController:
             budget_year is not in the 2020s
         """
         budget_amount = Decimal(amount)
-        assert amount != 0
-        assert budget_month >= 1 and budget_month <= 12
-        assert budget_year >= 2020 and budget_year <= 2030
+        assert amount != 0, 'amount must be nonzero'
+        budget_month_msg = 'month must be between 1-12'
+        assert budget_month >= 1 and budget_month <= 12, budget_month_msg
+        budget_year_msg = 'year must be between 2020-2030'
+        assert budget_year >= 2020 and budget_year <= 2030, budget_year_msg
         BudgetModel.add_budget(category_id, budget_year, budget_month, 
                                budget_amount)

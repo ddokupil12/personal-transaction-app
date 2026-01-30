@@ -43,7 +43,7 @@ def logSuccess(message, rte, **kwargs):
 
 def checkLogAssertionErr(message, e):
     """
-    Changes error message if there's an AssertionError
+    Changes the error message if there's an AssertionError
     
     :param message: str (the message to show)
     :param e: Exception (the exception that was raised)
@@ -53,7 +53,7 @@ def checkLogAssertionErr(message, e):
     Raises: TypeError (see `logError()`)
     """
     if isinstance(e, AssertionError):
-        message = 'Date must not be in the future'
+        message = e
 
     logError(message, e)
 

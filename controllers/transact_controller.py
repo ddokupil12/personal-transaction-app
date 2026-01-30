@@ -22,7 +22,8 @@ class TransactController:
         Raises: AssertionError when `transaction_date` is in the future
         """
         dateObj = datetime.strptime(transaction_date, '%Y-%m-%d').date()
-        assert dateObj <= datetime.today().date()
+        currentDate = datetime.today().date()
+        assert dateObj <= currentDate, 'Date must not be in the future'
 
     @classmethod
     def add_transaction(cls, account_id, category_id, amount, transaction_date,
@@ -43,7 +44,7 @@ class TransactController:
             transaction date is in the future
         """
         cls.check_date(transaction_date)
-        assert amount != 0
+        assert amount != 0, 'amount must be nonzero'
         TransactModel.add_transaction(account_id, category_id, Decimal(amount),
                                       transaction_date, description)
         
