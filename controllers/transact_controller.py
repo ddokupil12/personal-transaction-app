@@ -37,8 +37,6 @@ class TransactController:
         :param transaction_date: date
         :param description: str
 
-        Returns: None
-
         Raises AssertionError if:
             amount == 0
             transaction date is in the future

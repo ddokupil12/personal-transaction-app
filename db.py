@@ -58,7 +58,6 @@ def db_fetchall(*args):
 def db_fetchone(*args):
     return db_fetch(all=False, *args)
     
-
 def db_commit(*args):
     """
     Docstring for db_commit

@@ -7,10 +7,13 @@ class GeneralController:
         """Main dashboard showing accounts and recent transactions"""
         accounts = AccountModel.get_accounts()
         
-        # Add balance to each account
-        for account in accounts:
-            account['balance'] = AccountModel.get_account_balance(account['accountid'])
+        for account in accounts: # Add balance to each account
+            balance = AccountModel.get_account_balance(account['accountid'])
+            account['balance'] = balance
         
         # Get recent transactions
-        recent_transactions, _ = TransactModel.get_transactions(limit, return_total=False)
-        return (accounts, recent_transactions)
+        recent_transactions, _ = TransactModel.get_transactions(
+            limit, 
+            return_total=False
+        )
+        return accounts, recent_transactions

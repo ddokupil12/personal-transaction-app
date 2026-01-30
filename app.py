@@ -48,8 +48,6 @@ def checkLogAssertionErr(message, e):
     :param message: str (the message to show)
     :param e: Exception (the exception that was raised)
 
-    Returns: None
-
     Raises: TypeError (see `logError()`)
     """
     if isinstance(e, AssertionError):
