@@ -3,6 +3,12 @@ from models.account_model import AccountModel
 class AcctController:
     @staticmethod
     def accounts(balance=True):
+        """
+        Controller for returning all current accounts from the database
+        
+        :param balance: bool | True
+            Determines whether each account balance is returned
+        """
         accounts = AccountModel.get_accounts()
         if balance:
             for account in accounts:
