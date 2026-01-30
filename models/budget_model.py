@@ -24,8 +24,7 @@ class BudgetModel:
                                """, (budget['categoryid'], year, month))
                 
                 # execute() returns dict with only key 'actual'
-                actual = cursor.fetchone()['actual']
-                budget['actual'] = actual
+                budget['actual'] = cursor.fetchone()['actual']
 
             return budgets
         
