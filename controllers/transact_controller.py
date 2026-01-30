@@ -43,6 +43,7 @@ class TransactController:
             transaction date is in the future
         """
         cls.check_date(transaction_date)
+        assert amount != 0
         TransactModel.add_transaction(account_id, category_id, Decimal(amount),
                                       transaction_date, description)
         
