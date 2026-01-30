@@ -25,6 +25,10 @@ def db_fetchall(*args):
         if len(args) == 1:
             query = args[0]
             cursor.execute(query)
+        elif len(args) == 2:
+            query = args[0]
+            dbArgs = args[1]
+            cursor.execute(query, dbArgs)
         else:
             raise ValueError("Can't accept multiple queries or arguments")
         
