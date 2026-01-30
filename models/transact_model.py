@@ -4,7 +4,6 @@ class TransactModel:
     @staticmethod
     def get_transactions(per_page=None, offset=0, return_total=True):
         if per_page is not None:
-            print('if true')
             transactions = db_fetchall("""
                 SELECT t.*, a.accountname, c.categoryname 
                 FROM transact t
@@ -13,9 +12,7 @@ class TransactModel:
                 ORDER BY t.transactiondate DESC, t.transactionid DESC
                 LIMIT %s OFFSET %s
             """, (per_page, offset))
-
         else:
-            print('if false')
             transactions = db_fetchall("""
                 SELECT *
                 FROM transact t
