@@ -3,7 +3,7 @@ from models.transact_model import TransactModel
 
 class GeneralController:
     @staticmethod
-    def dashboard():
+    def dashboard(limit):
         """Main dashboard showing accounts and recent transactions"""
         accounts = AccountModel.get_accounts()
         
@@ -12,5 +12,5 @@ class GeneralController:
             account['balance'] = AccountModel.get_account_balance(account['accountid'])
         
         # Get recent transactions
-        recent_transactions = TransactModel.get_recent_transactions()
+        recent_transactions = TransactModel.get_transactions(limit)
         return (accounts, recent_transactions)

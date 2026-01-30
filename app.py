@@ -62,7 +62,8 @@ def checkLogAssertionErr(message, e):
 def dashboard():
     """Main dashboard showing accounts and recent transactions"""
     try:
-        accounts, recent_transactions = GeneralController.dashboard()
+        limit = 10 # limit the recent transactions
+        accounts, recent_transactions = GeneralController.dashboard(limit)
         return render_template('dashboard.html', accounts=accounts, 
                                recent_transactions=recent_transactions)
     except Exception as e:

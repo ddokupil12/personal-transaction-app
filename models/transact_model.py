@@ -2,8 +2,9 @@ from db import db_fetchone, db_fetchall, db_commit, get_db_connection
 
 class TransactModel:
     @staticmethod
-    def get_transactions(per_page=None, offset=None):
-        if per_page and offset:
+    def get_transactions(per_page=None, offset=0):
+        if per_page is not None:
+            print('if true')
             with get_db_connection() as conn:
                 cursor = conn.cursor(dictionary=True)
                 cursor.execute("""
@@ -17,6 +18,7 @@ class TransactModel:
                 transactions = cursor.fetchall()
 
         else:
+            print('if false')
             transactions = db_fetchall("""
                 SELECT *
                 FROM transact t
@@ -41,18 +43,7 @@ class TransactModel:
                            FROM transact 
                            WHERE transactionid = %s
                            """, [transaction_id])
-    
-    @staticmethod
-    def get_recent_transactions():
-        return db_fetchall("""
-            SELECT t.*, a.accountname, c.categoryname 
-            FROM transact t
-            JOIN acct a ON t.accountid = a.accountid
-            JOIN category c ON t.CategoryID = c.CategoryID
-            ORDER BY t.TransactionDate DESC, t.TransactionID DESC
-            LIMIT 10
-        """)
-        
+
     @staticmethod
     def add_transaction(account_id, category_id, amount, transaction_date, 
                         description):
