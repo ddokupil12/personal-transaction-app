@@ -52,11 +52,9 @@ def db_fetch(all=True, *args):
         else:
             return cursor.fetchone()
 
-def db_fetchall(*args):
-    return db_fetch(all=True, *args)
+def db_fetchall(*args): return db_fetch(all=True, *args)
     
-def db_fetchone(*args):
-    return db_fetch(all=False, *args)
+def db_fetchone(*args): return db_fetch(all=False, *args)
     
 def db_commit(*args):
     """
