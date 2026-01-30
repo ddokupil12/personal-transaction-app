@@ -59,5 +59,8 @@ class BudgetController:
             budget_year is not in the 2020s
         """
         budget_amount = Decimal(amount)
+        assert amount != 0
+        assert budget_month >= 1 and budget_month <= 12
+        assert budget_year >= 2020 and budget_year <= 2030
         BudgetModel.add_budget(category_id, budget_year, budget_month, 
                                budget_amount)
