@@ -13,20 +13,45 @@ from context import app
 
 ##### Helper functions
 def logError(message, e):
-    """Sends an error message to the top of the screen"""
-    """and logs the traceback"""
+    """
+    Sends an error message to the top of the screen and logs the traceback
+    
+    :param message: str (message to show)
+    :param e: Exception (the Exception that was raised)
+    """
+    if isinstance(e, Exception) is False:
+        raise TypeError("`e' must be an Exception")
+    
     flash(message, 'error')
     print('err:', e)
     traceback.print_exc()
 
 def logSuccess(message, rte, **kwargs):
-    """Sends a success message to the top of the screen """
-    """and redirects to `rte`"""
+    """
+    Sends a success message to the top of the screen and redirects to 
+    `rte`
+    
+    :param message: str (message to show at the top of the screen)
+    :param rte: str (where to redirect the user)
+    :param kwargs: any (passed to `url_for()`)
+
+    Returns:
+    Response (flask.Flask.redirect)
+    """
     flash(message, 'success')
     return redirect(url_for(rte, **kwargs))
 
 def checkLogAssertionErr(message, e):
-    """Changes message if there's an AssertionError"""
+    """
+    Changes error message if there's an AssertionError
+    
+    :param message: str (the message to show)
+    :param e: Exception (the exception that was raised)
+
+    Returns: None
+
+    Raises: TypeError (see `logError()`)
+    """
     if isinstance(e, AssertionError):
         message = 'Date must not be in the future'
 
@@ -57,7 +82,17 @@ def accounts():
 
 @app.route('/accounts/add', methods=['GET', 'POST'])
 def add_account():
-    """Add new account"""
+    """
+    Add new account
+    
+    Method parameters: None
+
+    GET request parameters: None
+
+    POST request parameters:
+    accountname: str
+    accounttype: str
+    """
     if request.method == 'POST':
         try:
             name = request.form['accountname']
@@ -117,8 +152,10 @@ def add_category():
 
 @app.route('/categories/edit', methods=['GET', 'POST'])
 def edit_category():
-    """Edit a selected category"""
-    """For future implementation"""
+    """
+    Edit a selected category
+    For future implementation
+    """
     return 'Hello World'
 
 @app.route('/transactions')
@@ -140,7 +177,31 @@ def transactions():
 
 @app.route('/transactions/add', methods=['GET', 'POST'])
 def add_transaction():
-    """Add new transaction"""
+    """
+    Add new transaction
+    
+    Method parameters: None
+
+    GET request parameters: None
+
+    POST request parameters:
+    accountid: int
+    categoryid: int
+    amount: Decimal
+    transactiondate: date
+    dscr: str
+
+    Returns:
+    Error: str (HTML)
+    GET request: str (HTML)
+    POST request: Redirect
+
+    Raises: 
+    GET request: None
+    POST request: 
+        AssertionError from `TransactController.check_date()` when 
+        `transactiondate` is in the future
+    """
     try:
         if request.method == 'POST':
             errorMessage = 'Error adding transaction'
@@ -161,16 +222,37 @@ def add_transaction():
                                    datetime=datetime, mode='Add')
 
     except Exception as e:
-             
-        # An AssertionError will be raised if the date is in the future
         checkLogAssertionErr(errorMessage, e)
-
         return render_template('add_edit_transaction.html', accounts=[], 
                                categories=[], datetime=datetime, mode='Add')
     
 @app.route('/transactions/edit', methods=['GET', 'POST'])
 def edit_transaction():
-    """Edit a selected transaction"""
+    """
+    Edit a selected transaction
+
+    Method parameters: None
+
+    GET request parameters: None
+
+    POST request parameters:
+    accountid: int
+    categoryid: int
+    amount: Decimal
+    transactiondate: date
+    dscr: str
+
+    Returns:
+    Error: str (HTML)
+    GET request: str (HTML)
+    POST request: Redirect
+
+    Raises: 
+    GET request: None
+    POST request: 
+        AssertionError from `TransactController.check_date()` when 
+        `transactiondate` is in the future
+    """
     try:
         if request.method == 'POST':
             errorMessage = 'Error editing transaction'
@@ -195,9 +277,7 @@ def edit_transaction():
                                    transaction=transaction, datetime=datetime, 
                                    accounts=accounts, categories=categories)
 
-    except Exception as e: 
-        
-        # An AssertionError will be raised if the date is in the future
+    except Exception as e:
         checkLogAssertionErr(errorMessage, e)
 
         return render_template('add_edit_transaction.html', transaction=None, 
@@ -220,7 +300,9 @@ def budgets():
 
 @app.route('/budgets/add', methods=['GET', 'POST'])
 def add_budget():
-    """Add new budget"""
+    """
+    Add new budget
+    """
     try:
         if request.method == 'POST':
             errorMessage = 'Error adding budget'
@@ -246,8 +328,10 @@ def add_budget():
 
 @app.route('/budgets/edit', methods=['GET', 'POST'])
 def edit_budget():
-    """Edit a selected budget"""
-    """For future implementation"""
+    """
+    Edit a selected budget
+    For future implementation
+    """
     # This functionality exists in add_budget(). If you try to add 
     # a budget with a category that already has a budget, the existing 
     # budget will be updated.
@@ -288,14 +372,19 @@ def add_cashflow():
 # Before doing this method, the code needs to be abstracted
 @app.route('/cashflows/edit', methods=['GET', 'POST'])
 def edit_cashflow():
-    """Edit a selected cashflow"""
-    """For future implementation"""
+    """
+    Edit a selected cashflow
+    For future implementation
+    """
     return 'Hello world'
 
 @app.route('/verify', methods=['GET'])
 def verify():
-    """Verify that the sum of all account transfers is 0 and that all"""
-    """cashflows have 2 equal sides"""
+    """
+    Verify that the sum of all account transfers is 0 and that all 
+    cashflows have 2 equal sides
+    For future implementation
+    """
     return 'Hello world'
 
 if __name__ == '__main__':
