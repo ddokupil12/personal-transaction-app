@@ -19,48 +19,67 @@ def get_db_connection():
         if connection and connection.is_connected():
             connection.close()
 
-def db_fetchall(*args):
-    with get_db_connection() as conn:
-        cursor = conn.cursor(dictionary=True)
-        if len(args) == 1:
-            query = args[0]
-            cursor.execute(query)
-        elif len(args) == 2:
-            query = args[0]
-            dbArgs = args[1]
-            cursor.execute(query, dbArgs)
-        else:
-            raise ValueError("Can't accept multiple queries or arguments")
-        
-        return cursor.fetchall()
+def db_fetch(all=True, *args):
+    """
+    Docstring for db_fetch
     
+    :param all: bool (True: returns all rows | False: returns one)
+    :param args: str[, tuple] (The first argument is the query,
+        and the second argument is the arguments for that query)
 
-def db_fetchone(*args):
+    Returns:
+    All matching rows (when all=True)
+    One matching row (when all=False)
+
+    Raises:
+    ValueError when there are more than two arguments
+    """
     with get_db_connection() as conn:
         cursor = conn.cursor(dictionary=True)
+        query = args[0]
         if len(args) == 1:
-            query = args[0]
             cursor.execute(query)
         elif len(args) == 2:
-            query = args[0]
             dbArgs = args[1]
             cursor.execute(query, dbArgs)
         else:
             raise ValueError("Can't accept multiple queries")
-        
-        return cursor.fetchone()
+
+        if all:
+            return cursor.fetchall()
+        else:
+            return cursor.fetchone()
+
+def db_fetchall(*args):
+    return db_fetch(all=True, *args)
+    
+def db_fetchone(*args):
+    return db_fetch(all=False, *args)
     
 
 def db_commit(*args):
+    """
+    Docstring for db_commit
+    
+    :param args: an even list of arguments of queries followed by
+        the arguments for those queries.
+        query1, dbArgs1[, query2, dbArgs2] ...
+
+    Raises:
+    ValueError when there aren't any, or an even number of, arguments
+    """
+    lenArgs = len(args)
+    if lenArgs == 0:
+        raise ValueError("Expected at least 2 arguments")
+    elif lenArgs % 2 != 0:
+        raise ValueError("Expected an even number of arguments")
+    
     with get_db_connection() as conn:
         cursor = conn.cursor()
         lenArgs = len(args)
-        if lenArgs % 2 == 0:
-            for i in range(0, lenArgs, 2):
-                query = args[i]
-                dbArgs = args[i + 1]
-                cursor.execute(query, dbArgs)
-        else:
-            raise ValueError("Expected an even number of arguments")
-        
+        for i in range(0, lenArgs, 2):
+            query = args[i]
+            dbArgs = args[i + 1]
+            cursor.execute(query, dbArgs)
+
         conn.commit()
