@@ -8,7 +8,7 @@ class CatController:
     @staticmethod
     def add_category(name, cat_type):
         """
-        Docstring for add_category
+        Controller to add a category
         
         :param name: str
         :param cat_type: 'Income' | 'Expense'
