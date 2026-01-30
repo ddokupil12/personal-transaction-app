@@ -106,7 +106,18 @@ def add_account():
 
 @app.route('/accounts/edit', methods=['GET', 'POST'])
 def edit_account():
-    """Edit existing account"""
+    """
+    Edit existing account
+    
+    Method parameters: None
+
+    GET request parameters: None
+
+    POST request parameters:
+    accountid: int
+    accountname: str
+    accounttype: str
+    """
     try:    
         if request.method == 'POST':
             errorMessage = 'Error editing account'
@@ -128,7 +139,7 @@ def edit_account():
 
 @app.route('/categories')
 def categories():
-    """Manage categories"""
+    """View categories"""
     try:
         categories = CatController.categories()
         return render_template('categories.html', categories=categories)
@@ -138,7 +149,22 @@ def categories():
 
 @app.route('/categories/add', methods=['GET', 'POST'])
 def add_category():
-    """Add new category"""
+    """
+    Add new category
+
+    Method parameters: None
+
+    GET request parameters: None
+
+    POST request parameters:
+    categoryname: str
+    type_: 'Income' | 'Expense'
+
+    Raises:
+    GET request: None
+    POST request:
+        AssertionError when `type_` not in ['Income', 'Expense']
+    """
     if request.method == 'POST':
         try:
             name = request.form['categoryname']
@@ -199,8 +225,10 @@ def add_transaction():
     Raises: 
     GET request: None
     POST request: 
-        AssertionError from `TransactController.check_date()` when 
-        `transactiondate` is in the future
+        AssertionError when `transactiondate` is in the future
+            (see `TransactController.check_date()`)
+        AssertionError when amount == 0
+            (see `TransactController.add_transaction()`)
     """
     try:
         if request.method == 'POST':
@@ -302,6 +330,24 @@ def budgets():
 def add_budget():
     """
     Add new budget
+
+    Method parameters: None
+
+    GET request parameters: None
+
+    POST request parameters:
+    categoryid: int
+    budget_year: int
+    budget_month: int
+    amount: Decimal
+
+    Raises: 
+    GET request: None
+    POST request:
+    AssertionError when: (see `BudgetController.add_budget()`)
+        amount == 0
+        budget_month is not one of the 12 months
+        budget_year is not in the 2020s
     """
     try:
         if request.method == 'POST':

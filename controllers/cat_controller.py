@@ -7,4 +7,5 @@ class CatController:
     
     @staticmethod
     def add_category(name, cat_type): 
+        assert cat_type in ['Income', 'Expense']
         CategoryModel.add_category(name, cat_type)
