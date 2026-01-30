@@ -8,12 +8,12 @@ class AccountModel:
     
     @staticmethod
     def get_account_balance(account_id):
-        """Calculate account balance using relational method"""
+        """Calculate account balance using transaction table"""
         result = db_fetchone("""
-                            SELECT COALESCE(SUM(amount), 0) as balance
-                            FROM transact
-                            WHERE accountid = %s
-                            """, (account_id,))['balance'] 
+                             SELECT COALESCE(SUM(amount), 0) as balance
+                             FROM transact
+                             WHERE accountid = %s
+                             """, (account_id,))['balance'] 
         # db_fetchone() returns dict with only key 'balance'
 
         return result
