@@ -30,6 +30,8 @@ class TransactModel:
             total = db_fetchone("""
                                 SELECT COUNT(*) as total FROM transact
                                 """)['total']
+        else:
+            total = None
 
         return transactions, total
         

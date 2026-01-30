@@ -12,5 +12,5 @@ class GeneralController:
             account['balance'] = AccountModel.get_account_balance(account['accountid'])
         
         # Get recent transactions
-        recent_transactions = TransactModel.get_transactions(limit)
+        recent_transactions, total = TransactModel.get_transactions(limit, return_total=False)
         return (accounts, recent_transactions)
