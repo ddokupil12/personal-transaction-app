@@ -2,20 +2,17 @@ from db import db_fetchone, db_fetchall, db_commit, get_db_connection
 
 class TransactModel:
     @staticmethod
-    def get_transactions(per_page=None, offset=0):
+    def get_transactions(per_page=None, offset=0, return_total=True):
         if per_page is not None:
             print('if true')
-            with get_db_connection() as conn:
-                cursor = conn.cursor(dictionary=True)
-                cursor.execute("""
-                    SELECT t.*, a.accountname, c.categoryname 
-                    FROM transact t
-                    JOIN acct a ON t.accountid = a.accountid
-                    JOIN category c ON t.Categoryid = c.Categoryid
-                    ORDER BY t.transactiondate DESC, t.transactionid DESC
-                    LIMIT %s OFFSET %s
-                """, (per_page, offset))
-                transactions = cursor.fetchall()
+            transactions = db_fetchall("""
+                SELECT t.*, a.accountname, c.categoryname 
+                FROM transact t
+                JOIN acct a ON t.accountid = a.accountid
+                JOIN category c ON t.Categoryid = c.Categoryid
+                ORDER BY t.transactiondate DESC, t.transactionid DESC
+                LIMIT %s OFFSET %s
+            """, (per_page, offset))
 
         else:
             print('if false')
@@ -29,9 +26,10 @@ class TransactModel:
                 ORDER BY t.transactiondate DESC, t.transactionid DESC
             """)
 
-
-        # Get total count for pagination
-        total = db_fetchone("SELECT COUNT(*) as total FROM transact")['total']
+        if return_total is True: # Get total count for pagination
+            total = db_fetchone("""
+                                SELECT COUNT(*) as total FROM transact
+                                """)['total']
 
         return transactions, total
         
