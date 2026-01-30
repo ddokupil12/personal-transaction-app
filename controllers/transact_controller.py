@@ -14,13 +14,35 @@ class TransactController:
 
     @staticmethod
     def check_date(transaction_date):
+        """
+        Ensures that `transaction_date` is not in the future
+        
+        :param transaction_date: date
+
+        Raises: AssertionError when `transaction_date` is in the future
+        """
         dateObj = datetime.strptime(transaction_date, '%Y-%m-%d').date()
         assert dateObj <= datetime.today().date()
 
     @classmethod
     def add_transaction(cls, account_id, category_id, amount, transaction_date,
                         description):
-        cls.check_date(transaction_date) 
+        """
+        Controller for adding a transaction to the database
+        
+        :param account_id: int
+        :param category_id: int
+        :param amount: Decimal
+        :param transaction_date: date
+        :param description: str
+
+        Returns: None
+
+        Raises AssertionError if:
+            amount == 0
+            transaction date is in the future
+        """
+        cls.check_date(transaction_date)
         TransactModel.add_transaction(account_id, category_id, Decimal(amount),
                                       transaction_date, description)
         
