@@ -34,16 +34,18 @@ def db_fetch(all=True, *args):
     Raises:
     ValueError when there are more than two arguments
     """
+    lenArgs = len(args)
+    if lenArgs > 2:
+        raise ValueError("Can't accept multiple queries")
+    
     with get_db_connection() as conn:
         cursor = conn.cursor(dictionary=True)
         query = args[0]
-        if len(args) == 1:
+        if lenArgs == 1:
             cursor.execute(query)
-        elif len(args) == 2:
+        elif lenArgs == 2:
             dbArgs = args[1]
             cursor.execute(query, dbArgs)
-        else:
-            raise ValueError("Can't accept multiple queries")
 
         if all:
             return cursor.fetchall()
