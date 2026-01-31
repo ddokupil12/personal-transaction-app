@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    """Base configuration class"""
     SECRET_KEY = environ.get('SECRET_KEY')
     DEBUG = True
     PORT = environ.get('PORT')
@@ -22,13 +21,6 @@ class Config:
 class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
-    DB_CONFIG = {
-        'host': environ.get('DB_HOST'),
-        'database': environ.get('DB_NAME'),
-        'user': environ.get('DB_USER'),
-        'password': environ.get('DB_PASSWORD'),
-        'port': int(environ.get('DB_PORT', 3306))
-    }
 
 # Configuration dictionary
 config = {
