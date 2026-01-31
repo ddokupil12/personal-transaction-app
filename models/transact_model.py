@@ -1,4 +1,4 @@
-from db import db_fetchone, db_fetchall, db_commit, get_db_connection
+from db import db_fetchone, db_fetchall, db_commit
 
 class TransactModel:
     @staticmethod

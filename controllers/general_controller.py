@@ -8,8 +8,8 @@ class GeneralController:
         accounts = AccountModel.get_accounts()
         
         for account in accounts: # Add balance to each account
-            balance = TransactModel.get_account_balance(account['accountid'])
-            account['balance'] = balance
+            account['balance'] = TransactModel.get_account_balance(
+                account['accountid'])
         
         # Get recent transactions
         recent_transactions, _ = TransactModel.get_transactions(
