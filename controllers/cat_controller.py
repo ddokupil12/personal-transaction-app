@@ -17,6 +17,6 @@ class CatController:
         """
         types = CategoryModel.get_category_types()
         types_fmt = str(types).replace('[', '').replace(']', '')
-        error_message = f'Category type must be: {types_fmt}'
+        error_message = f'Category type must be one of: {types_fmt}'
         assert cat_type in types, error_message
         CategoryModel.add_category(name, cat_type)
