@@ -13,7 +13,7 @@ class TransactController:
         return TransactModel.get_transaction(transaction_id)
 
     @staticmethod
-    def check_date(transaction_date):
+    def __check_date(transaction_date):
         """
         Ensures that `transaction_date` is not in the future
         
@@ -41,7 +41,7 @@ class TransactController:
             amount == 0
             transaction date is in the future
         """
-        cls.check_date(transaction_date)
+        cls.__check_date(transaction_date)
         assert amount != 0, 'amount must be nonzero'
         TransactModel.add_transaction(account_id, category_id, Decimal(amount),
                                       transaction_date, description)
@@ -49,7 +49,7 @@ class TransactController:
     @classmethod
     def edit_transaction(cls, account_id, category_id, amount, 
                          transaction_date, description, transaction_id):
-        cls.check_date(transaction_date)
+        cls.__check_date(transaction_date)
         TransactModel.edit_transaction(account_id, category_id, amount,
                                        transaction_date, description, 
                                        transaction_id)
