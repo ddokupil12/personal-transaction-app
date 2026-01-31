@@ -1,7 +1,7 @@
 from decimal import Decimal
 from datetime import datetime
 
-from models.transact_model import TransactModel
+from models import TransactModel
 
 __all__ = ['TransactController']
 

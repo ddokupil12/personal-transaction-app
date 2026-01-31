@@ -1,4 +1,4 @@
-from models.cashflow_model import CashflowModel
+from models import CashflowModel
 
 __all__ = ['CashflowController']
 

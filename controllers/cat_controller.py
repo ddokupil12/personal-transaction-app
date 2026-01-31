@@ -1,4 +1,4 @@
-from models.category_model import CategoryModel
+from models import CategoryModel
 
 __all__ = ['CatController']
 

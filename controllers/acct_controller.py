@@ -1,5 +1,4 @@
-from models.account_model import AccountModel
-from models.transact_model import TransactModel
+from models import AccountModel, TransactModel
 
 __all__ = ['AcctController']
 

@@ -1,7 +1,7 @@
 from decimal import Decimal
 from datetime import datetime
 
-from models.budget_model import BudgetModel
+from models import BudgetModel
 
 __all__ = ['BudgetController']
 
