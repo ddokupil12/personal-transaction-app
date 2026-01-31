@@ -5,7 +5,7 @@ from flask import render_template, request, redirect, url_for, flash
 
 from controllers import AcctController, BudgetController, CashflowController
 from controllers import CatController, GeneralController, TransactController
-from config import app
+from context import app
 
 __all__ = []
 
