@@ -189,7 +189,7 @@ def add_category():
             CatController.add_category(name, cat_type)
             return _log_success('Category added successfully!', 'categories')
         except Exception as e:
-            _log_error('Error adding category', e)
+            _check_log_assertion_err('Error adding category', e)
     
     return render_template('add_edit_category.html')
 
@@ -459,4 +459,4 @@ def verify():
     return 'Hello world'
 
 if __name__ == '__main__':
-    app.run(debug=app.config['DEBUG'], port=app.config['PORT'])
+    app.run(debug=app.config['DEBUG'], port=app.config['PORT'], load_dotenv=False)
