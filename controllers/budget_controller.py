@@ -17,29 +17,26 @@ class BudgetController:
         budgetIncome = 0
         budgets = BudgetModel.get_budgets(year, month)
         for budget in budgets:
-            actual = budget['actual']
+            actual = budget['actual'] # Actual expenses are negative
             absActual = abs(actual) # Budgets are positive numbers
             budget['remaining'] = budget['budget_amount'] - absActual
-            if budget['type_'] == 'Expense':
+            if budget['type_'] == 'Expense': # Handle expense accounts
                 budgetSpending += budget['budget_amount']
                 if actual > 0: # Handle expense accounts with income
-                    totalSpent += actual
-                    budget['actual'] = 0 - actual
+                    totalSpent -= actual
+                    budget['actual'] = 0 - actual # Show amount as negative
                     budget['remaining'] = budget['budget_amount'] + absActual
                 else: # Handle expense accounts normally
                     totalSpent += absActual
                     budget['actual'] = absActual
 
-            else: # Handle income accounts
+            else: # Handle income accounts 
                 budgetIncome += budget['budget_amount']
-                budget['actual'] = absActual
-
 
         # Summary of expenses
         summary = {'total_budgeted': budgetSpending,
-                'total_spent': totalSpent,
-                'total_remaining': budgetSpending - totalSpent
-                }
+                   'total_spent': totalSpent,
+                   'total_remaining': budgetSpending - totalSpent}
             
         return budgets, summary
         
@@ -59,6 +56,8 @@ class BudgetController:
             budget_year is not in the 2020s
         """
         budget_amount = Decimal(amount)
+        budget_month = int(budget_month)
+        budget_year = int(budget_year)
         assert amount != 0, 'amount must be nonzero'
         budget_month_msg = 'month must be between 1-12'
         assert budget_month >= 1 and budget_month <= 12, budget_month_msg
