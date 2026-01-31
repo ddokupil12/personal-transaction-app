@@ -13,7 +13,8 @@ class AcctController:
         accounts = AccountModel.get_accounts()
         if balance:
             for account in accounts:
-                account['balance'] = TransactModel.get_account_balance(account['accountid'])
+                b = TransactModel.get_account_balance(account['accountid'])
+                account['balance'] = b
 
 
         return accounts
