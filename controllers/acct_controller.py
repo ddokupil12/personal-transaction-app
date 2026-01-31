@@ -1,4 +1,5 @@
 from models.account_model import AccountModel
+from models.transact_model import TransactModel
 
 class AcctController:
     @staticmethod
@@ -12,7 +13,7 @@ class AcctController:
         accounts = AccountModel.get_accounts()
         if balance:
             for account in accounts:
-                account['balance'] = AccountModel.get_account_balance(account['accountid'])
+                account['balance'] = TransactModel.get_account_balance(account['accountid'])
 
 
         return accounts

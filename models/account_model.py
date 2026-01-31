@@ -7,18 +7,6 @@ class AccountModel:
         return db_fetchall('SELECT * FROM acct ORDER BY accountname')
     
     @staticmethod
-    def get_account_balance(account_id):
-        """Calculate account balance using transaction table"""
-        result = db_fetchone("""
-                             SELECT COALESCE(SUM(amount), 0) as balance
-                             FROM transact
-                             WHERE accountid = %s
-                             """, (account_id,))['balance'] 
-        # db_fetchone() returns dict with only key 'balance'
-
-        return result
-    
-    @staticmethod
     def get_account(account_id):
         return db_fetchone("""
                            SELECT * 
