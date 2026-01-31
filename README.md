@@ -86,7 +86,7 @@ account = db_fetchone(
         FROM acct
         WHERE accountid = %s
     """, [account_id]
-    )
+)
 ```
 
 - When this doesn't work, use the hanging indent method:
