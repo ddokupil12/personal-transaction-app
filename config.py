@@ -2,9 +2,11 @@ from os import environ
 
 from dotenv import load_dotenv
 
+__all__ = ['config']
+
 load_dotenv()
 
-class Config:
+class _Config:
     """
     The default configuration for the database
 
@@ -25,13 +27,13 @@ class Config:
         'port': int(environ.get('DB_PORT', 3306))
     }
 
-class ProductionConfig(Config):
+class _ProductionConfig(_Config):
     """Production configuration"""
     DEBUG = False
 
-# Configuration dictionary to allow selection of a configuration
+# _Configuration dictionary to allow selection of a configuration
 config = {
-    'production': ProductionConfig,
-    'development': Config,
-    'default': Config,
+    'production': _ProductionConfig,
+    'development': _Config,
+    'default': _Config,
 }

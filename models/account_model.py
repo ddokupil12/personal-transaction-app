@@ -3,11 +3,20 @@ from db import db_fetchone, db_fetchall, db_commit
 class AccountModel:
     @staticmethod
     def get_accounts():
-        """Fetch all accounts"""
+        """
+        Fetch all accounts
+        
+        O(n) (where n = len(accounts))
+        """
         return db_fetchall('SELECT * FROM acct ORDER BY accountname')
     
     @staticmethod
     def get_account(account_id):
+        """
+        Gets account information for one account
+
+        O(1)
+        """
         return db_fetchone("""
                            SELECT * 
                            FROM acct
@@ -16,6 +25,11 @@ class AccountModel:
     
     @staticmethod
     def add_account(name, account_type):
+        """
+        Adds one account
+
+        O(1)
+        """
         db_commit("""
                   INSERT INTO acct (accountname, accounttype) 
                   VALUES (%s, %s)
@@ -23,6 +37,11 @@ class AccountModel:
     
     @staticmethod
     def edit_account(account_id, account_name, account_type):
+        """
+        Edits one account
+
+        O(1)
+        """
         db_commit(
             """
                 UPDATE acct

@@ -9,6 +9,8 @@ class AcctController:
         
         :param balance: bool | True
             Determines whether each account balance is returned
+        
+        O(n) (where n = len(accounts))
         """
         accounts = AccountModel.get_accounts()
         if balance:
