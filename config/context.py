@@ -1,6 +1,6 @@
 from flask import Flask
 
-from config import config
+from .app_config import config
 
 __all__ = ['app', 'DB_CONFIG']
 

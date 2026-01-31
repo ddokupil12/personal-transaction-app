@@ -8,7 +8,7 @@ load_dotenv()
 
 class _Config:
     """
-    The default configuration for the database
+    The default configuration for the app
 
     Attributes:
     SECRET_KEY: str (the server secret key)
@@ -24,7 +24,7 @@ class _Config:
         'database': environ.get('DB_NAME'),
         'user': environ.get('DB_USER'),
         'password': environ.get('DB_PASSWORD'),
-        'port': int(environ.get('DB_PORT', 3306))
+        'port': int(environ.get('DB_PORT'))
     }
 
 class _ProductionConfig(_Config):
