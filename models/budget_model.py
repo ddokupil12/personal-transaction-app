@@ -1,4 +1,4 @@
-from db import db_commit, get_db_connection
+from config import db_commit, get_db_connection
 
 class BudgetModel:
     @staticmethod
