@@ -2,9 +2,9 @@ from os import environ
 
 from dotenv import load_dotenv
 
-__all__ = ['config']
+__all__ = ['config', 'is_dotenv_loaded']
 
-load_dotenv()
+is_dotenv_loaded = load_dotenv()
 
 class _Config:
     """
@@ -24,7 +24,7 @@ class _Config:
         'database': environ.get('DB_NAME'),
         'user': environ.get('DB_USER'),
         'password': environ.get('DB_PASSWORD'),
-        'port': int(environ.get('DB_PORT'))
+        'port': int(environ.get('DB_PORT', 3306))
     }
 
 class _ProductionConfig(_Config):
@@ -33,7 +33,7 @@ class _ProductionConfig(_Config):
 
 # _Configuration dictionary to allow selection of a configuration
 config = {
-    'production': _ProductionConfig,
     'development': _Config,
-    'default': _Config,
+    'production': _ProductionConfig,
+    'default': _ProductionConfig,
 }
