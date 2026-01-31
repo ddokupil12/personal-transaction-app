@@ -15,5 +15,8 @@ class CatController:
         :param name: str
         :param cat_type: 'Income' | 'Expense'
         """
-        assert cat_type in ['Income', 'Expense']
+        types = CategoryModel.get_category_types()
+        types_fmt = str(types).replace('[', '').replace(']', '')
+        error_message = 'Category type must be: {types_fmt}'
+        assert cat_type in types, error_message
         CategoryModel.add_category(name, cat_type)
