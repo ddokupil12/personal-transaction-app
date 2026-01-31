@@ -2,6 +2,8 @@ from flask import Flask
 
 from config import config
 
+__all__ = ['app', 'DB_CONFIG']
+
 _config_name = 'development'
 app = Flask(__name__)
 

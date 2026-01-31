@@ -1,5 +1,7 @@
 from models.cashflow_model import CashflowModel
 
+__all__ = ['CashflowController']
+
 class CashflowController:
     @staticmethod
     def cashflows():

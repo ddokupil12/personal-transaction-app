@@ -3,6 +3,8 @@ from datetime import datetime
 
 from models.budget_model import BudgetModel
 
+__all__ = ['BudgetController']
+
 class BudgetController:
     @staticmethod
     def budgets(year, month):

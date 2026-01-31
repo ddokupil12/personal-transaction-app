@@ -3,6 +3,8 @@ from datetime import datetime
 
 from models.transact_model import TransactModel
 
+__all__ = ['TransactController']
+
 class TransactController:
     @staticmethod
     def transactions(per_page=None, offset=None):

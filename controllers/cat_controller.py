@@ -1,5 +1,7 @@
 from models.category_model import CategoryModel
 
+__all__ = ['CatController']
+
 class CatController:
     @staticmethod
     def categories():

@@ -1,6 +1,8 @@
 from models.account_model import AccountModel
 from models.transact_model import TransactModel
 
+__all__ = ['GeneralController']
+
 class GeneralController:
     @staticmethod
     def dashboard(limit):

@@ -1,6 +1,8 @@
 from models.account_model import AccountModel
 from models.transact_model import TransactModel
 
+__all__ = ['AcctController']
+
 class AcctController:
     @staticmethod
     def accounts(balance=True):
