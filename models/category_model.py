@@ -12,7 +12,3 @@ class CategoryModel:
                   INSERT INTO category (categoryname, type_) 
                   VALUES (%s, %s)
                   """, (name, cat_type))
-        
-    @staticmethod
-    def get_category_types():
-        return db_fetchall("""SELECT UNIQUE type_ FROM category""")
