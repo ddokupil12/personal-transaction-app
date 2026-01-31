@@ -19,7 +19,7 @@ def get_db_connection():
         if connection and connection.is_connected():
             connection.close()
 
-def db_fetch(*args, all=True):
+def _db_fetch(*args, all=True):
     """
     Docstring for db_fetch
     
@@ -52,9 +52,9 @@ def db_fetch(*args, all=True):
         else:
             return cursor.fetchone()
 
-def db_fetchall(*args): return db_fetch(*args, all=True)
+def db_fetchall(*args): return _db_fetch(*args, all=True)
     
-def db_fetchone(*args): return  db_fetch(*args, all=False)
+def db_fetchone(*args): return  _db_fetch(*args, all=False)
     
 def db_commit(*args):
     """
