@@ -219,7 +219,7 @@ def transactions():
                                p=page, has_next=has_next, has_prev=has_prev)
     except Exception as e:
         _log_error('Error loading transactions', e)
-        return render_template('transactions.html', transactions=[], page=1, 
+        return render_template('transactions.html', transactions=[], p=1, 
                                has_next=False, has_prev=False)
 
 @app.route('/transactions/add', methods=['GET', 'POST'])
