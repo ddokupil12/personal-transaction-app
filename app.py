@@ -1,5 +1,7 @@
 from datetime import datetime
-import traceback
+from traceback import print_exc
+from functools import wraps
+from enum import Enum, auto
 
 from flask import render_template, request, redirect, url_for, flash
 
@@ -10,23 +12,21 @@ from context import app
 __all__ = []
 
 ##### Helper functions
-def _log_error(message, e):
-    """
-    Sends an error message to the top of the screen and logs the traceback
-    
-    :param message: str (message to show)
-    :param e: Exception (the Exception that was raised)
 
-    O(n) (where n = len(traceback))
-    """
-    if isinstance(e, Exception) is False:
-        raise TypeError("`e' must be an Exception")
-    
-    flash(message, 'error')
-    print('err:', e)
-    traceback.print_exc()
+class Model(Enum):
+    acct = auto()
+    budget = auto()
+    cashflow = auto()
+    category = auto()
+    transact = auto()
 
-def _log_success(message, rte, **kwargs):
+class Action(Enum):
+    add = auto()
+    read = auto()
+    edit = auto()
+    delete = auto()
+
+def _log_success(model: Model, action: Action, **kwargs):
     """
     Sends a success message to the top of the screen and redirects to 
     `rte`
@@ -40,58 +40,97 @@ def _log_success(message, rte, **kwargs):
 
     O(1) (with constant route length)
     """
-    flash(message, 'success')
+    match model:
+        case Model.acct:
+            page_msg = 'Account'
+            rte = 'accounts'
+        case Model.budget:
+            page_msg = 'Budget'
+            rte = 'budgets'
+        case Model.cashflow:
+            page_msg = 'Cashflow'
+            rte = 'cashflows'
+        case Model.transact:
+            page_msg = 'Transaction'
+            rte = 'transactions'
+        case _ :
+            page_msg = 'Data'
+            rte = 'dashboard'
+    
+    match action:
+        case Action.add:
+            action_msg = 'added'
+        case Action.read:
+            action_msg = 'loaded'
+        case Action.edit:
+            action_msg = 'edited'
+        case Action.delete:
+            action_msg = 'deleted'
+
+    flash(f'{page_msg} {action_msg} successfully!', 'success')
     return redirect(url_for(rte, **kwargs))
 
-def _check_log_assertion_err(message, e):
+def _log_error(
+    log_level='error',  # Logging level
+    error_message="An unexpected error occurred",
+    template='dashboard.html',
+    **templatekwargs
+):
     """
-    Changes the error message if there's an AssertionError
+    Flexible error handling decorator with multiple configuration options
     
-    :param message: str (the message to show)
-    :param e: Exception (the exception that was raised)
-
-    Raises: TypeError (see `_log_error()`)
-
-    O(n) (where n = len(traceback))
+    :param log_level: Logging level (debug, info, warning, error)
+    :param error_message: Default error message
+    :param custom_handler: Custom error handling function
     """
-    if isinstance(e, AssertionError):
-        message = e
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                nonlocal error_message
+                if isinstance(e, AssertionError):
+                    error_message = e
+                flash(error_message, 'error')
+                print('err:', e)
+                print_exc()
 
-    _log_error(message, e)
+                return render_template(template, **templatekwargs)
+        
+        return wrapper
+    return decorator
 
 ##### Routes
 @app.route('/')
+@_log_error(template='dashboard.html', accounts=[], recent_transactions=[], 
+            error_message='Error loading dashboard')
 def dashboard():
     """
     Main dashboard showing accounts and recent transactions
     
     O(n) (where n = len(accounts))
     """
-    try:
-        limit = 10 # limit the recent transactions
-        accounts, recent_transactions = GeneralController.dashboard(limit)
-        return render_template('dashboard.html', accounts=accounts, 
-                               recent_transactions=recent_transactions)
-    except Exception as e:
-        _log_error('Error loading dashboard', e)
-        return render_template('dashboard.html', accounts=[], 
-                               recent_transactions=[])
+    limit = 10 # limit the recent transactions
+    accounts, recent_transactions = GeneralController.dashboard(limit)
+    return render_template('dashboard.html', accounts=accounts, 
+                            recent_transactions=recent_transactions)
 
 @app.route('/accounts')
+@_log_error(template='accounts.html', error_message='Error loading accounts', 
+            accounts=[])
 def accounts():
     """
     Manage accounts
 
     O(n) (where n = len(accounts))
     """
-    try:
-        accounts = AcctController.accounts()
-        return render_template('accounts.html', accounts=accounts)
-    except Exception as e:
-        _log_error('Error loading accounts', e)
-        return render_template('accounts.html', accounts=[])
+    accounts = AcctController.accounts()
+    return render_template('accounts.html', accounts=accounts)
 
 @app.route('/accounts/add', methods=['GET', 'POST'])
+@_log_error(error_message='Error adding account', 
+            template='add_edit_account.html', mode='Add')
 def add_account():
     """
     Add new account
@@ -107,17 +146,16 @@ def add_account():
     O(1)
     """
     if request.method == 'POST':
-        try:
-            name = request.form['accountname']
-            account_type = request.form['accounttype']
-            AcctController.add_account(name, account_type)
-            return _log_success('Account added successfully!', 'accounts')
-        except Exception as e:
-            _log_error('Error adding account', e)
+        name = request.form['accountname']
+        account_type = request.form['accounttype']
+        AcctController.add_account(name, account_type)
+        return _log_success(Model.acct, Action.add)
     
     return render_template('add_edit_account.html', mode='Add')
 
 @app.route('/accounts/edit', methods=['GET', 'POST'])
+@_log_error(error_message='Error editing account', 
+            template='add_edit_account.html', account=None, mode='Edit')
 def edit_account():
     """
     Edit existing account
@@ -131,40 +169,32 @@ def edit_account():
     accountname: str
     accounttype: str
     """
-    try:    
-        if request.method == 'POST':
-            errorMessage = 'Error editing account'
-            account_id = request.form['accountid']
-            account_name = request.form['accountname']
-            account_type = request.form['accounttype']
-            AcctController.edit_account(account_id, account_name, account_type)
-            return _log_success('Account edited successfully!', 'accounts')
-        else:
-            errorMessage = 'Error loading form data'
-            account_id = request.args['id']
-            account = AcctController.get_account(account_id)
-            return render_template('add_edit_account.html', account=account, mode='Edit')
-
-    except Exception as e:
-        _log_error(errorMessage, e)
-        return render_template('add_edit_account.html', account=None, 
-                               mode='Edit')
+    if request.method == 'POST':
+        account_id = request.form['accountid']
+        account_name = request.form['accountname']
+        account_type = request.form['accounttype']
+        AcctController.edit_account(account_id, account_name, account_type)
+        return _log_success(Model.acct, Action.edit)
+    else:
+        account_id = request.args['id']
+        account = AcctController.get_account(account_id)
+        return render_template('add_edit_account.html', account=account, mode='Edit')
 
 @app.route('/categories')
+@_log_error(error_message='Error loading categories', 
+            template='categories.html', categories=[])
 def categories():
     """
     View categories
     
     O(n) (where n = len(categories))
     """
-    try:
-        categories = CatController.categories()
-        return render_template('categories.html', categories=categories)
-    except Exception as e:
-        _log_error('Error loading categories', e)
-        return render_template('categories.html', categories=[])
+    categories = CatController.categories()
+    return render_template('categories.html', categories=categories)
 
 @app.route('/categories/add', methods=['GET', 'POST'])
+@_log_error(error_message='Error adding category', 
+            template='add_edit_category.html')
 def add_category():
     """
     Add new category
@@ -183,17 +213,16 @@ def add_category():
         AssertionError when `type_` not in ['Income', 'Expense']
     """
     if request.method == 'POST':
-        try:
-            name = request.form['categoryname']
-            cat_type = request.form['type_']
-            CatController.add_category(name, cat_type)
-            return _log_success('Category added successfully!', 'categories')
-        except Exception as e:
-            _check_log_assertion_err('Error adding category', e)
-    
-    return render_template('add_edit_category.html')
+        name = request.form['categoryname']
+        cat_type = request.form['type_']
+        CatController.add_category(name, cat_type)
+        return _log_success(Model.category, Action.add)
+    else:
+        return render_template('add_edit_category.html')
 
 @app.route('/categories/edit', methods=['GET', 'POST'])
+@_log_error(error_message='Error editing category', 
+            template='add_edit_category.html')
 def edit_category():
     """
     Edit a selected category
@@ -202,27 +231,28 @@ def edit_category():
     return 'Hello World'
 
 @app.route('/transactions')
+@_log_error(error_message='Error loading transactions', 
+            template='transactions.html', transactions=[], p=1, has_next=False, 
+            has_prev=False)
 def transactions():
     """
     View all transactions
     
     O(limit) (could be up to len(transactions))
     """
-    try:
-        page = request.args.get('p', 1, type=int)
-        per_page = 20
-        offset = (page - 1) * per_page
-        transactions, total = TransactController.transactions(per_page, offset)
-        has_next = offset + per_page < total
-        has_prev = page > 1
-        return render_template('transactions.html', transactions=transactions,
-                               p=page, has_next=has_next, has_prev=has_prev)
-    except Exception as e:
-        _log_error('Error loading transactions', e)
-        return render_template('transactions.html', transactions=[], p=1, 
-                               has_next=False, has_prev=False)
+    page = request.args.get('p', 1, type=int)
+    per_page = 20
+    offset = (page - 1) * per_page
+    transactions, total = TransactController.transactions(per_page, offset)
+    has_next = offset + per_page < total
+    has_prev = page > 1
+    return render_template('transactions.html', transactions=transactions,
+                           p=page, has_next=has_next, has_prev=has_prev)
 
 @app.route('/transactions/add', methods=['GET', 'POST'])
+@_log_error(error_message='Error adding transaction', 
+            template='add_edit_transaction.html', accounts=[], categories=[], 
+            datetime=datetime, mode='Add')
 def add_transaction():
     """
     Add new transaction
@@ -251,31 +281,26 @@ def add_transaction():
         AssertionError when amount == 0
             (see `TransactController.add_transaction()`)
     """
-    try:
-        if request.method == 'POST':
-            errorMessage = 'Error adding transaction'
-            account_id = request.form['accountid']
-            category_id = request.form['categoryid']
-            amount = request.form['amount']
-            transaction_date = request.form['transactiondate']
-            dscr = request.form['dscr']
-            TransactController.add_transaction(account_id, category_id, amount, 
-                                               transaction_date, dscr)
-            return _log_success('Transaction added successfully!', 'transactions')
-        else:
-            errorMessage = 'Error loading form data'
-            accounts = AcctController.accounts(balance=False)
-            categories = CatController.categories()
-            return render_template('add_edit_transaction.html',             
-                                   accounts=accounts, categories=categories, 
-                                   datetime=datetime, mode='Add')
-
-    except Exception as e:
-        _check_log_assertion_err(errorMessage, e)
-        return render_template('add_edit_transaction.html', accounts=[], 
-                               categories=[], datetime=datetime, mode='Add')
+    if request.method == 'POST':
+        account_id = request.form['accountid']
+        category_id = request.form['categoryid']
+        amount = request.form['amount']
+        transaction_date = request.form['transactiondate']
+        dscr = request.form['dscr']
+        TransactController.add_transaction(account_id, category_id, amount, 
+                                            transaction_date, dscr)
+        return _log_success(Model.transact, Action.add)
+    else:
+        accounts = AcctController.accounts(balance=False)
+        categories = CatController.categories()
+        return render_template('add_edit_transaction.html',             
+                                accounts=accounts, categories=categories, 
+                                datetime=datetime, mode='Add')
     
 @app.route('/transactions/edit', methods=['GET', 'POST'])
+@_log_error(error_message='Error editing transaction', 
+            template='add_edit_transaction.html', transaction=None, 
+            datetime=datetime, accounts=[], categories=[])
 def edit_transaction():
     """
     Edit a selected transaction
@@ -302,37 +327,30 @@ def edit_transaction():
         AssertionError from `TransactController.check_date()` when 
         `transactiondate` is in the future
     """
-    try:
-        if request.method == 'POST':
-            errorMessage = 'Error editing transaction'
-            transaction_id = request.form['transactionid']
-            account_id = request.form['accountid']
-            category_id = request.form['categoryid']
-            dscr = request.form['dscr']
-            transaction_date = request.form['transactiondate']
-            amount = request.form['amount']
-            TransactController.edit_transaction(account_id, category_id, 
-                                                amount, transaction_date, dscr, 
-                                                transaction_id)
-            message = 'Transaction edited successfully!'
-            return _log_success(message, 'transactions')
-        else:
-            errorMessage = 'Error loading form data'
-            transaction_id = request.args['id']
-            accounts = AcctController.accounts(balance=False)
-            categories = CatController.categories()
-            transaction = TransactController.get_transaction(transaction_id)
-            return render_template('add_edit_transaction.html', 
-                                   transaction=transaction, datetime=datetime, 
-                                   accounts=accounts, categories=categories)
-
-    except Exception as e:
-        _check_log_assertion_err(errorMessage, e)
-
-        return render_template('add_edit_transaction.html', transaction=None, 
-                               datetime=datetime, accounts=[], categories=[])
+    if request.method == 'POST':
+        transaction_id = request.form['transactionid']
+        account_id = request.form['accountid']
+        category_id = request.form['categoryid']
+        dscr = request.form['dscr']
+        transaction_date = request.form['transactiondate']
+        amount = request.form['amount']
+        TransactController.edit_transaction(account_id, category_id, 
+                                            amount, transaction_date, dscr, 
+                                            transaction_id)
+        return _log_success(Model.transact, Action.edit)
+    else:
+        transaction_id = request.args['id']
+        accounts = AcctController.accounts(balance=False)
+        categories = CatController.categories()
+        transaction = TransactController.get_transaction(transaction_id)
+        return render_template('add_edit_transaction.html', 
+                                transaction=transaction, datetime=datetime, 
+                                accounts=accounts, categories=categories)
         
 @app.route('/budgets')
+@_log_error(error_message='Error loading budgets', template='budgets.html', 
+            budgets=[], year=datetime.now().year, month=datetime.now().month, 
+            datetime=datetime, abs=abs)
 def budgets():
     """
     View budgets
@@ -340,18 +358,15 @@ def budgets():
     O(n) (where n = len(budgets))
     """
     now = datetime.now()
-    try:
-        year = request.args.get('year', now.year, type=int)
-        month = request.args.get('month', now.month, type=int)
-        budgets, summary = BudgetController.budgets(year, month)
-        return render_template('budgets.html', budgets=budgets, year=year, 
-                               month=month, datetime=datetime, summary=summary)
-    except Exception as e:
-        _log_error('Error loading budgets', e)
-        return render_template('budgets.html', budgets=[], year=now.year, 
-                               month=now.month, datetime=datetime, abs=abs)
+    year = request.args.get('year', now.year, type=int)
+    month = request.args.get('month', now.month, type=int)
+    budgets, summary = BudgetController.budgets(year, month)
+    return render_template('budgets.html', budgets=budgets, year=year, 
+                            month=month, datetime=datetime, summary=summary)
 
 @app.route('/budgets/add', methods=['GET', 'POST'])
+@_log_error(error_message='Error adding budget', 
+            template='add_edit_budget.html', categories=[], datetime=datetime)
 def add_budget():
     """
     Add new budget
@@ -374,28 +389,18 @@ def add_budget():
         budget_month is not one of the 12 months
         budget_year is not in the 2020s
     """
-    try:
-        if request.method == 'POST':
-            errorMessage = 'Error adding budget'
-            category_id = request.form['categoryid']
-            year = request.form['budget_year']
-            month = request.form['budget_month']
-            budget_amount = request.form['amount']
-            BudgetController.add_budget(category_id, year, month, budget_amount)
-            message = 'Budget added successfully!'
-            return _log_success(message, 'budgets', year=year, month=month)
-        else:
-            errorMessage = 'Error loading form data'
-            categories = CatController.categories()
-            return render_template('add_edit_budget.html', 
-                                   categories=categories, 
-                                   datetime=datetime)
-        
-    except Exception as e:
-        _check_log_assertion_err(errorMessage, e)
-        return render_template('add_edit_budget.html', categories=[], 
-                                datetime=datetime)    
-    
+    if request.method == 'POST':
+        category_id = request.form['categoryid']
+        year = request.form['budget_year']
+        month = request.form['budget_month']
+        budget_amount = request.form['amount']
+        BudgetController.add_budget(category_id, year, month, budget_amount)
+        return _log_success(Model.budget, Action.add, year=year, month=month)
+    else:
+        categories = CatController.categories()
+        return render_template('add_edit_budget.html', 
+                                categories=categories, 
+                                datetime=datetime)
 
 @app.route('/budgets/edit', methods=['GET', 'POST'])
 def edit_budget():
@@ -409,38 +414,32 @@ def edit_budget():
     return 'Hello World'
     
 @app.route('/cashflows')
+@_log_error(error_message='Error loading cashflows', template='cashflows.html', 
+            cashflows=[])
 def cashflows():
     """View cashflows"""
-    try:
-        cashflows = CashflowController.cashflows()
-        return render_template('cashflows.html', cashflows=cashflows)
-    except Exception as e:
-        _log_error('Error loading cashflows', e)
-        return render_template('cashflows.html', cashflows=[])
+    cashflows = CashflowController.cashflows()
+    return render_template('cashflows.html', cashflows=cashflows)
 
 @app.route('/cashflows/add', methods=['GET', 'POST'])
+@_log_error(error_message='Error adding cashflow', 
+            template='add_edit_cashflow.html', transactions=[], 
+            cashflow_types=CashflowController.get_cashflow_types())
 def add_cashflow():
     """Add new cashflow"""
-    types = CashflowController.get_cashflow_types()
-    try:
-        if request.method == 'POST':
-            incomeid = request.form['incomeid']
-            expenseid = request.form['expenseid']
-            type_ = request.form['type']
-            CashflowController.add_cashflow(expenseid, incomeid, type_)
-            return _log_success('Cashflow added successfully!', 'cashflows')
-        else:
-            transactions = TransactController.transactions()
-            return render_template('add_edit_cashflow.html', 
-                                   transactions=transactions, 
-                                   cashflow_types=types)
-        
-    except Exception as e:
-        _check_log_assertion_err('Error adding cashflow', e)
-        return render_template('add_edit_cashflow.html', transactions=[], 
-                               cashflow_types=types)
+    if request.method == 'POST':
+        incomeid = request.form['incomeid']
+        expenseid = request.form['expenseid']
+        type_ = request.form['type']
+        CashflowController.add_cashflow(expenseid, incomeid, type_)
+        return _log_success(Model.cashflow, Action.add)
+    else:
+        transactions = TransactController.transactions()
+        return render_template('add_edit_cashflow.html', 
+                                transactions=transactions, 
+                                cashflow_types=CashflowController.
+                                get_cashflow_types())
 
-# Before doing this method, the code needs to be abstracted
 @app.route('/cashflows/edit', methods=['GET', 'POST'])
 def edit_cashflow():
     """
@@ -459,4 +458,5 @@ def verify():
     return 'Hello world'
 
 if __name__ == '__main__':
-    app.run(debug=app.config['DEBUG'], port=app.config['PORT'], load_dotenv=False)
+    app.run(debug=app.config['DEBUG'], port=app.config['PORT'], 
+            load_dotenv=False)
