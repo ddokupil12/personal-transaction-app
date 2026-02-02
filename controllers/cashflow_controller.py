@@ -12,5 +12,5 @@ class CashflowController:
         CashflowModel.add_cashflow(expenseid, incomeid, type_)
 
     @staticmethod
-    def get_cashflow_types():
+    def get_types():
         return ['Business', 'Transfer']
