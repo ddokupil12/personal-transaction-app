@@ -88,7 +88,7 @@ class TransactModel:
         )
     @staticmethod
     def get_account_balance(account_id):
-        """Calculate account balance using transaction table"""
+        # Calculate account balance using transaction table
         result = db_fetchone("""
                              SELECT COALESCE(SUM(amount), 0) as balance
                              FROM transact

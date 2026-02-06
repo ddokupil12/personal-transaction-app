@@ -8,12 +8,9 @@ __all__ = ['BudgetController']
 class BudgetController:
     @staticmethod
     def budgets(year, month):
-        """
-        Controller to get all budgets
-        
-        :param year: int (budget year)
-        :param month: int (budget month)
-        """
+        # Controller to get all budgets
+        # :param year: int (budget year)
+        # :param month: int (budget month)
         totalSpent = 0
         budgetSpending = 0
         budgetIncome = 0
@@ -44,19 +41,17 @@ class BudgetController:
         
     @staticmethod
     def add_budget(category_id, budget_year, budget_month, amount):
-        """
-        Controller for adding budgets
-        
-        :param category_id: int
-        :param budget_year: int
-        :param budget_month: int
-        :param amount: Decimal
+        # Controller for adding budgets
+        # 
+        # :param category_id: int
+        # :param budget_year: int
+        # :param budget_month: int
+        # :param amount: Decimal
 
-        Raises AssertionError when:
-            amount == 0
-            budget_month is not one of the 12 months
-            budget_year is not in the 2020s
-        """
+        # Raises AssertionError when:
+        #     amount == 0
+        #     budget_month is not one of the 12 months
+        #     budget_year is not in the 2020s
         budget_amount = Decimal(amount)
         budget_month = int(budget_month)
         budget_year = int(budget_year)

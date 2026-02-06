@@ -5,7 +5,7 @@ __all__ = ['GeneralController']
 class GeneralController:
     @staticmethod
     def dashboard(limit):
-        """Main dashboard showing accounts and recent transactions"""
+        # Main dashboard showing accounts and recent transactions
         accounts = AccountModel.get_accounts()
         
         for account in accounts: # Add balance to each account
