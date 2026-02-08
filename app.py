@@ -9,15 +9,15 @@ from controllers import CatController, GeneralController, TransactController
 from context import app
 from message import log_error, log_success, Model, Action
 
-
 @app.route('/')
 @log_error(template='dashboard.html', accounts=[], recent_transactions=[],
            action=Action.read)
 def dashboard():
     """
-    Main dashboard showing accounts and recent transactions
+    Load the main dashboard showing accounts and recent transactions.
     
-    O(n) (where n = len(accounts))
+    This function takes no arguments and returns the rendered template 
+    showing a simplified view of all accounts and recent transactions.
     """
     limit = 10 # limit the recent transactions
     accounts, recent_transactions = GeneralController.dashboard(limit)
@@ -28,9 +28,10 @@ def dashboard():
 @log_error(template='accounts.html', action=Action.read, accounts=[])
 def accounts():
     """
-    Manage accounts
+    View all accounts.
 
-    O(n) (where n = len(accounts))
+    This function takes no arguments and returns the rendered template 
+    showing all accounts in detail.
     """
     accounts = AcctController.accounts()
     return render_template('accounts.html', accounts=accounts)
@@ -39,7 +40,15 @@ def accounts():
 @log_error(action=Action.add, template='add_edit_account.html', mode='Add')
 def add_account():
     """
-    Add new account
+    Add a new account.
+
+    On a GET request, this function takes no arguments and returns a
+    page that allows a user to add a new account. The user can
+    enter an account name and an account type.
+
+    On a POST request, this function takes an account name and type as
+    arguments. The user will get a success or error message depending 
+    on whether the account could be added.
     
     Method parameters: None
 
@@ -48,8 +57,6 @@ def add_account():
     POST request parameters:
     accountname: str
     accounttype: str
-
-    O(1)
     """
     if request.method == 'POST':
         name = request.form['accountname']
@@ -64,7 +71,15 @@ def add_account():
            mode='Edit')
 def edit_account():
     """
-    Edit existing account
+    Edit an existing account.
+
+    On a GET request, this function takes no arguments and returns a
+    page with account information filled in. The user can then change
+    the information.
+
+    On a POST request, this function takes an account id, name, and 
+    type as arguments. The user will get a success or error message 
+    depending on whether the account could be edited.
     
     Method parameters: None
 
@@ -90,9 +105,10 @@ def edit_account():
 @log_error(action=Action.read, template='categories.html', categories=[])
 def categories():
     """
-    View categories
+    View all categories.
     
-    O(n) (where n = len(categories))
+    This function takes no arguments and returns the rendered template 
+    showing all categories in detail.
     """
     categories = CatController.categories()
     return render_template('categories.html', categories=categories)
@@ -101,7 +117,15 @@ def categories():
 @log_error(action=Action.add, template='add_edit_category.html')
 def add_category():
     """
-    Add new category
+    Add a new category.
+
+    On a GET request, this function takes no arguments and returns a
+    page that allows a user to add a new category. The user can
+    enter a category name and select a category type.
+
+    On a POST request, this function takes a category name and type as
+    arguments. The user will get a success or error message depending 
+    on whether the category could be added.
 
     Method parameters: None
 
@@ -128,7 +152,8 @@ def add_category():
 @log_error(action=Action.edit, template='add_edit_category.html')
 def edit_category():
     """
-    Edit a selected category
+    Edit a selected category.
+
     For future implementation
     """
     return 'Hello World'
@@ -138,9 +163,11 @@ def edit_category():
            p=1, has_next=False, has_prev=False)
 def transactions():
     """
-    View all transactions
+    View all transactions.
     
-    O(limit) (could be up to len(transactions))
+    This function takes no arguments and returns the rendered template 
+    showing all transactions in detail. There is a Next button at the
+    bottom of the page to show more transactions.
     """
     page = request.args.get('p', 1, type=int)
     per_page = 20
@@ -156,8 +183,18 @@ def transactions():
            accounts=[], categories=[], datetime=datetime, mode='Add')
 def add_transaction():
     """
-    Add new transaction
+    Add a new transaction.
     
+    On a GET request, this function takes no arguments and returns a
+    page that allows a user to add a new transaction. The user can 
+    select an account and category, and then enter the amount, date,
+    and description.
+
+    On a POST request, this function takes an account ID, category ID, 
+    amount, date, and description as arguments. The user will get a 
+    success or error message depending on whether the transaction could
+    be added.
+
     Method parameters: None
 
     GET request parameters: None
@@ -203,7 +240,7 @@ def add_transaction():
            transaction=None, datetime=datetime, accounts=[], categories=[])
 def edit_transaction():
     """
-    Edit a selected transaction
+    Edit a selected transaction.
 
     Method parameters: None
 
@@ -253,7 +290,7 @@ def edit_transaction():
            datetime=datetime, abs=abs)
 def budgets():
     """
-    View budgets
+    View all budgets.
     
     O(n) (where n = len(budgets))
     """
@@ -269,7 +306,15 @@ def budgets():
            datetime=datetime)
 def add_budget():
     """
-    Add new budget
+    Add a new budget.
+
+    On a GET request, this function takes no arguments and returns a
+    page that allows a user to add a new budget. The user can
+    select a year, month, and category, and then enter an amount.
+
+    On a POST request, this function takes a category ID, month, year,
+    and amount as arguments. The user will get a success or error 
+    message depending on whether the budget could be added.
 
     Method parameters: None
 
@@ -305,7 +350,8 @@ def add_budget():
 @app.route('/budgets/edit', methods=['GET', 'POST'])
 def edit_budget():
     """
-    Edit a selected budget
+    Edit a selected budget.
+
     For future implementation
     """
     # This functionality exists in add_budget(). If you try to add 
@@ -316,7 +362,7 @@ def edit_budget():
 @app.route('/cashflows')
 @log_error(action=Action.read, template='cashflows.html', cashflows=[])
 def cashflows():
-    """View cashflows"""
+    """View all cashflows."""
     cashflows = CashflowController.cashflows()
     return render_template('cashflows.html', cashflows=cashflows)
 
@@ -325,7 +371,7 @@ def cashflows():
            transactions=[], 
            cashflow_types=CashflowController.get_types())
 def add_cashflow():
-    """Add new cashflow"""
+    """Add a new cashflow."""
     if request.method == 'POST':
         incomeid = request.form['incomeid']
         expenseid = request.form['expenseid']
@@ -342,7 +388,8 @@ def add_cashflow():
 @app.route('/cashflows/edit', methods=['GET', 'POST'])
 def edit_cashflow():
     """
-    Edit a selected cashflow
+    Edit a selected cashflow.
+
     For future implementation
     """
     return 'Hello world'
@@ -350,8 +397,11 @@ def edit_cashflow():
 @app.route('/verify', methods=['GET'])
 def verify():
     """
+    Verify that account transfers and cashflows are correct.
+
     Verify that the sum of all account transfers is 0 and that all 
-    cashflows have 2 equal sides
+    cashflows have 2 equal sides.
+
     For future implementation
     """
     return 'Hello world'
