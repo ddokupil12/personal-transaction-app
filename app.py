@@ -242,6 +242,15 @@ def edit_transaction():
     """
     Edit a selected transaction.
 
+    On a GET request, this function takes no arguments and returns a
+    page with transaction information filled in. The user can then change
+    the information.
+
+    On a POST request, this function takes an account ID, category ID, 
+    transaction ID, description, date, and amount as arguments. The 
+    user will get a success or error message depending on whether the 
+    transaction could be edited.
+
     Method parameters: None
 
     GET request parameters: None
