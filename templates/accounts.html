@@ -25,7 +25,7 @@
                                     ${{ "{:,.2f}".format(account.balance) }}
                                 </span>
                             </p>
-                            <small class="text-muted">Created: {{ account.createdat.strftime('%m/%d/%Y') }}</small>
+                            <small class="text-muted">Created: {{ account.date_created.strftime('%m/%d/%Y') }}</small>
                             {% set edit_url = url_for('edit_account') %}
                             {% set edit_value = account.accountid %}
                             {% include 'edit_button.html' %}
