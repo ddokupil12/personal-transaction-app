@@ -2,6 +2,7 @@ from decimal import Decimal
 from datetime import datetime
 
 from models import TransactModel
+from .acct_controller import AcctController
 
 __all__ = ['TransactController']
 
@@ -48,3 +49,15 @@ class TransactController:
         TransactModel.edit_transaction(account_id, category_id, amount,
                                        transaction_date, description, 
                                        transaction_id)
+        
+    @staticmethod
+    def dashboard(limit):
+        # Main dashboard showing accounts and recent transactions
+        accounts = AcctController.accounts()
+        
+        # Get recent transactions
+        recent_transactions, _ = TransactModel.get_transactions(
+            limit, 
+            return_total=False
+        )
+        return accounts, recent_transactions
