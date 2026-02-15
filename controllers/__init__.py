@@ -1,3 +1,5 @@
+# This package has all of the controllers for the app.
+
 from .acct_controller import AcctController
 from .budget_controller import BudgetController
 from .cashflow_controller import CashflowController

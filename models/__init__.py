@@ -1,3 +1,5 @@
+# This package has all of the models for the app.
+
 from .account_model import AccountModel
 from .budget_model import BudgetModel
 from .cashflow_model import CashflowModel
