@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import render_template, request
 
 from controllers import AcctController, BudgetController, CashflowController
-from controllers import CatController, GeneralController, TransactController
+from controllers import CatController, TransactController
 from context import app
 from message import log_error, log_success, Model, Action
 
@@ -20,7 +20,7 @@ def dashboard():
     showing a simplified view of all accounts and recent transactions.
     """
     limit = 10 # limit the recent transactions
-    accounts, recent_transactions = GeneralController.dashboard(limit)
+    accounts, recent_transactions = TransactController.dashboard(limit)
     return render_template('dashboard.html', accounts=accounts, 
                            recent_transactions=recent_transactions)
 
