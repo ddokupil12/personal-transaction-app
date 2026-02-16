@@ -59,7 +59,7 @@ def _match_action(action):
     # Returns:
     # past: action verb in past tense (ex. 'added')
     # participle: action verb as a present participle (ex. 'adding')
-    match action:
+    match action: # Simple past and present participle for each Action
         case Action.add:
             past = 'added'
             participle = 'adding'
