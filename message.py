@@ -95,17 +95,19 @@ def log_success(model, action, **kwargs):
     return redirect(url_for(rte, **kwargs))
 
 def log_error(
-    log_level='error',  # Logging level
+    log_level='error',
     action=None,
-    pg_template='dashboard.html', # The template that will load
-    **pg_kwargs # The kwargs for the template
+    pg_template='dashboard.html',
+    **pg_kwargs
 ):
     """
     Log errors and return a template
     
     :param log_level: Logging level (debug, info, warning, error)
-    :param error_message: Default error message
-    :param custom_handler: Custom error handling function
+        For future implementation
+    :param action: the Action attempted
+    :param pg_template: The page that will be loaded
+    :param pg_kwargs: The kwargs for the template
     """
     def decorator(func):
         @wraps(func)
