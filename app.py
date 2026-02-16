@@ -401,8 +401,7 @@ def cashflows():
 
 @app.route('/cashflows/add', methods=['GET', 'POST'])
 @log_error(action=Action.add, template='add_edit_cashflow.html', 
-           transactions=[], 
-           cashflow_types=CashflowController.get_types())
+           transactions=[], types=CashflowController.get_types())
 def add_cashflow():
     """Add a new cashflow."""
     if request.method == 'POST':
@@ -415,8 +414,7 @@ def add_cashflow():
         transactions = TransactController.transactions()
         return render_template('add_edit_cashflow.html', 
                                transactions=transactions, 
-                               cashflow_types=CashflowController.
-                               get_types())
+                               types=CashflowController.get_types())
 
 @app.route('/cashflows/edit', methods=['GET', 'POST'])
 def edit_cashflow():
