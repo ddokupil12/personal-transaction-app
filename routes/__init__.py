@@ -1,3 +1,5 @@
+# This package has all of the routes for the app.
+
 from account_routes import acct_bp
 from budget_routes import budget_bp
 from cashflow_routes import cashflow_bp
