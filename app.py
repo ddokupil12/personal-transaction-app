@@ -22,6 +22,8 @@
     If not, see <https://www.gnu.org/licenses/>.
 """
 
+__all__ = []
+
 from context import app, create_app
 
 if __name__ == '__main__':

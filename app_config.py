@@ -1,8 +1,8 @@
+__all__ = ['config', 'is_dotenv_loaded']
+
 from os import environ
 
 from dotenv import load_dotenv
-
-__all__ = ['config', 'is_dotenv_loaded']
 
 is_dotenv_loaded = load_dotenv()
 

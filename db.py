@@ -1,9 +1,9 @@
+__all__ = ['get_db_connection', 'db_fetchall', 'db_fetchone', 'db_commit']
+
 from contextlib import contextmanager
 from mysql.connector import Error, connect
 
 from context import DB_CONFIG
-
-__all__ = ['get_db_connection', 'db_fetchall', 'db_fetchone', 'db_commit']
 
 @contextmanager
 def get_db_connection():
