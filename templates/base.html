@@ -49,7 +49,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+            <a class="navbar-brand" href="{{ url_for('transact.dashboard') }}">
                 <i class="fas fa-wallet me-2"></i>Budget Manager
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -58,27 +58,27 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('accounts') }}">
+                        <a class="nav-link" href="{{ url_for('acct.accounts') }}">
                             <i class="fas fa-university me-1"></i>Accounts
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('transactions') }}">
+                        <a class="nav-link" href="{{ url_for('transact.transactions') }}">
                             <i class="fas fa-exchange-alt me-1"></i>Transactions
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('categories') }}">
+                        <a class="nav-link" href="{{ url_for('category.categories') }}">
                             <i class="fas fa-tags me-1"></i>Categories
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('budgets') }}">
+                        <a class="nav-link" href="{{ url_for('budget.budgets') }}">
                             <i class="fas fa-chart-pie me-1"></i>Budgets
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('cashflows')}}">
+                        <a class="nav-link" href="{{ url_for('cashflow.cashflows')}}">
                             <i class="fa fa-adjust"></i> cashflows
                         </a>
                     </li>
