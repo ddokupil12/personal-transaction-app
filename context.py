@@ -10,7 +10,7 @@ from app_config import config, is_dotenv_loaded
 assert is_dotenv_loaded, 'Load dotenv before running app'
 
 _config_name = environ.get('CONFIG_NAME')
-app = Flask(__name__, template_folder='./templates')
+app = Flask(__name__)
 app.config.from_object(config.get(_config_name, config['default']))
 DB_CONFIG = app.config['DB_CONFIG']
 
