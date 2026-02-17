@@ -7,9 +7,7 @@
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><i class="fas fa-adjust"></i> cashflows</h1>
-        <a href="{{ url_for('cashflow.add_cashflow') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i>Add cashflow
-        </a>
+        {% include 'cashflow_button.html' %}
     </div>
     <div class="card">
         <div class="card-body">
@@ -111,9 +109,7 @@
                     <i class="fas fa-adjust"></i>
                     <h5>No cashflows found</h5>
                     <p class="text-muted">Start by adding your first cashflow.</p>
-                    <a href="{{ url_for('cashflow.add_cashflow') }}" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i>Add cashflow
-                    </a>
+                    {% include 'cashflow_button.html' %}
                 </div>
             {% endif %}
         </div>
