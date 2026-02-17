@@ -1,0 +1,5 @@
+<label for="amount" class="form-label">Amount</label>
+<div class="input-group">
+    <span class="input-group-text">$</span>
+    <input type="number" step="0.01" class="form-control" id="amount" name="amount" required {% if pg == 'budget' %} min="0" {% endif %} value="{{transaction.amount if transaction else ''}}">
+</div>

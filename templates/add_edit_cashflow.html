@@ -37,7 +37,7 @@
                         <div class="mb-3">
                             <select class="form-select" id="type" name="type" required>
                                 <option value="">Select type...</option>
-                                {% for t in cashflow_types %}
+                                {% for t in types %}
                                 <option value="{{t}}">{{t}}</option>
                                 {% endfor %}
                             </select>
@@ -46,7 +46,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save me-1"></i>Save cashflow
                             </button>
-                            <a href="{{ url_for('cashflows') }}" class="btn btn-outline-secondary">Cancel</a>
+                            <a href="{{ url_for('cashflow.cashflows') }}" class="btn btn-outline-secondary">Cancel</a>
                         </div>
                     </form>
                 </div>

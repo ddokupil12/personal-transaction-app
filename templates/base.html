@@ -34,7 +34,7 @@
             padding: 1px;
         }
         .footer-button:hover {
-            color: blue; /* Turn black on hover */
+            color: blue;
             text-decoration: underline;
         }
         .footer-text {
@@ -49,7 +49,7 @@
     <!-- Navigation -->
     <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
+            <a class="navbar-brand" href="{{ url_for('transact.dashboard') }}">
                 <i class="fas fa-wallet me-2"></i>Budget Manager
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -58,27 +58,27 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('accounts') }}">
+                        <a class="nav-link" href="{{ url_for('acct.accounts') }}">
                             <i class="fas fa-university me-1"></i>Accounts
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('transactions') }}">
+                        <a class="nav-link" href="{{ url_for('transact.transactions') }}">
                             <i class="fas fa-exchange-alt me-1"></i>Transactions
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('categories') }}">
+                        <a class="nav-link" href="{{ url_for('category.categories') }}">
                             <i class="fas fa-tags me-1"></i>Categories
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('budgets') }}">
+                        <a class="nav-link" href="{{ url_for('budget.budgets') }}">
                             <i class="fas fa-chart-pie me-1"></i>Budgets
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('cashflows')}}">
+                        <a class="nav-link" href="{{ url_for('cashflow.cashflows')}}">
                             <i class="fa fa-adjust"></i> cashflows
                         </a>
                     </li>
@@ -116,10 +116,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
     {% block scripts %}{% endblock %}
     <footer>
-        <span class="footer-text text-muted">Version 4</span>
+        <span class="footer-text text-muted">Version 5</span>
+        <span class="footer-text text-muted">Copyright (C) 2026 David Dokupil</span>
         <span class="footer-text text-muted">Open source under AGPLv3</span>
         <span>
-            <button class="btn footer-button" onclick="window.open('https:/\/github.com/ddokupil12/personal-transaction-app', '_blank')">GitHub</button>
+            <button class="btn footer-button" onclick="window.open('https:/\/github.com/ddokupil12/personal-transaction-app')">GitHub</button>
         </span>
     </footer>
 </body>

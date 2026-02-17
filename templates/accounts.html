@@ -7,7 +7,7 @@
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><i class="fas fa-university me-2"></i>Accounts</h1>
-        <a href="{{ url_for('add_account') }}" class="btn btn-primary">
+        <a href="{{ url_for('acct.add_account') }}" class="btn btn-primary">
             <i class="fas fa-plus me-1"></i>Add Account
         </a>
     </div>
@@ -25,8 +25,8 @@
                                     ${{ "{:,.2f}".format(account.balance) }}
                                 </span>
                             </p>
-                            <small class="text-muted">Created: {{ account.createdat.strftime('%m/%d/%Y') }}</small>
-                            {% set edit_url = url_for('edit_account') %}
+                            <small class="text-muted">Created: {{ account.date_created.strftime('%m/%d/%Y') }}</small>
+                            {% set edit_url = url_for('acct.edit_account') %}
                             {% set edit_value = account.accountid %}
                             {% include 'edit_button.html' %}
                         </div>
@@ -40,7 +40,7 @@
                         <i class="fas fa-university fa-3x text-muted mb-3"></i>
                         <h5>No accounts found</h5>
                         <p class="text-muted">Get started by adding your first account.</p>
-                        <a href="{{ url_for('add_account') }}" class="btn btn-primary">
+                        <a href="{{ url_for('acct.add_account') }}" class="btn btn-primary">
                             <i class="fas fa-plus me-1"></i>Add Account
                         </a>
                     </div>

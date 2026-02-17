@@ -2,7 +2,7 @@ CREATE TABLE Acct (
     accountid INT AUTO_INCREMENT PRIMARY KEY,
     accountname VARCHAR(50) NOT NULL,
     accounttype VARCHAR(50),
-    createdat DATETIME DEFAULT CURRENT_TIMESTAMP
+    date_created DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 CREATE TABLE category (
     categoryid INT AUTO_INCREMENT PRIMARY KEY,

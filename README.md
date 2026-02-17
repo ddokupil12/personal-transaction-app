@@ -1,7 +1,7 @@
 # Personal Transaction App
 
 This Flask application allows users to keep track of personal finances. 
-Users can add multiple accounts and categories to sort transactions and add budgets to keep track of spending in important areas.
+Users can add multiple accounts and categories to sort transactions. Additionally, users can add budgets to keep track of spending in important areas.
 
 # Specs
 
@@ -86,7 +86,7 @@ account = db_fetchone(
         FROM acct
         WHERE accountid = %s
     """, [account_id]
-    )
+)
 ```
 
 - When this doesn't work, use the hanging indent method:
