@@ -1,9 +1,9 @@
+__all__ = ['BudgetController']
+
 from decimal import Decimal
 from datetime import datetime
 
 from models import BudgetModel
-
-__all__ = ['BudgetController']
 
 class BudgetController:
     @staticmethod

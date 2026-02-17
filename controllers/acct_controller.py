@@ -1,6 +1,6 @@
-from models import AccountModel, TransactModel
-
 __all__ = ['AcctController']
+
+from models import AccountModel, TransactModel
 
 class AcctController:
     @staticmethod

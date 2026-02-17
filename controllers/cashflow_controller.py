@@ -1,6 +1,6 @@
-from models import CashflowModel
-
 __all__ = ['CashflowController']
+
+from models import CashflowModel
 
 class CashflowController:
     @staticmethod

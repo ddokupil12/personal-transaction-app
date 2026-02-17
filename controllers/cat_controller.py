@@ -1,6 +1,6 @@
-from models import CategoryModel
-
 __all__ = ['CatController']
+
+from models import CategoryModel
 
 class CatController:
     @staticmethod

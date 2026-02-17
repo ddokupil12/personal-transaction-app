@@ -1,10 +1,10 @@
+__all__ = ['TransactController']
+
 from decimal import Decimal
 from datetime import datetime
 
 from models import TransactModel
 from .acct_controller import AcctController
-
-__all__ = ['TransactController']
 
 class TransactController:
     @staticmethod
