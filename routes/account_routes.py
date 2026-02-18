@@ -6,7 +6,7 @@ from controllers import AcctController
 acct_bp = Blueprint('acct', __name__)
 
 @acct_bp.route('/accounts')
-@log_error(template='accounts.html', action=Action.read, accounts=[])
+@log_error(pg_template='accounts.html', action=Action.read, accounts=[])
 def accounts():
     """
     View all accounts.
@@ -18,7 +18,7 @@ def accounts():
     return render_template('accounts.html', accounts=accounts)
 
 @acct_bp.route('/accounts/add', methods=['GET', 'POST'])
-@log_error(action=Action.add, template='add_edit_account.html', mode='Add')
+@log_error(action=Action.add, pg_template='add_edit_account.html', mode='Add')
 def add_account():
     """
     Add a new account.

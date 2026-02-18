@@ -6,14 +6,14 @@ from controllers import CashflowController, TransactController
 cashflow_bp = Blueprint('cashflow', __name__)
 
 @cashflow_bp.route('/cashflows')
-@log_error(action=Action.read, template='cashflows.html', cashflows=[])
+@log_error(action=Action.read, pg_template='cashflows.html', cashflows=[])
 def cashflows():
     """View all cashflows."""
     cashflows = CashflowController.cashflows()
     return render_template('cashflows.html', cashflows=cashflows)
 
 @cashflow_bp.route('/cashflows/add', methods=['GET', 'POST'])
-@log_error(action=Action.add, template='add_edit_cashflow.html', 
+@log_error(action=Action.add, pg_template='add_edit_cashflow.html', 
            transactions=[], types=CashflowController.get_types())
 def add_cashflow():
     """Add a new cashflow."""

@@ -8,7 +8,7 @@ from controllers import TransactController, AcctController, CatController
 transact_bp = Blueprint('transact', __name__)
 
 @transact_bp.route('/')
-@log_error(template='dashboard.html', accounts=[], recent_transactions=[],
+@log_error(pg_template='dashboard.html', accounts=[], recent_transactions=[],
            action=Action.read)
 def dashboard():
     """
@@ -23,7 +23,7 @@ def dashboard():
                            recent_transactions=recent_transactions)
 
 @transact_bp.route('/transactions')
-@log_error(action=Action.read, template='transactions.html', transactions=[], 
+@log_error(action=Action.read, pg_template='transactions.html', transactions=[], 
            p=1, has_next=False, has_prev=False)
 def transactions():
     """
@@ -43,7 +43,7 @@ def transactions():
                            p=page, has_next=has_next, has_prev=has_prev)
 
 @transact_bp.route('/transactions/add', methods=['GET', 'POST'])
-@log_error(action=Action.add, template='add_edit_transaction.html', 
+@log_error(action=Action.add, pg_template='add_edit_transaction.html', 
            accounts=[], categories=[], datetime=datetime, mode='Add')
 def add_transaction():
     """
@@ -100,7 +100,7 @@ def add_transaction():
                                 datetime=datetime, mode='Add')
     
 @transact_bp.route('/transactions/edit', methods=['GET', 'POST'])
-@log_error(action=Action.edit, template='add_edit_transaction.html', 
+@log_error(action=Action.edit, pg_template='add_edit_transaction.html', 
            transaction=None, datetime=datetime, accounts=[], categories=[])
 def edit_transaction():
     """

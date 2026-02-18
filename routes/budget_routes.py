@@ -8,7 +8,7 @@ from controllers import BudgetController, CatController
 budget_bp = Blueprint('budget', __name__)
 
 @budget_bp.route('/budgets')
-@log_error(action=Action.read, template='budgets.html', budgets=[], 
+@log_error(action=Action.read, pg_template='budgets.html', budgets=[], 
            year=datetime.now().year, month=datetime.now().month, 
            datetime=datetime, abs=abs)
 def budgets():
@@ -25,7 +25,7 @@ def budgets():
                            month=month, datetime=datetime, summary=summary)
 
 @budget_bp.route('/budgets/add', methods=['GET', 'POST'])
-@log_error(action=Action.add, template='add_edit_budget.html', categories=[], 
+@log_error(action=Action.add, pg_template='add_edit_budget.html', categories=[], 
            datetime=datetime)
 def add_budget():
     """
