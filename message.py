@@ -34,19 +34,19 @@ def _match_model(model):
     match model:
         case Model.acct:
             message = 'account'
-            rte = 'accounts'
+            rte = 'acct.accounts'
         case Model.budget:
             message = 'budget'
-            rte = 'budgets'
+            rte = 'budget.budgets'
         case Model.cashflow:
             message = 'cashflow'
-            rte = 'cashflows'
+            rte = 'cashflow.cashflows'
         case Model.transact:
             message = 'transaction'
-            rte = 'transactions'
+            rte = 'transact.transactions'
         case _ :
             message = 'data'
-            rte = 'dashboard'
+            rte = 'transact.dashboard'
 
     return message, rte
 
@@ -97,6 +97,7 @@ def log_success(model, action, **kwargs):
 def log_error(
     log_level='error',
     action=None,
+    model=None,
     pg_template='dashboard.html',
     **pg_kwargs
 ):
@@ -118,7 +119,7 @@ def log_error(
                 if isinstance(e, AssertionError):
                     error_message = e
                 elif isinstance(action, Action):
-                    model_msg, _ = _match_model(None)
+                    model_msg, _ = _match_model(model)
                     _, action_msg = _match_action(action) # returns participle
                     error_message = f'Error {action_msg} {model_msg}'
                 else:
@@ -128,6 +129,7 @@ def log_error(
                 print('err:', e)
                 print_exc()
 
+                print(pg_template)
                 return render_template(pg_template, **pg_kwargs)
         
         return wrapper
