@@ -8,8 +8,8 @@ from .acct_controller import AcctController
 
 class TransactController:
     @staticmethod
-    def transactions(per_page=None, offset=None):
-        return TransactModel.get_transactions(per_page, offset)
+    def transactions(per_page=None, offset=None, search_query=None):
+        return TransactModel.get_transactions(per_page, offset, search_query)
     
     @staticmethod
     def get_transaction(transaction_id):

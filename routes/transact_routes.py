@@ -24,7 +24,7 @@ def dashboard():
 
 @transact_bp.route('/transactions')
 @log_error(action=Action.read, pg_template='transactions.html', transactions=[], 
-           p=1, has_next=False, has_prev=False)
+           p=1, has_next=False, has_prev=False, str=str)
 def transactions():
     """
     View all transactions.
@@ -34,13 +34,23 @@ def transactions():
     bottom of the page to show more transactions.
     """
     page = request.args.get('p', 1, type=int)
+    query = request.args.get('s', 1, type=str)
     per_page = 20
     offset = (page - 1) * per_page
-    transactions, total = TransactController.transactions(per_page, offset)
+    transactions, total = TransactController.transactions(per_page, offset, query)
     has_next = offset + per_page < total
     has_prev = page > 1
     return render_template('transactions.html', transactions=transactions,
-                           p=page, has_next=has_next, has_prev=has_prev)
+                           p=page, has_next=has_next, has_prev=has_prev, s='')
+
+@transact_bp.route('/transactions/search')
+@log_error(action=Action.read, pg_template='transactions.html', transactions=[], str=str)
+def search():
+    """Search the descriptions of the transactions and return matches"""
+    query = request.args.get('s', 1, type=str)
+    transactions, _ = TransactController.transactions(search_query=query)
+    return render_template('transactions.html', transactions=transactions,
+                           p=1, has_next=False, has_prev=False, s=query)
 
 @transact_bp.route('/transactions/add', methods=['GET', 'POST'])
 @log_error(action=Action.add, pg_template='add_edit_transaction.html', 

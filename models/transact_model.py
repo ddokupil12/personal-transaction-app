@@ -2,7 +2,8 @@ from db import db_fetchone, db_fetchall, db_commit
 
 class TransactModel:
     @staticmethod
-    def get_transactions(per_page=None, offset=0, return_total=True):
+    def get_transactions(per_page=None, offset=0, 
+                         search_query=None, return_total=True):
         if per_page is not None:
             transactions = db_fetchall("""
                 SELECT t.*, a.accountname, c.categoryname 
@@ -12,6 +13,15 @@ class TransactModel:
                 ORDER BY t.transactiondate DESC, t.transactionid DESC
                 LIMIT %s OFFSET %s
             """, (per_page, offset))
+        elif search_query is not None:
+            transactions = db_fetchall("""
+                SELECT t.*, a.accountname, c.categoryname 
+                FROM transact t
+                JOIN acct a ON t.accountid = a.accountid
+                JOIN category c ON t.Categoryid = c.Categoryid
+                WHERE t.dscr like %s
+                ORDER BY t.transactiondate DESC, t.transactionid DESC
+            """, (f'%{search_query}%',))
         else:
             transactions = db_fetchall("""
                 SELECT *
