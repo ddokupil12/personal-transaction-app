@@ -1,32 +1,24 @@
-"""
-    This appplication allows users to keep track of personal finances.
-    
-    Copyright (C) 2026 David Dokupil
+__all__ = ['app', 'DB_CONFIG', 'create_app']
 
-    Users can add multiple accounts and categories to sort 
-    transactions. Additionally, users can add budgets to keep track of 
-    spending in important areas.
+from os import environ
 
-    This program is free software: you can redistribute it and/or 
-    modify it under the terms of the GNU Affero General Public License 
-    as published by the Free Software Foundation, either version 3 of 
-    the License, or (at your option) any later version.
+from flask import Flask
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
-    Affero General Public License for more details.
+from config import config, is_dotenv_loaded
 
-    You should have received a copy of the GNU Affero General Public 
-    License along with this program in `LICENSE.txt'. 
-    If not, see <https://www.gnu.org/licenses/>.
-"""
+# dotenv should be loaded in config
+assert is_dotenv_loaded, 'Load dotenv before running app'
 
-__all__ = []
+_config_name = environ.get('CONFIG_NAME')
+app = Flask(__name__)
+app.config.from_object(config.get(_config_name, config['default']))
+DB_CONFIG = app.config['DB_CONFIG']
 
-from context import app, create_app
+def create_app():
+    from routes import acct_bp, budget_bp, cashflow_bp, category_bp, transact_bp
 
-if __name__ == '__main__':
-    create_app()
-    app.run(debug=app.config['DEBUG'], port=app.config['PORT'], 
-            load_dotenv=False)
+    app.register_blueprint(acct_bp)
+    app.register_blueprint(budget_bp)
+    app.register_blueprint(cashflow_bp)
+    app.register_blueprint(category_bp)
+    app.register_blueprint(transact_bp)
