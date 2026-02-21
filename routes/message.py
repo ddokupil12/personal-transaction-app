@@ -50,30 +50,55 @@ def _match_model(model):
 
     return message, rte
 
-def _match_action(action):
+def header_action(action):
+    match action:
+        case Action.add:
+            return 'Add New'
+        case Action.edit:
+            return 'Edit'
+        case _ :
+            return ''
+
+def _match_action(action, tense='participle'):
     # Helper function for `_log_success()`
     # Determines how to show the action name to the user
 
     # :param action: The successful action
 
-    # Returns:
+    # Returns one of:
+    # present: action verb in simple present tense (ex. 'add')
     # past: action verb in past tense (ex. 'added')
     # participle: action verb as a present participle (ex. 'adding')
-    match action: # Simple past and present participle for each Action
+
+    match action:
         case Action.add:
+            present = 'add'
             past = 'added'
             participle = 'adding'
         case Action.read:
+            present = 'load'
             past = 'loaded'
             participle = 'loading'
         case Action.edit:
+            present = 'edit'
             past = 'edited'
             participle = 'editing'
         case Action.delete:
+            present = 'delete'
             past = 'deleted'
             participle = 'deleting'
+        case _:
+            raise ValueError("Specify an action")
 
-    return past, participle
+    match tense:
+        case 'participle':
+            return participle
+        case 'past':
+            return past
+        case 'present':
+            return present
+        case _ :
+            raise ValueError("Use an available tense")
 
 def log_success(model, action, **kwargs):
     """
@@ -90,7 +115,7 @@ def log_success(model, action, **kwargs):
     O(1) (with constant route length)
     """
     model_msg, rte = _match_model(model)
-    action_msg, _ = _match_action(action)
+    action_msg = _match_action(action, 'past')
     flash(f'{model_msg} {action_msg} successfully!'.capitalize(), 'success')
     return redirect(url_for(rte, **kwargs))
 
@@ -120,17 +145,18 @@ def log_error(
                     error_message = e
                 elif isinstance(action, Action):
                     model_msg, _ = _match_model(model)
-                    _, action_msg = _match_action(action) # returns participle
+                    action_msg = _match_action(action) # returns participle
                     error_message = f'Error {action_msg} {model_msg}'
                 else:
                     error_message = 'An unexpected error occurred'
 
                 flash(error_message, 'error')
-                print('err:', e)
                 print_exc()
 
-                print(pg_template)
-                return render_template(pg_template, **pg_kwargs)
+                if pg_kwargs.get('mode') is None:
+                    mode = header_action(action)
+
+                return render_template(pg_template, mode=mode, **pg_kwargs)
         
         return wrapper
     return decorator
