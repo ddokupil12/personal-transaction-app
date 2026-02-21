@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, request
 
-from message import log_error, log_success, Model, Action
 from controllers import AcctController
+from .message import log_error, log_success, header_action, Model, Action
 
 acct_bp = Blueprint('acct', __name__)
 
 @acct_bp.route('/accounts')
-@log_error(pg_template='accounts.html', action=Action.read, accounts=[])
+@log_error(pg_template='accounts.html', model=Model.acct, action=Action.read, accounts=[])
 def accounts():
     """
     View all accounts.
@@ -18,7 +18,7 @@ def accounts():
     return render_template('accounts.html', accounts=accounts)
 
 @acct_bp.route('/accounts/add', methods=['GET', 'POST'])
-@log_error(action=Action.add, pg_template='add_edit_account.html', mode='Add')
+@log_error(model=Model.acct, action=Action.add, pg_template='add_edit_account.html')
 def add_account():
     """
     Add a new account.
@@ -45,11 +45,10 @@ def add_account():
         AcctController.add_account(name, account_type)
         return log_success(Model.acct, Action.add)
     
-    return render_template('add_edit_account.html', mode='Add')
+    return render_template('add_edit_account.html', mode=header_action(Action.add))
 
 @acct_bp.route('/accounts/edit', methods=['GET', 'POST'])
-@log_error(action=Action.edit, template='add_edit_account.html', account=None, 
-           mode='Edit')
+@log_error(model=Model.acct, action=Action.edit, template='add_edit_account.html', account=None)
 def edit_account():
     """
     Edit an existing account.
@@ -81,4 +80,4 @@ def edit_account():
         account_id = request.args['id']
         account = AcctController.get_account(account_id)
         return render_template('add_edit_account.html', account=account, 
-                               mode='Edit')
+                               mode=header_action(Action.edit))

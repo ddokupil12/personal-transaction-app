@@ -2,13 +2,13 @@ from datetime import datetime
 
 from flask import Blueprint, render_template, request
 
-from message import log_error, log_success, Model, Action
 from controllers import TransactController, AcctController, CatController
+from .message import log_error, log_success, header_action, Model, Action
 
 transact_bp = Blueprint('transact', __name__)
 
 @transact_bp.route('/')
-@log_error(pg_template='dashboard.html', accounts=[], recent_transactions=[],
+@log_error(pg_template='dashboard.html', accounts=[], recent_transactions=[], model=Model.transact,
            action=Action.read)
 def dashboard():
     """
@@ -23,7 +23,7 @@ def dashboard():
                            recent_transactions=recent_transactions)
 
 @transact_bp.route('/transactions')
-@log_error(action=Action.read, pg_template='transactions.html', transactions=[], 
+@log_error(model=Model.transact, action=Action.read, pg_template='transactions.html', transactions=[], 
            p=1, has_next=False, has_prev=False, str=str)
 def transactions():
     """
@@ -44,7 +44,7 @@ def transactions():
                            p=page, has_next=has_next, has_prev=has_prev, s='')
 
 @transact_bp.route('/transactions/search')
-@log_error(action=Action.read, pg_template='transactions.html', transactions=[], str=str)
+@log_error(model=Model.transact, action=Action.read, pg_template='transactions.html', transactions=[], str=str)
 def search():
     """Search the descriptions of the transactions and return matches"""
     query = request.args.get('s', 1, type=str)
@@ -53,8 +53,8 @@ def search():
                            p=1, has_next=False, has_prev=False, s=query)
 
 @transact_bp.route('/transactions/add', methods=['GET', 'POST'])
-@log_error(action=Action.add, pg_template='add_edit_transaction.html', 
-           accounts=[], categories=[], datetime=datetime, mode='Add')
+@log_error(model=Model.transact, action=Action.add, pg_template='add_edit_transaction.html', 
+           accounts=[], categories=[], datetime=datetime)
 def add_transaction():
     """
     Add a new transaction.
@@ -107,10 +107,10 @@ def add_transaction():
         categories = CatController.categories()
         return render_template('add_edit_transaction.html',             
                                 accounts=accounts, categories=categories, 
-                                datetime=datetime, mode='Add')
+                                datetime=datetime, mode=header_action(Action.add))
     
 @transact_bp.route('/transactions/edit', methods=['GET', 'POST'])
-@log_error(action=Action.edit, pg_template='add_edit_transaction.html', 
+@log_error(model=Model.transact, action=Action.edit, pg_template='add_edit_transaction.html', 
            transaction=None, datetime=datetime, accounts=[], categories=[])
 def edit_transaction():
     """
@@ -165,4 +165,4 @@ def edit_transaction():
         transaction = TransactController.get_transaction(transaction_id)
         return render_template('add_edit_transaction.html', 
                                transaction=transaction, datetime=datetime, 
-                               accounts=accounts, categories=categories)
+                               accounts=accounts, categories=categories, mode=header_action(Action.edit))

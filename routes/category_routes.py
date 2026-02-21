@@ -1,12 +1,12 @@
 from flask import Blueprint, render_template, request
 
-from message import log_error, log_success, Model, Action
 from controllers import CatController
+from .message import log_error, log_success, header_action, Model, Action
 
 category_bp = Blueprint('category', __name__)
 
 @category_bp.route('/categories')
-@log_error(action=Action.read, pg_template='categories.html', categories=[])
+@log_error(model=Model.category, action=Action.read, pg_template='categories.html', categories=[])
 def categories():
     """
     View all categories.
@@ -18,7 +18,7 @@ def categories():
     return render_template('categories.html', categories=categories)
 
 @category_bp.route('/categories/add', methods=['GET', 'POST'])
-@log_error(action=Action.add, pg_template='add_edit_category.html')
+@log_error(model=Model.category, action=Action.add, pg_template='add_edit_category.html')
 def add_category():
     """
     Add a new category.
@@ -50,10 +50,10 @@ def add_category():
         CatController.add_category(name, cat_type)
         return log_success(Model.category, Action.add)
     else:
-        return render_template('add_edit_category.html')
+        return render_template('add_edit_category.html', mode=header_action(Action.add))
 
 @category_bp.route('/categories/edit', methods=['GET', 'POST'])
-@log_error(action=Action.edit, pg_template='add_edit_category.html')
+@log_error(model=Model.category, action=Action.edit, pg_template='add_edit_category.html')
 def edit_category():
     """
     Edit a selected category.
