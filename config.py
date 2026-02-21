@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 is_dotenv_loaded = load_dotenv()
 
 class _Config:
-    SECRET_KEY = environ.get('SECRET_KEY')
+    SECRET_KEY = environ['SECRET_KEY']
     DEBUG = True
     PORT = environ.get('PORT') # The server's port
     DB_CONFIG = {
