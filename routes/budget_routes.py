@@ -2,15 +2,14 @@ from datetime import datetime
 
 from flask import Blueprint, render_template, request
 
-from message import log_error, log_success, Model, Action
 from controllers import BudgetController, CatController
+from .message import log_error, log_success, header_action, Model, Action
 
 budget_bp = Blueprint('budget', __name__)
 
 @budget_bp.route('/budgets')
-@log_error(action=Action.read, pg_template='budgets.html', budgets=[], 
-           year=datetime.now().year, month=datetime.now().month, 
-           datetime=datetime, abs=abs)
+@log_error(model=Model.budget, action=Action.read, pg_template='budgets.html', budgets=[],  
+           datetime=datetime)
 def budgets():
     """
     View all budgets.
@@ -25,7 +24,7 @@ def budgets():
                            month=month, datetime=datetime, summary=summary)
 
 @budget_bp.route('/budgets/add', methods=['GET', 'POST'])
-@log_error(action=Action.add, pg_template='add_edit_budget.html', categories=[], 
+@log_error(model=Model.budget, action=Action.add, pg_template='add_edit_budget.html', categories=[], 
            datetime=datetime)
 def add_budget():
     """
@@ -66,11 +65,14 @@ def add_budget():
         return log_success(Model.budget, Action.add, year=year, month=month)
     else:
         categories = CatController.categories()
+        now = datetime.now()
         return render_template('add_edit_budget.html', 
                                categories=categories, 
-                               datetime=datetime)
+                               datetime=datetime, mode=header_action(Action.add), now_year=now.year, now_month=now.month)
 
 @budget_bp.route('/budgets/edit', methods=['GET', 'POST'])
+@log_error(model=Model.budget, action=Action.edit, pg_template='add_edit_budget.html', categories=[], 
+           datetime=datetime)
 def edit_budget():
     """
     Edit a selected budget.
