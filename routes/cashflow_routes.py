@@ -24,10 +24,11 @@ def add_cashflow():
         CashflowController.add_cashflow(expenseid, incomeid, type_)
         return log_success(Model.cashflow, Action.add)
     else:
-        transactions = TransactController.transactions()
+        transactions, _ = TransactController.transactions(return_total=False)
         return render_template('add_edit_cashflow.html', 
                                transactions=transactions, 
-                               types=CashflowController.get_types(), mode=Action.add)
+                               types=CashflowController.get_types(), 
+                               mode=header_action(Action.add))
 
 @cashflow_bp.route('/cashflows/edit', methods=['GET', 'POST'])
 @log_error(model=Model.cashflow, action=Action.edit, pg_template='add_edit_cashflow.html', 
