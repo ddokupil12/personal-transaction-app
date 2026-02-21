@@ -4,7 +4,7 @@ from os import environ
 
 from flask import Flask
 
-from app_config import config, is_dotenv_loaded
+from config import config, is_dotenv_loaded
 
 # dotenv should be loaded in app_config
 assert is_dotenv_loaded, 'Load dotenv before running app'
