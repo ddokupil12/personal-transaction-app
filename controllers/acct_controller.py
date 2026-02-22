@@ -27,5 +27,3 @@ class AcctController:
     @staticmethod
     def edit_account(account_id, account_name, account_type):
         AccountModel.edit_account(account_id, account_name, account_type)
-        account = {'accountid': account_id, 'accountname': account_name, 'accounttype': account_type}
-        return account
