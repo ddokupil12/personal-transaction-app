@@ -41,6 +41,9 @@ def _match_model(model):
         case Model.cashflow:
             message = 'cashflow'
             rte = 'cashflow.cashflows'
+        case Model.category:
+            message = 'category'
+            rte = 'category.categories'
         case Model.transact:
             message = 'transaction'
             rte = 'transact.transactions'
@@ -51,13 +54,16 @@ def _match_model(model):
     return message, rte
 
 def header_action(action):
+    verb = _match_action(action, tense='present')
     match action:
         case Action.add:
-            return 'Add New'
+            msg = f'{verb} New'
         case Action.edit:
-            return 'Edit'
+            msg = verb
         case _ :
             return ''
+        
+    return msg.title()
 
 def _match_action(action, tense='participle'):
     # Helper function for `_log_success()`
