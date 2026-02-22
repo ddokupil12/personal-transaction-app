@@ -13,9 +13,7 @@
         <div class="card-body">
             <form method="GET" class="row g-3">
                 <div class="col-md-4">
-                    {% if month is undefined %}
-                        {% set month = 1 %}
-                    {% endif %}
+                    {% set month = month if month else 1 %}
                     <label for="month" class="form-label">Month</label>
                     <select class="form-select" id="month" name="month" onchange="this.form.submit()">
                         {% for i in range(1, 13) %}
@@ -26,9 +24,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
-                    {% if year is undefined %}
-                        {% set year = 1 %}
-                    {% endif %}
+                    {% set year = year if year else 1 %}
                     <label for="year" class="form-label">Year</label>
                     <select class="form-select" id="year" name="year" onchange="this.form.submit()">
                         {% for y in range(2020, 2030) %}
@@ -88,6 +84,12 @@
                                 </div>
                                 <small class="text-muted">{{ "{:.1f}".format(percentage) }}% paid</small>
                             {% endif %}
+                            
+                            <div class="mb-2" style="margin-top: 10px;">
+                                {% set edit_value = budget.budgetid %}
+                                {% set edit_url = url_for('budget.edit_budget') %}
+                                {% include 'edit_button.html' %}
+                            </div>
                         </div>
                     </div>
                 </div>

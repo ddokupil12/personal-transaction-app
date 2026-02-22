@@ -58,8 +58,8 @@ def add_budget():
     """
     if request.method == 'POST':
         category_id = request.form['categoryid']
-        year = request.form['budget_year']
-        month = request.form['budget_month']
+        year = request.form.get('budget_year', None, type=int)
+        month = request.form.get('budget_month', None, type=int)
         budget_amount = request.form['amount']
         BudgetController.add_budget(category_id, year, month, budget_amount)
         return log_success(Model.budget, Action.add, year=year, month=month)
@@ -68,18 +68,27 @@ def add_budget():
         now = datetime.now()
         return render_template('add_edit_budget.html', 
                                categories=categories, 
-                               datetime=datetime, mode=header_action(Action.add), now_year=now.year, now_month=now.month)
+                               datetime=datetime, mode=header_action(Action.add), year=now.year, month=now.month)
+
 
 @budget_bp.route('/budgets/edit', methods=['GET', 'POST'])
-@log_error(model=Model.budget, action=Action.edit, pg_template='add_edit_budget.html', categories=[], 
-           datetime=datetime)
+@log_error(model=Model.budget, action=Action.edit, categories=[],
+           pg_template='add_edit_budget.html', datetime=datetime)
 def edit_budget():
     """
     Edit a selected budget.
-
-    For future implementation
     """
-    # This functionality exists in add_budget(). If you try to add 
-    # a budget with a category that already has a budget, the existing 
-    # budget will be updated.
-    return 'Hello World'
+    if request.method == 'POST':
+        category_id = request.form['categoryid']
+        year = request.form.get('budget_year', None, type=int)
+        month = request.form.get('budget_month', None, type=int)
+        budget_amount = request.form['amount']
+        BudgetController.edit_budget(category_id, year, month, budget_amount)
+        return log_success(Model.budget, Action.edit, year=year, month=month)
+    else:
+        budget_id = request.args['id']
+        budget = BudgetController.get_budget(int(budget_id))
+        categories = CatController.categories()
+        return render_template('add_edit_budget.html', 
+                               categories=categories, 
+                               datetime=datetime, mode=header_action(Action.edit), year=budget['budget_year'], month=budget['budget_month'], amount=budget['budget_amount'], categoryid=budget['categoryid'], budgetid=budget['budgetid'])
