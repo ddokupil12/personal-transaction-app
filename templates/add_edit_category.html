@@ -12,17 +12,18 @@
                 </div>
                 <div class="card-body">
                     <form method="POST">
+                        <input type="hidden" name="id" value="{{category.categoryid if category else ''}}">
                         <div class="mb-3">
                             <label for="categoryname" class="form-label">Category Name</label>
-                            <input type="text" class="form-control" id="categoryname" name="categoryname" maxlength="50" required>
+                            <input type="text" class="form-control" id="categoryname" name="categoryname" maxlength="50" value="{{category.categoryname if category else ''}}" required>
                         </div>
                         
                         <div class="mb-3">
                             <label for="type_" class="form-label">Category Type</label>
                             <select class="form-select" id="type_" name="type_" required>
                                 <option value="">Select type...</option>
-                                <option value="Income">Income</option>
-                                <option value="Expense">Expense</option>
+                                <option value="Income" {% if category and category.type_ == 'Income' %}selected{% endif %}>Income</option>
+                                <option value="Expense" {% if category and category.type_ == 'Expense' %}selected{% endif %}>Expense</option>
                             </select>
                         </div>
                         

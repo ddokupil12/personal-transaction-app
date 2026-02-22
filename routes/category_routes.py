@@ -15,7 +15,16 @@ def categories():
     showing all categories in detail.
     """
     categories = CatController.categories()
-    return render_template('categories.html', categories=categories)
+    income = []
+    expense = []
+    for c in categories:
+        if c['type_'] == 'Income':
+            income.append(c)
+        elif c['type_'] == 'Expense':
+            expense.append(c)
+
+    return render_template('categories.html', income_categories=income, 
+                           expense_categories=expense)
 
 @category_bp.route('/categories/add', methods=['GET', 'POST'])
 @log_error(model=Model.category, action=Action.add, pg_template='add_edit_category.html')
@@ -50,14 +59,24 @@ def add_category():
         CatController.add_category(name, cat_type)
         return log_success(Model.category, Action.add)
     else:
-        return render_template('add_edit_category.html', mode=header_action(Action.add))
+        return render_template('add_edit_category.html', 
+                               mode=header_action(Action.add))
 
 @category_bp.route('/categories/edit', methods=['GET', 'POST'])
 @log_error(model=Model.category, action=Action.edit, pg_template='add_edit_category.html')
 def edit_category():
     """
     Edit a selected category.
-
-    For future implementation
     """
-    return 'Hello World'
+    if request.method == 'POST':
+        name = request.form['categoryname']
+        cat_type = request.form['type_']
+        id = request.form['id']
+        CatController.edit_category(id, name, cat_type)
+        return log_success(Model.category, Action.edit)
+    else:
+        id = request.args['id']
+        category = CatController.get_category(id)
+        return render_template('add_edit_category.html', 
+                               mode=header_action(Action.edit), 
+                               category=category)
