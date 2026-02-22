@@ -1,12 +1,13 @@
 """
     This appplication allows users to keep track of personal finances.
-    
+
+    Users can add multiple accounts and categories to keep track of 
+    transactions. Additionally, users can add budgets to highlight 
+    spending in important areas. Accounts, categories, budgets, and 
+    transactions can be edited as needed.
+
     Copyright (C) 2026 David Dokupil
-
-    Users can add multiple accounts and categories to sort 
-    transactions. Additionally, users can add budgets to keep track of 
-    spending in important areas.
-
+    
     This program is free software: you can redistribute it and/or 
     modify it under the terms of the GNU Affero General Public License 
     as published by the Free Software Foundation, either version 3 of 

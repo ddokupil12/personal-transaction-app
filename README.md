@@ -1,7 +1,8 @@
 # Personal Transaction App
 
-This Flask application allows users to keep track of personal finances. 
-Users can add multiple accounts and categories to sort transactions. Additionally, users can add budgets to keep track of spending in important areas.
+This appplication allows users to keep track of personal finances.
+
+Users can add multiple accounts and categories to keep track of transactions. Additionally, users can add budgets to highlight spending in important areas. Accounts, categories, budgets, and transactions can be edited as needed.
 
 # Specs
 
