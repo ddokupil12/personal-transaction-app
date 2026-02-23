@@ -19,21 +19,24 @@ This code has not been tested with any other versions.
     - This is the version I use, but other versions might be compatible as well
     - Version 9.4.0 is the latest at the time of this writing.
 - Add a new database and use `budget.sql` to create the tables.
-- Write `./.env` file with:
+- Create a `.env` file with:
     - DB_HOST -- name of the server, usually `localhost`
     - DB_PORT -- the server's port, usually 3306
     - DB_NAME -- name of the database
     - DB_USER -- your username, usually `root`
     - DB_PASSWORD -- your password, which should be secure
-- Launch server using `python app.py` (use `python3` if applicable)
+    - SECRET_KEY -- a 256-bit string to keep your server secure
+    - PORT -- the port your server will run on, default 5000
+    - CONFIG_NAME -- the name of the configuration you want to use, default `production` (see `config.py` for options)
+- Launch server using `python run.py` (use `python3` if applicable)
 
 # Usage
 - Use nav bar to switch between sections of the website
 - Click the "Edit" buttons to edit those particular rows of their respective tables.
-    - For example, click "Edit" on the `/transactions` page to edit a transaction.
+    - For example, click "Edit" on the `/transactions` page next to a transaction to edit that transaction.
 
 # Acknowledgements
-- Made with Claude and Copilot, although most of the abstraction and some features were entirely written by me.
+- Made with Claude, ChatGPT, and Copilot, although most of the abstraction and some features were entirely written by me.
 - I was inspired by the standard POS transaction database schema and adapted it to better track my own finances. I encourage you to find a system that works for you.
 
 # Contributions
@@ -117,4 +120,10 @@ db_commit("""
 
 
 # License
-To support open source development, you may use this code under the [AGPL v3 license](LICENSE).
+Copyright (C) 2025-2026 David Dokupil
+
+This program is free software: you can redistribute it and/or modify it under the terms of the [GNU Affero General Public License](LICENSE) as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+You should have received a copy of the [GNU Affero General Public License](LICENSE) along with this program. If not, see <https://www.gnu.org/licenses/>.
