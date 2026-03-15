@@ -21,7 +21,7 @@ class Action(Enum):
     edit = auto()
     delete = auto()
 
-def _match_model(model):
+def _match_model(model, plural=False):
     # Helper function for `_log_success()`
     # Determines how to show the model name to the user
     # Determines the route based on what model was changed
@@ -33,25 +33,35 @@ def _match_model(model):
     # rte: the route that should be passed to `url_for()`
     match model:
         case Model.acct:
-            message = 'account'
+            msg_singular = 'acct'
+            msg_plural = 'accounts'
             rte = 'acct.accounts'
         case Model.budget:
-            message = 'budget'
+            msg_singular = 'budget'
+            msg_plural = 'budgets'
             rte = 'budget.budgets'
         case Model.cashflow:
-            message = 'cashflow'
+            msg_singular = 'cashflow'
+            msg_plural = 'cashflows'
             rte = 'cashflow.cashflows'
         case Model.category:
-            message = 'category'
+            msg_singular = 'category'
+            msg_plural = 'categories'
             rte = 'category.categories'
         case Model.transact:
-            message = 'transaction'
+            msg_singular = 'transaction'
+            msg_plural = 'transactions'
             rte = 'transact.transactions'
         case _ :
-            message = 'data'
+            msg_singular = 'data'
+            msg_plural = msg_singular
             rte = 'transact.dashboard'
 
-    return message, rte
+    match plural:
+        case True:
+            return msg_plural, rte
+        case False:
+            return msg_singular, rte
 
 def header_action(action):
     verb = _match_action(action, tense='present')
@@ -150,7 +160,8 @@ def log_error(
                 if isinstance(e, AssertionError):
                     error_message = e
                 elif isinstance(action, Action):
-                    model_msg, _ = _match_model(model)
+                    plural = action == Action.read
+                    model_msg, _ = _match_model(model, plural=plural)
                     action_msg = _match_action(action) # returns participle
                     error_message = f'Error {action_msg} {model_msg}'
                 else:
