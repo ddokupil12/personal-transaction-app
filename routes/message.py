@@ -3,6 +3,7 @@ __all__ = ['Model', 'Action', 'log_success', 'log_error']
 from traceback import print_exc
 from functools import wraps
 from enum import Enum, auto
+from logging import error, ERROR, critical, CRITICAL
 
 from flask import flash, redirect, render_template, url_for
 
@@ -136,8 +137,8 @@ def log_success(model, action, **kwargs):
     return redirect(url_for(rte, **kwargs))
 
 def log_error(
-    log_level='error',
-    action=None,
+    action,
+    log_level=CRITICAL,
     model=None,
     pg_template='dashboard.html',
     **pg_kwargs
@@ -169,6 +170,10 @@ def log_error(
 
                 flash(error_message, 'error')
                 print_exc()
+                if log_level == CRITICAL:
+                    critical(error_message)
+                else:
+                    error(error_message)
 
                 if pg_kwargs.get('mode') is None:
                     mode = header_action(action)
