@@ -34,7 +34,7 @@ def _match_model(model, plural=False):
     # rte: the route that should be passed to `url_for()`
     match model:
         case Model.acct:
-            msg_singular = 'acct'
+            msg_singular = 'account'
             msg_plural = 'accounts'
             rte = 'acct.accounts'
         case Model.budget:
