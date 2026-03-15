@@ -8,7 +8,7 @@ from .message import log_error, log_success, header_action, Model, Action
 transact_bp = Blueprint('transact', __name__)
 
 @transact_bp.route('/')
-@log_error(pg_template='dashboard.html', accounts=[], recent_transactions=[], model=Model.transact,
+@log_error(pg_template='dashboard.html', accounts=[], recent_transactions=[],
            action=Action.read)
 def dashboard():
     """
