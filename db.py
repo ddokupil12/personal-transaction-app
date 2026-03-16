@@ -29,14 +29,13 @@ def _db_fetch(*args, all=True):
     # :param all: bool (True: returns all rows | False: returns one)
     # :param args: str[, tuple] (The first argument is the query,
     #     and the second argument is the arguments for that query)
-
+    #
     # Returns:
     # All matching rows (when all=True)
     # One matching row (when all=False)
-
+    #
     # Raises:
     # ValueError when there are more than two arguments
-    # """
     lenArgs = len(args)
     if lenArgs > 2:
         raise ValueError("Can't accept multiple queries")
@@ -61,11 +60,11 @@ def db_fetchone(*args): return  _db_fetch(*args, all=False)
     
 def db_commit(*args):
     # Docstring for db_commit
-    
+    #
     # :param args: an even list of arguments of queries followed by
     #     the arguments for those queries.
     #     query1, dbArgs1[, query2, dbArgs2] ...
-
+    #
     # Raises:
     # ValueError when there aren't any, or an even number of, arguments
     lenArgs = len(args)
