@@ -27,7 +27,7 @@ class CashflowModel:
         db_commit("""
             INSERT INTO cashflow (expense, income, type_) 
             VALUES (%s, %s, %s)
-        """, (expenseid, incomeid, type_))
+        """, (expenseid, incomeid, type_), return_id=False)
 
     @staticmethod
     def get_transfers():
