@@ -58,7 +58,7 @@ def db_fetchall(*args): return _db_fetch(*args, all=True)
     
 def db_fetchone(*args): return  _db_fetch(*args, all=False)
     
-def db_commit(*args):
+def db_commit(*args, return_id=True):
     # Docstring for db_commit
     #
     # :param args: an even list of arguments of queries followed by
@@ -73,7 +73,7 @@ def db_commit(*args):
     elif lenArgs % 2 != 0:
         raise ValueError("Expected an even number of arguments")
     
-    new_id = 0
+    new_id = None
     with get_db_connection() as conn:
         cursor = conn.cursor()
         lenArgs = len(args)
@@ -82,7 +82,10 @@ def db_commit(*args):
             dbArgs = args[i + 1]
             cursor.execute(query, dbArgs)
 
-        new_id = cursor.lastrowid
+        if return_id:
+            new_id = cursor.lastrowid
+        
         conn.commit()
 
-    return new_id
+    if return_id:
+        return new_id
