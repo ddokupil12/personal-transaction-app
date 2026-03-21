@@ -45,7 +45,7 @@ def _db_fetch(*args, all=True):
         query = args[0]
         if lenArgs == 1:
             cursor.execute(query)
-        elif lenArgs == 2:
+        else:
             dbArgs = args[1]
             cursor.execute(query, dbArgs)
 
