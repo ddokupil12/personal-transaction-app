@@ -11,9 +11,9 @@ class CatController:
     def get_category(id):
         return CategoryModel.get_category(id)
     
-    # @staticmethod
-    # def get_category_by_name(name):
-    #     return CategoryModel.get_category_by_name(name)
+    @staticmethod
+    def get_category_by_name(name):
+        return CategoryModel.get_category_by_name(name)
     
     @staticmethod
     def check_type(cat_type):
