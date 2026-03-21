@@ -51,13 +51,14 @@ def verify():
     # For each transfer, make sure the amounts on both sides are equal (Controller)
 
     # Make sure that all transfers are cashflows, and raise exceptions for the ones that aren't (Controller)
+    missing = CashflowController.get_missing_cashflows()
     # Suggest transfers the user can confirm to add so that all transfers are paired (Controller)
 
     # Display transfers that aren't paired (View)
     # Display transfers that are paired, but aren't accurate (View)
     # Suggest additions and revisions to the user (View)
 
-    return render_template('verify.html', verified=verified, update=update)
+    return render_template('verify_cashflows.html', verified=verified, update=update, missing=missing)
 
 @cashflow_bp.route('/cashflows/add_transfer', methods=['GET', 'POST'])
 @log_error(model=Model.cashflow, action=Action.read, pg_template='add_transfer.html', cashflows=[])
