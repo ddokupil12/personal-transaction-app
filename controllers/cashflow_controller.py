@@ -38,7 +38,6 @@ class CashflowController:
         transfers = TransactController.get_transfers()
         expense_ids = cls.get_expense_ids()
         income_ids = cls.get_income_ids()
-        print(expense_ids)
         result = [i for i in transfers if i['transactionid'] not in expense_ids and i['transactionid'] not in income_ids]
         return result
 
