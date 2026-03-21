@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request
+from datetime import datetime
 
-from controllers import CashflowController, TransactController
+from controllers import CashflowController, TransactController, AcctController, CatController
 from .message import log_error, log_success, header_action, Model, Action
 
 cashflow_bp = Blueprint('cashflow', __name__)
@@ -40,3 +41,48 @@ def edit_cashflow():
     For future implementation
     """
     return 'Hello world'
+
+@cashflow_bp.route('/cashflows/verify')
+@log_error(model=Model.cashflow, action=Action.read, pg_template='verify_cashflows.html', cashflows=[])
+def verify():
+    """Verify that account transfers are accurate and paired"""
+    # Get transactions where cashflow is type transfer (Controller)
+    verified, update = CashflowController.verify_transfers()
+    # For each transfer, make sure the amounts on both sides are equal (Controller)
+
+    # Make sure that all transfers are cashflows, and raise exceptions for the ones that aren't (Controller)
+    # Suggest transfers the user can confirm to add so that all transfers are paired (Controller)
+
+    # Display transfers that aren't paired (View)
+    # Display transfers that are paired, but aren't accurate (View)
+    # Suggest additions and revisions to the user (View)
+
+    return render_template('verify.html', verified=verified, update=update)
+
+@cashflow_bp.route('/cashflows/add_transfer', methods=['GET', 'POST'])
+@log_error(model=Model.cashflow, action=Action.read, pg_template='add_transfer.html', cashflows=[])
+def add_transfer():
+    """Add both transfer transactions on one page, and add the corresponding cashflow"""
+    if request.method == 'POST':
+        i_account = request.form['i_account']
+        e_account = request.form['e_account']
+        amount = abs(int(request.form['amount']))
+        date = request.form['date']
+        i_dscr = request.form['i_dscr']
+        e_dscr = request.form['e_dscr']
+        category = request.form['categoryid']
+        type_ = 'Transfer'
+        i_id = TransactController.add_transaction(i_account, category, amount, 
+                                                  date, i_dscr)
+        e_id = TransactController.add_transaction(e_account, category, 
+                                                  0 - amount, 
+                                                  date, e_dscr)
+        CashflowController.add_cashflow(e_id, i_id, type_)
+        return log_success(Model.cashflow, Action.add)
+    else:
+        accounts = AcctController.accounts(balance=False)
+        categories = CatController.categories()
+        return render_template('add_transfer.html',             
+                                accounts=accounts, categories=categories, 
+                                datetime=datetime, mode=header_action(Action.add))
+    

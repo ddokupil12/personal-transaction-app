@@ -28,3 +28,19 @@ class CashflowModel:
             INSERT INTO cashflow (expense, income, type_) 
             VALUES (%s, %s, %s)
         """, (expenseid, incomeid, type_))
+
+    @staticmethod
+    def get_transfers():
+        return db_fetchall("""
+            SELECT t.transactionid as expensetransactionid,
+                t.transactiondate as expensedate, t.amount as expenseamount, 
+                t.dscr as expensedscr, r1.*, 
+                t2.transactionid as incometransactionid,
+                t2.amount as incomeamount, t2.transactiondate as incomedate, 
+                t2.dscr as incomedscr
+            FROM transact t
+            JOIN cashflow r1 on t.transactionid = r1.expense
+            JOIN transact t2 on r1.income = t2.transactionid
+            WHERE r1.type_ = 'Transfer'
+            ORDER BY t.transactiondate DESC, t.transactionid DESC;
+        """)

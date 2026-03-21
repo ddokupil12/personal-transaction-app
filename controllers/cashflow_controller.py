@@ -14,3 +14,20 @@ class CashflowController:
     @staticmethod
     def get_types():
         return ['Business', 'Transfer']
+    
+    @staticmethod
+    def get_transfers():
+        return CashflowModel.get_transfers()
+    
+    @classmethod
+    def verify_transfers(cls):
+        transfers = cls.get_transfers()
+        verified = []
+        update = []
+        for i in transfers:
+            if i['expenseamount'] + i['incomeamount'] == 0:
+                verified.append(i)
+            else:
+                update.append(i)
+
+        return verified, update
