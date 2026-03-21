@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}{{mode}} Cashflow - Budget Manager{% endblock %}
+
+{% block content %}
+<div class="main-content">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>{{mode}} Transfer</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="i_account" class="form-label">Income Account</label>
+                                <select class="form-select" id="i_account" name="i_account" required>
+                                    <option value="">Select account...</option>
+                                    {% for account in accounts %}
+                                        <option value="{{ account.accountid }}" {%if income and account and account.accountid == income.accountid %} selected {% endif %}>{{ account.accountname }} ({{ account.accounttype }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label for="e_account" class="form-label">Expense Account</label>
+                                <select class="form-select" id="e_account" name="e_account" required>
+                                    <option value="">Select account...</option>
+                                    {% for account in accounts %}
+                                        <option value="{{ account.accountid }}" {%if expense and account and account.accountid == expense.accountid %} selected {% endif %}>{{ account.accountname }} ({{ account.accounttype }})</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {% set pg = 'add_transfer' %}
+                                {% set amount_value = expense.amount if expense else '' %}
+                                {% include 'amount_input.html' %}
+                                <small class="form-text text-muted">Use positive numbers. The expense amount will be converted to a negative number.</small>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label for="date" class="form-label">Transaction Date</label>
+                                <input type="date" class="form-control" id="date" name="date" value="{{expense.transactiondate if expense else ''}}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="dscr" class="form-label">Description</label>
+                                <input type="text" class="form-control" id="dscr" name="dscr" maxlength="50" value="{{expense.dscr if expense else ''}}" required>
+                            </div>
+                        
+                            <div class="col-md-6 mb-3">
+                                {% set categoryid = expense.categoryid if expense else '' %}
+                                {% include 'category_select.html' %}
+                            </div>
+                        </div>
+                        
+                        <input type="hidden" value="{{expense.transactionid if expense else ''}}" name="expense_id">
+                        <input type="hidden" value="{{income.transactionid if income else ''}}" name="income_id">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i>Save Transaction
+                            </button>
+                            <a href="{{ url_for('transact.transactions') }}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
