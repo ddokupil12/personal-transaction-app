@@ -1,6 +1,7 @@
 __all__ = ['CashflowController']
 
 from models import CashflowModel
+from .transact_controller import TransactController
 
 class CashflowController:
     @staticmethod
@@ -31,3 +32,20 @@ class CashflowController:
                 update.append(i)
 
         return verified, update
+    
+    @classmethod
+    def get_missing_cashflows(cls):
+        transfers = TransactController.get_transfers()
+        expense_ids = cls.get_expense_ids()
+        income_ids = cls.get_income_ids()
+        print(expense_ids)
+        result = [i for i in transfers if i['transactionid'] not in expense_ids and i['transactionid'] not in income_ids]
+        return result
+
+    @staticmethod
+    def get_expense_ids():
+        return [i['expense'] for i in CashflowModel.get_expense_ids()]
+    
+    @staticmethod
+    def get_income_ids():
+        return [i['income'] for i in CashflowModel.get_income_ids()]

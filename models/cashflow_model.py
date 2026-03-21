@@ -44,3 +44,11 @@ class CashflowModel:
             WHERE r1.type_ = 'Transfer'
             ORDER BY t.transactiondate DESC, t.transactionid DESC;
         """)
+    
+    @staticmethod
+    def get_expense_ids():
+        return db_fetchall("""SELECT expense FROM cashflow""")
+    
+    @staticmethod
+    def get_income_ids():
+        return db_fetchall("""SELECT income FROM cashflow""")
