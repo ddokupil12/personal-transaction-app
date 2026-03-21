@@ -11,6 +11,10 @@ class CatController:
     def get_category(id):
         return CategoryModel.get_category(id)
     
+    # @staticmethod
+    # def get_category_by_name(name):
+    #     return CategoryModel.get_category_by_name(name)
+    
     @staticmethod
     def check_type(cat_type):
         types = ['Income', 'Expense']
@@ -25,9 +29,9 @@ class CatController:
         # :param name: str
         # :param cat_type: 'Income' | 'Expense'
         cls.check_type(cat_type)
-        CategoryModel.add_category(name, cat_type)
+        return CategoryModel.add_category(name, cat_type)
 
     @classmethod
     def edit_category(cls, id, name, cat_type):
         cls.check_type(cat_type)
-        CategoryModel.edit_category(id, name, cat_type)
+        return CategoryModel.edit_category(id, name, cat_type)

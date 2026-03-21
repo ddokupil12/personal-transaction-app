@@ -80,7 +80,7 @@ class TransactModel:
     @staticmethod
     def add_transaction(account_id, category_id, amount, transaction_date, 
                         description):
-        db_commit(
+        return db_commit(
             """
                 INSERT INTO transact (accountid, categoryid, amount, 
                     transactiondate, dscr) 
@@ -95,7 +95,7 @@ class TransactModel:
     @staticmethod
     def edit_transaction(account_id, category_id, amount, transaction_date,
                          dscr, transaction_id):
-        db_commit(
+        return db_commit(
             """
                 UPDATE transact 
                 SET accountid = %s 

@@ -10,16 +10,20 @@ class CategoryModel:
     def get_category(categoryid):
         return db_fetchone("""SELECT * FROM category WHERE categoryid = %s""", (categoryid,))
 
+    # @staticmethod
+    # def get_category_by_name(name):
+    #     return db_fetchone("""SELECT * FROM category WHERE categoryname = %s""", (name,))
+    
     @staticmethod
     def add_category(name, cat_type):
-        db_commit("""
+        return db_commit("""
                   INSERT INTO category (categoryname, type_) 
                   VALUES (%s, %s)
                   """, (name, cat_type))
     
     @staticmethod
     def edit_category(id, name, cat_type):
-        db_commit("""
+        return db_commit("""
                   UPDATE category
                   SET categoryname = %s
                   WHERE categoryid = %s

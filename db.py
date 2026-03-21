@@ -73,6 +73,7 @@ def db_commit(*args):
     elif lenArgs % 2 != 0:
         raise ValueError("Expected an even number of arguments")
     
+    new_id = 0
     with get_db_connection() as conn:
         cursor = conn.cursor()
         lenArgs = len(args)
@@ -81,4 +82,7 @@ def db_commit(*args):
             dbArgs = args[i + 1]
             cursor.execute(query, dbArgs)
 
+        new_id = cursor.lastrowid
         conn.commit()
+
+    return new_id
