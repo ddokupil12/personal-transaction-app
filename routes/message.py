@@ -173,9 +173,9 @@ def log_error(
                 flash(error_message, 'error')
                 print_exc()
                 if log_level == CRITICAL:
-                    critical(error_message)
+                    critical(error_message, exc_info=True)
                 else:
-                    error(error_message)
+                    error(error_message, exc_info=True)
 
                 if pg_kwargs.get('mode') is None:
                     mode = header_action(action)
