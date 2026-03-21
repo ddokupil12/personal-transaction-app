@@ -5,6 +5,7 @@ from datetime import datetime
 
 from models import TransactModel
 from .acct_controller import AcctController
+from .cat_controller import CatController
 
 class TransactController:
     @staticmethod
@@ -14,6 +15,12 @@ class TransactController:
     @staticmethod
     def filter_category(categories):
         return TransactModel.filter_category(categories)
+
+    @classmethod
+    def get_transfers(cls):
+        # Get Account Transfer category ID
+        transfer_cat = CatController.get_category_by_name('Account Transfer')
+        return cls.filter_category([transfer_cat['categoryid']])
 
     @staticmethod
     def get_transaction(transaction_id):
