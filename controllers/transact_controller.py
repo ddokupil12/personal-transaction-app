@@ -12,6 +12,10 @@ class TransactController:
         return TransactModel.get_transactions(per_page, offset, search_query, return_total)
     
     @staticmethod
+    def filter_category(categories):
+        return TransactModel.filter_category(categories)
+
+    @staticmethod
     def get_transaction(transaction_id):
         return TransactModel.get_transaction(transaction_id)
 

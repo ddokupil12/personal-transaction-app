@@ -42,6 +42,32 @@ class TransactModel:
 
         return transactions, total
         
+    @staticmethod
+    def filter_category(categories):
+        len_ = len(categories)
+        assert len_ < 50, "Too many categories selected"
+        raw_args = ['(']
+        for idx, i in enumerate(categories):
+            last = len_ - 1
+            if last > idx:
+                raw_args.append('%s,')
+            else:
+                raw_args.append('%s')
+
+        raw_args.append(')')
+
+        fmt_args = ''.join(raw_args)
+        query = f"""
+            SELECT *
+                FROM transact t
+                INNER JOIN category c
+                ON t.categoryid = c.categoryid
+                INNER JOIN acct a
+                ON a.accountid = t.accountid
+                WHERE c.categoryid IN {fmt_args}
+                ORDER BY t.transactiondate DESC, t.transactionid DESC
+        """
+        return db_fetchall(query, categories)
 
     @staticmethod
     def get_transaction(transaction_id):

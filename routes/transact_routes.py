@@ -166,3 +166,13 @@ def edit_transaction():
         return render_template('add_edit_transaction.html', 
                                transaction=transaction, datetime=datetime, 
                                accounts=accounts, categories=categories, mode=header_action(Action.edit))
+    
+@transact_bp.route('/transactions/filter')
+@log_error(model=Model.transact, action=Action.read, pg_template='transactions.html', transactions=[], 
+           p=1, has_next=False, has_prev=False, str=str)
+def filter():
+    categories = request.args['categories']
+    catSplit = categories.split(',')
+    transactions = TransactController.filter_category(catSplit)
+    return render_template('transactions.html', transactions=transactions,
+                           p=1, has_next=False, has_prev=False, s='')
