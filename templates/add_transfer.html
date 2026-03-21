@@ -49,10 +49,16 @@
                         
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="dscr" class="form-label">Description</label>
-                                <input type="text" class="form-control" id="dscr" name="dscr" maxlength="50" value="{{expense.dscr if expense else ''}}" required>
+                                <label for="i_dscr" class="form-label">Income Description</label>
+                                <input type="text" class="form-control" id="i_dscr" name="i_dscr" maxlength="50" value="{{expense.dscr if expense else ''}}" required>
                             </div>
-                        
+                            <div class="col-md-6 mb-3">
+                                <label for="e_dscr" class="form-label">Expense Description</label>
+                                <input type="text" class="form-control" id="e_dscr" name="e_dscr" maxlength="50" value="{{expense.dscr if expense else ''}}" required>
+                            </div>
+                        </div>
+
+                        <div class="row">
                             <div class="col-md-6 mb-3">
                                 {% set categoryid = expense.categoryid if expense else '' %}
                                 {% include 'category_select.html' %}
