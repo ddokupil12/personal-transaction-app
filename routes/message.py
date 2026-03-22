@@ -44,7 +44,7 @@ def _match_model(model, plural=False):
         case Model.cashflow:
             msg_singular = 'cashflow'
             msg_plural = 'cashflows'
-            rte = 'cashflow.cashflows'
+            rte = 'cashflow.verify'
         case Model.category:
             msg_singular = 'category'
             msg_plural = 'categories'
