@@ -10,7 +10,24 @@ class CashflowController:
     
     @staticmethod
     def add_cashflow(expenseid, incomeid, type_):
+        expense = TransactController.get_transaction(expenseid)
+        income = TransactController.get_transaction(incomeid)
+        assert expense['amount'] < 0, 'Expense must be negative'
+        assert income['amount'] > 0, 'Income must be positive'
+        if type_ == 'Transfer':
+            assert expense['amount'] + income['amount'] == 0, 'Sum of both sides must be 0'
+            assert expense['transactiondate'] == income['transactiondate']
         CashflowModel.add_cashflow(expenseid, incomeid, type_)
+
+    @classmethod
+    def add_transfer(cls, i_account, e_account, i_dscr, e_dscr, amount, date, category):
+        i_id = TransactController.add_transaction(i_account, category, amount, 
+                                                  date, i_dscr)
+        e_id = TransactController.add_transaction(e_account, category, 
+                                                  0 - amount, 
+                                                  date, e_dscr)
+        type_ = 'Transfer'
+        cls.add_cashflow(e_id, i_id, type_)
 
     @staticmethod
     def get_types():

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 from datetime import datetime
 
-from controllers import CashflowController, TransactController, AcctController, CatController
+from controllers import CashflowController, AcctController, CatController
 from .message import log_error, log_success, header_action, Model, Action
 
 cashflow_bp = Blueprint('cashflow', __name__)
@@ -67,18 +67,13 @@ def add_transfer():
     if request.method == 'POST':
         i_account = request.form['i_account']
         e_account = request.form['e_account']
-        amount = abs(int(request.form['amount']))
-        date = request.form['date']
         i_dscr = request.form['i_dscr']
         e_dscr = request.form['e_dscr']
+        amount = request.form['amount']
+        date = request.form['date']
         category = request.form['categoryid']
-        type_ = 'Transfer'
-        i_id = TransactController.add_transaction(i_account, category, amount, 
-                                                  date, i_dscr)
-        e_id = TransactController.add_transaction(e_account, category, 
-                                                  0 - amount, 
-                                                  date, e_dscr)
-        CashflowController.add_cashflow(e_id, i_id, type_)
+        CashflowController.add_transfer(i_account, e_account, i_dscr, e_dscr, 
+                                        amount, date, category)
         return log_success(Model.cashflow, Action.add)
     else:
         accounts = AcctController.accounts(balance=False)
