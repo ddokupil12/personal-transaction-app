@@ -34,7 +34,7 @@ class CashflowModel:
         return db_fetchall("""
             SELECT t.transactionid as expensetransactionid,
                 t.transactiondate as expensedate, t.amount as expenseamount, 
-                t.dscr as expensedscr, r1.*, 
+                t.dscr as expensedscr, 
                 t2.transactionid as incometransactionid,
                 t2.amount as incomeamount, t2.transactiondate as incomedate, 
                 t2.dscr as incomedscr
