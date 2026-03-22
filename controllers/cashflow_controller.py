@@ -16,6 +16,7 @@ class CashflowController:
         income = TransactController.get_transaction(incomeid)
         assert expense['amount'] < 0, 'Expense must be negative'
         assert income['amount'] > 0, 'Income must be positive'
+        assert expense['categoryid'] == income['categoryid']
         if type_ == 'Transfer':
             assert expense['amount'] + income['amount'] == 0, 'Sum of both sides must be 0'
             assert expense['transactiondate'] == income['transactiondate']
@@ -46,7 +47,11 @@ class CashflowController:
         verified = []
         update = []
         for i in transfers:
-            if i['expenseamount'] + i['incomeamount'] == 0:
+            if (i['expenseamount'] + i['incomeamount'] == 0
+                    and i['expensedate'] == i['incomedate']
+                    and i['expensecategory'] == i['incomecategory']
+                    and i['expenseamount'] < 0
+                    and i['incomeamount'] > 0):
                 verified.append(i)
             else:
                 update.append(i)
