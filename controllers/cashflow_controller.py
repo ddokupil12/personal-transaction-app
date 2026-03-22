@@ -1,5 +1,7 @@
 __all__ = ['CashflowController']
 
+from decimal import Decimal
+
 from models import CashflowModel
 from .transact_controller import TransactController
 
@@ -20,7 +22,8 @@ class CashflowController:
         CashflowModel.add_cashflow(expenseid, incomeid, type_)
 
     @classmethod
-    def add_transfer(cls, i_account, e_account, i_dscr, e_dscr, amount, date, category):
+    def add_transfer(cls, i_account, e_account, i_dscr, e_dscr, amount_, date, category):
+        amount = abs(Decimal(amount_))
         i_id = TransactController.add_transaction(i_account, category, amount, 
                                                   date, i_dscr)
         e_id = TransactController.add_transaction(e_account, category, 
