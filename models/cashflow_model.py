@@ -37,7 +37,7 @@ class CashflowModel:
                 t.dscr as expensedscr, 
                 t2.transactionid as incometransactionid,
                 t2.amount as incomeamount, t2.transactiondate as incomedate, 
-                t2.dscr as incomedscr
+                t2.dscr as incomedscr, r1.type_
             FROM transact t
             JOIN cashflow r1 on t.transactionid = r1.expense
             JOIN transact t2 on r1.income = t2.transactionid
