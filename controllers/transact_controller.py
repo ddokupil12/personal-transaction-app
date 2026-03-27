@@ -18,9 +18,13 @@ class TransactController:
 
     @classmethod
     def get_transfers(cls):
-        # Get Account Transfer category ID
         transfer_cat = CatController.get_category_by_name('Account Transfer')
         return cls.filter_category([transfer_cat['categoryid']])
+    
+    @classmethod
+    def get_business_transacts(cls):
+        business_cat = CatController.get_category_by_name('Business')
+        return cls.filter_category([business_cat['categoryid']])
 
     @staticmethod
     def get_transaction(transaction_id):
