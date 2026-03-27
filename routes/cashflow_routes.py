@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 from datetime import datetime
 
-from controllers import CashflowController, AcctController, CatController
+from controllers import CashflowController, AcctController, CatController, TransactController
 from .message import log_error, log_success, header_action, Model, Action
 
 cashflow_bp = Blueprint('cashflow', __name__)
@@ -58,7 +58,10 @@ def verify():
     # Display transfers that are paired, but aren't accurate (View)
     # Suggest additions and revisions to the user (View)
 
-    return render_template('verify_cashflows.html', verified=verified, update=update, missing=missing)
+    balance_adjustment_id = CatController.get_category_by_name('Balance Adjustment')['categoryid']
+    balance_adjustments = TransactController.filter_category([balance_adjustment_id])
+
+    return render_template('verify_cashflows.html', verified=verified, update=update, missing=missing, balance_adjustments=balance_adjustments)
 
 @cashflow_bp.route('/cashflows/add_transfer', methods=['GET', 'POST'])
 @log_error(model=Model.cashflow, action=Action.read, pg_template='add_transfer.html', cashflows=[])

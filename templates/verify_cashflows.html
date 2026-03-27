@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}Verify Cashflows{% endblock %}
+{% block title %}Verify Integrity{% endblock %}
 {% block content %}
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1><i class="fas fa-adjust"></i> Cashflows</h1>
+        <h1><i class="fas fa-check"></i> Verify Integrity</h1>
         {% include 'cashflow_button.html' %}
     </div>
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -203,6 +203,45 @@
     {% else %}
         <div class="text-center">
             <h5>No missing cashflows</h5>
+        </div>
+    {% endif %}
+    {% if balance_adjustments %}
+    <h3>Balance Adjustments</h3>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr>
+                            <th>Edit</th>
+                            <th>Date</th>
+                            <th>Account</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th class="text-end">Amount</th>
+                        </tr></thead>
+                        <tbody>
+                            {% for transaction in balance_adjustments %}
+                                <tr>
+                                    <td>
+                                        {% set edit_url = url_for('transact.edit_transaction') %}
+                                        {% set edit_value = transaction.transactionid %}
+                                        {% include 'edit_button.html' %}
+                                    </td>
+                                    <td>{{ transaction.transactiondate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ transaction.accountname }}</td>
+                                    <td>{{ transaction.categoryname }}</td>
+                                    <td>{{ transaction.dscr or '-' }}</td>
+                                    <td class="text-end">
+                                        <span class="{{ 'balance-positive' if transaction.amount > 0 else 'balance-negative' }}">
+                                            {{ '+' if transaction.amount > 0 else '' }}${{ "{:,.2f}".format(transaction.amount) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     {% endif %}
 </div>
