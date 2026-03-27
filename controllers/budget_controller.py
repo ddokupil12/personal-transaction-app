@@ -13,6 +13,7 @@ class BudgetController:
         totalSpent = 0
         budgetSpending = 0
         budgetIncome = 0
+        total_income = 0
         budgets = BudgetModel.get_budgets(year, month)
         for budget in budgets:
             actual = budget['actual'] # Actual expenses are negative
@@ -30,11 +31,15 @@ class BudgetController:
 
             else: # Handle income categories 
                 budgetIncome += budget['budget_amount']
+                total_income += budget['actual']
 
         # Summary of expenses
         summary = {'total_budgeted': budgetSpending,
                    'total_spent': totalSpent,
-                   'total_remaining': budgetSpending - totalSpent}
+                   'total_remaining': budgetSpending - totalSpent,
+                   'budget_income': budgetIncome,
+                   'total_income': total_income,
+                   'total_remaining_income': budgetIncome - total_income}
             
         return budgets, summary
         

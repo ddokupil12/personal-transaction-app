@@ -73,7 +73,7 @@
                             {% set percentage = (budget.actual / budget.budget_amount * 100) if budget.budget_amount > 0 else 0 %}
                             {% if budget.type_ == "Expense" %}
                                 <div class="progress mb-2" style="height: 10px;">
-                                    <div class="progress-bar {{ 'bg-danger' if percentage > 100 else 'bg-success' if percentage < 80 else 'bg-warning' }}" 
+                                    <div class="progress-bar {{ 'bg-danger' if percentage > 100 else 'bg-warning' if percentage > 80 else 'bg-success' }}" 
                                     style="width: {{ [percentage, 100]|min }}%"></div>
                                 </div>
                                 <small class="text-muted">{{ "{:.1f}".format(percentage) }}% used</small>
@@ -129,6 +129,33 @@
                             <div class="col-md-4">
                                 <h4 class="{{ 'text-success' if summary.total_remaining >= 0 else 'text-danger' }}">
                                     ${{ "{:,.2f}".format(summary.total_remaining) }}
+                                </h4>
+                                <small class="text-muted">Remaining</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Income Summary - {{ datetime(year, month, 1).strftime('%B %Y') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h4 class="text-primary">${{ "{:,.2f}".format(summary.budget_income) }}</h4>
+                                <small class="text-muted">Total Budgeted</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-warning">${{ "{:,.2f}".format(summary.total_income) }}</h4>
+                                <small class="text-muted">Total Income</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="{{ 'text-success' if 0 >= summary.total_remaining_income else 'text-warning' }}">
+                                    ${{ "{:,.2f}".format(summary.total_remaining_income) }}
                                 </h4>
                                 <small class="text-muted">Remaining</small>
                             </div>
