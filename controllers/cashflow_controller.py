@@ -16,10 +16,10 @@ class CashflowController:
         income = TransactController.get_transaction(incomeid)
         assert expense['amount'] < 0, 'Expense must be negative'
         assert income['amount'] > 0, 'Income must be positive'
-        assert expense['categoryid'] == income['categoryid']
+        assert expense['categoryid'] == income['categoryid'], 'category must be the same'
         if type_ == 'Transfer':
             assert expense['amount'] + income['amount'] == 0, 'Sum of both sides must be 0'
-            assert expense['transactiondate'] == income['transactiondate']
+            assert expense['transactiondate'] == income['transactiondate'], 'Date must be the same'
         CashflowModel.add_cashflow(expenseid, incomeid, type_)
 
     @classmethod
