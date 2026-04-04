@@ -30,7 +30,7 @@ class CashflowModel:
         """, (expenseid, incomeid, type_), return_id=False)
 
     @staticmethod
-    def get_transfers():
+    def get_cashflows_by_type(type_):
         return db_fetchall("""
             SELECT t.transactionid as expensetransactionid,
                 t.transactiondate as expensedate, t.amount as expenseamount, 
@@ -41,9 +41,9 @@ class CashflowModel:
             FROM transact t
             JOIN cashflow r1 on t.transactionid = r1.expense
             JOIN transact t2 on r1.income = t2.transactionid
-            WHERE r1.type_ = 'Transfer'
+            WHERE r1.type_ = %s
             ORDER BY t.transactiondate DESC, t.transactionid DESC;
-        """)
+        """, (type_,))
     
     @staticmethod
     def get_expense_ids():

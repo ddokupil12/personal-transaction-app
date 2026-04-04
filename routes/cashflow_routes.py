@@ -25,7 +25,9 @@ def add_cashflow():
         CashflowController.add_cashflow(expenseid, incomeid, type_)
         return log_success(Model.cashflow, Action.add)
     else:
-        transactions = CashflowController.get_missing_cashflows()
+        t_missing, b_missing = CashflowController.get_missing_cashflows()
+        t_missing.extend(b_missing)
+        transactions = t_missing
         return render_template('add_edit_cashflow.html', 
                                transactions=transactions, 
                                types=CashflowController.get_types(), 
@@ -47,21 +49,23 @@ def edit_cashflow():
 def verify():
     """Verify that account transfers are accurate and paired"""
     # Get transactions where cashflow is type transfer (Controller)
-    verified, update = CashflowController.verify_transfers()
+    t_verified, t_update = CashflowController.verify_transfers()
     # For each transfer, make sure the amounts on both sides are equal (Controller)
 
+    b_verified, b_update = CashflowController.verify_transfers()
+
     # Make sure that all transfers are cashflows, and raise exceptions for the ones that aren't (Controller)
-    missing = CashflowController.get_missing_cashflows()
+    t_missing, b_missing = CashflowController.get_missing_cashflows()
     # Suggest transfers the user can confirm to add so that all transfers are paired (Controller)
 
     # Display transfers that aren't paired (View)
     # Display transfers that are paired, but aren't accurate (View)
     # Suggest additions and revisions to the user (View)
 
-    balance_adjustment_id = CatController.get_category_by_name('Balance Adjustment')['categoryid']
-    balance_adjustments = TransactController.filter_category([balance_adjustment_id])
+    adjustment_id = CatController.get_category_by_name('Balance Adjustment')['categoryid']
+    adjustments = TransactController.filter_category([adjustment_id])
 
-    return render_template('verify_cashflows.html', verified=verified, update=update, missing=missing, balance_adjustments=balance_adjustments)
+    return render_template('verify_cashflows.html', t_update=t_update, t_missing=t_missing, b_update=b_update, b_missing=b_missing, adjustments=adjustments)
 
 @cashflow_bp.route('/cashflows/add_transfer', methods=['GET', 'POST'])
 @log_error(model=Model.cashflow, action=Action.read, pg_template='add_transfer.html', cashflows=[])
