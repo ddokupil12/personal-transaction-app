@@ -7,8 +7,8 @@ from .transact_controller import TransactController
 
 class CashflowController:
     @staticmethod
-    def cashflows():
-        return CashflowModel.get_cashflows()
+    def cashflows(per_page=None, offset=None, return_total=True):
+        return CashflowModel.get_cashflows(per_page, offset, return_total)
     
     @staticmethod
     def add_cashflow(expenseid, incomeid, type_):

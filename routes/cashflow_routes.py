@@ -10,8 +10,13 @@ cashflow_bp = Blueprint('cashflow', __name__)
 @log_error(model=Model.cashflow, action=Action.read, pg_template='cashflows.html', cashflows=[])
 def cashflows():
     """View all cashflows."""
-    cashflows = CashflowController.cashflows()
-    return render_template('cashflows.html', cashflows=cashflows)
+    page = request.args.get('p', 1, type=int)
+    per_page = 20
+    offset = (page - 1) * per_page
+    cashflows, total = CashflowController.cashflows(per_page, offset)
+    has_next = offset + per_page < total
+    has_prev = page > 1
+    return render_template('cashflows.html', cashflows=cashflows, has_next=has_next, has_prev=has_prev, p=page)
 
 @cashflow_bp.route('/cashflows/add', methods=['GET', 'POST'])
 @log_error(model=Model.cashflow, action=Action.add, pg_template='add_edit_cashflow.html', 
