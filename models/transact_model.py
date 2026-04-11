@@ -8,6 +8,7 @@ class TransactModel:
             JOIN category c ON t.Categoryid = c.Categoryid
         """
     __order = 'ORDER BY t.transactiondate DESC, t.transactionid DESC'
+    __where_id = 'WHERE transactionid = %s'
     
     @classmethod
     def get_transactions(cls, per_page=None, offset=0, 
@@ -40,16 +41,16 @@ class TransactModel:
         len_ = len(categories)
         assert len_ < 50, "Too many categories selected"
         placeholders = ','.join(['%s'] * len_)
-        query = ' '.join([cls.__base, f'WHERE c.categoryid IN ({placeholders})', cls.__order])
+        query = ' '.join([
+            cls.__base, 
+            f'WHERE c.categoryid IN ({placeholders})', 
+            cls.__order
+        ])
         return db_fetchall(query, categories)
 
     @staticmethod
     def get_transaction(transaction_id):
-        return db_fetchone("""
-                           SELECT * 
-                           FROM transact 
-                           WHERE transactionid = %s
-                           """, [transaction_id])
+        return db_fetchone("""SELECT * FROM transact""", [transaction_id])
 
     @staticmethod
     def add_transaction(account_id, category_id, amount, transaction_date, 
@@ -66,35 +67,36 @@ class TransactModel:
             )
         )
 
-    @staticmethod
-    def edit_transaction(account_id, category_id, amount, transaction_date,
+    @classmethod
+    def edit_transaction(cls, account_id, category_id, amount, transaction_date,
                          dscr, transaction_id):
+        update = 'UPDATE transact'
         return db_commit(
-            """
-                UPDATE transact 
-                SET accountid = %s 
-                WHERE transactionid = %s
-            """, (account_id, transaction_id),
-            """
-                UPDATE transact
-                SET categoryid = %s
-                WHERE transactionid = %s
-            """, (category_id, transaction_id),
-            """
-                UPDATE transact
-                SET dscr = %s
-                WHERE transactionid = %s
-            """, (dscr, transaction_id),
-            """
-                UPDATE transact
-                SET transactiondate = %s
-                WHERE transactionid = %s
-            """, (transaction_date, transaction_id),
-            """
-                UPDATE transact
-                SET amount = %s
-                WHERE transactionid = %s
-            """, (amount, transaction_id)
+            ' '.join([
+                update, 
+                """SET accountid = %s""", 
+                cls.__where_id
+            ]), (account_id, transaction_id),
+            ' '.join([
+                update, 
+                """SET categoryid = %s""", 
+                cls.__where_id
+            ]), (category_id, transaction_id),
+            ' '.join([
+                update, 
+                """SET dscr = %s""", 
+                cls.__where_id
+            ]), (dscr, transaction_id),
+            ' '.join([
+                update, 
+                """SET transactiondate = %s""", 
+                cls.__where_id
+            ]), (transaction_date, transaction_id),
+            ' '.join([
+                update, 
+                """SET amount = %s""", 
+                cls.__where_id
+            ]), (amount, transaction_id)
         )
     @staticmethod
     def get_account_balance(account_id):
