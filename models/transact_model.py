@@ -20,11 +20,22 @@ class TransactModel:
                 offset is not None, 
                 search_query is not None
                 ]):
-            transactions = db_fetchall(' '.join([cls.__base, search, cls.__order, limit]), (f'%{search_query}%', per_page, offset))
+            transactions = db_fetchall(' '.join([
+                cls.__base, 
+                search, 
+                cls.__order, 
+                limit
+            ]), (f'%{search_query}%', per_page, offset))
         elif per_page is not None and offset is not None:
-            transactions = db_fetchall(' '.join([cls.__base, cls.__order, limit]), (per_page, offset))
+            transactions = db_fetchall(' '.join([cls.__base, 
+                                                 cls.__order, 
+                                                 limit
+                                                 ]), (per_page, offset))
         elif search_query is not None:
-            transactions = db_fetchall(' '.join([cls.__base, search, cls.__order]), (f'%{search_query}%',))
+            transactions = db_fetchall(' '.join([cls.__base, 
+                                                 search, 
+                                                 cls.__order
+                                                 ]), (f'%{search_query}%',))
         else:
             transactions = db_fetchall(' '.join([cls.__base, cls.__order]))
 
@@ -53,7 +64,7 @@ class TransactModel:
         return db_fetchone("""SELECT * FROM transact""", [transaction_id])
 
     @staticmethod
-    def add_transaction(account_id, category_id, amount, transaction_date, 
+    def add_transaction(account_id, category_id, amount, date_, 
                         description):
         return db_commit(
             """
@@ -61,42 +72,31 @@ class TransactModel:
                     transactiondate, dscr) 
                 VALUES (%s, %s, %s, %s, %s)
             """, 
-            (
-                account_id, category_id, amount, transaction_date, 
-                description
-            )
+            (account_id, category_id, amount, date_, description)
         )
 
     @classmethod
-    def edit_transaction(cls, account_id, category_id, amount, transaction_date,
-                         dscr, transaction_id):
+    def edit_transaction(cls, account_id, category_id, amount, date_,
+                         dscr, id):
         update = 'UPDATE transact'
         return db_commit(
             ' '.join([
                 update, 
-                """SET accountid = %s""", 
+                'SET accountid = %s', 
                 cls.__where_id
-            ]), (account_id, transaction_id),
+            ]), (account_id, id),
             ' '.join([
                 update, 
-                """SET categoryid = %s""", 
+                'SET categoryid = %s', 
                 cls.__where_id
-            ]), (category_id, transaction_id),
+            ]), (category_id, id),
+            ' '.join([update, 'SET dscr = %s', cls.__where_id]), (dscr, id),
             ' '.join([
                 update, 
-                """SET dscr = %s""", 
+                'SET transactiondate = %s', 
                 cls.__where_id
-            ]), (dscr, transaction_id),
-            ' '.join([
-                update, 
-                """SET transactiondate = %s""", 
-                cls.__where_id
-            ]), (transaction_date, transaction_id),
-            ' '.join([
-                update, 
-                """SET amount = %s""", 
-                cls.__where_id
-            ]), (amount, transaction_id)
+            ]), (date_, id),
+            ' '.join([update, 'SET amount = %s', cls.__where_id]), (amount, id)
         )
     @staticmethod
     def get_account_balance(account_id):

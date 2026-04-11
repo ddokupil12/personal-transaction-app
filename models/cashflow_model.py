@@ -56,8 +56,8 @@ class CashflowModel:
     
     @staticmethod
     def get_expense_ids():
-        return db_fetchall("""SELECT expense FROM cashflow""")
+        return db_fetchall('SELECT expense FROM cashflow')
     
     @staticmethod
     def get_income_ids():
-        return db_fetchall("""SELECT income FROM cashflow""")
+        return db_fetchall('SELECT income FROM cashflow')
