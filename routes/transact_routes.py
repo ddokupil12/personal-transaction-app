@@ -34,23 +34,14 @@ def transactions():
     bottom of the page to show more transactions.
     """
     page = request.args.get('p', 1, type=int)
-    query = request.args.get('s', type=str)
+    query = request.args.get('s', '', type=str)
     per_page = 20
     offset = (page - 1) * per_page
-    transactions, total = TransactController.transactions(per_page, offset, query)
+    transactions, total = TransactController.transactions(per_page, offset, search_query=query)
     has_next = offset + per_page < total
     has_prev = page > 1
     return render_template('transactions.html', transactions=transactions,
-                           p=page, has_next=has_next, has_prev=has_prev, s='')
-
-@transact_bp.route('/transactions/search')
-@log_error(model=Model.transact, action=Action.read, pg_template='transactions.html', transactions=[], str=str)
-def search():
-    """Search the descriptions of the transactions and return matches"""
-    query = request.args.get('s', 1, type=str)
-    transactions, _ = TransactController.transactions(search_query=query)
-    return render_template('transactions.html', transactions=transactions,
-                           p=1, has_next=False, has_prev=False, s=query)
+                           p=page, has_next=has_next, has_prev=has_prev, s=query)
 
 @transact_bp.route('/transactions/add', methods=['GET', 'POST'])
 @log_error(model=Model.transact, action=Action.add, pg_template='add_edit_transaction.html', 
