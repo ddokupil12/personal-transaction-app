@@ -34,7 +34,7 @@ def transactions():
     bottom of the page to show more transactions.
     """
     page = request.args.get('p', 1, type=int)
-    query = request.args.get('s', 1, type=str)
+    query = request.args.get('s', type=str)
     per_page = 20
     offset = (page - 1) * per_page
     transactions, total = TransactController.transactions(per_page, offset, query)
