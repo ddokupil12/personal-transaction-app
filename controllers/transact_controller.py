@@ -72,7 +72,7 @@ class TransactController:
         accounts = AcctController.accounts()
         
         # Get recent transactions
-        recent_transactions, _ = TransactModel.get_transactions(
+        recent_transactions = TransactModel.get_transactions(
             limit, 
             return_total=False
         )

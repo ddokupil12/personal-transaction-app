@@ -37,10 +37,9 @@ class TransactModel:
             total = db_fetchone("""
                                 SELECT COUNT(*) as total FROM transact
                                 """)['total']
+            return transactions, total
         else:
-            total = None
-
-        return transactions, total
+            return transactions
         
     @staticmethod
     def filter_category(categories):
