@@ -81,7 +81,7 @@
                     <ul class="pagination justify-content-center">
                         {% if has_prev %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('cashflow.cashflows', page=page-1) }}">Previous</a>
+                                <a class="page-link" href="{{ url_for('cashflow.cashflows', p=p-1) }}">Previous</a>
                             </li>
                         {% else %}
                             <li class="page-item disabled">
@@ -95,7 +95,7 @@
                         
                         {% if has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('cashflow.cashflows', page=page+1) }}">Next</a>
+                                <a class="page-link" href="{{ url_for('cashflow.cashflows', p=p+1) }}">Next</a>
                             </li>
                         {% else %}
                             <li class="page-item disabled">
