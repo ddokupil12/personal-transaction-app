@@ -1,37 +1,31 @@
 from db import db_fetchone, db_fetchall, db_commit
 
 class TransactModel:
-    @staticmethod
-    def get_transactions(per_page=None, offset=0, 
+    __base = """
+            SELECT t.*, a.accountname, c.categoryname 
+            FROM transact t
+            JOIN acct a ON t.accountid = a.accountid
+            JOIN category c ON t.Categoryid = c.Categoryid
+        """
+    __order = 'ORDER BY t.transactiondate DESC, t.transactionid DESC'
+    
+    @classmethod
+    def get_transactions(cls, per_page=None, offset=0, 
                          search_query=None, return_total=True):
-        if per_page is not None:
-            transactions = db_fetchall("""
-                SELECT t.*, a.accountname, c.categoryname 
-                FROM transact t
-                JOIN acct a ON t.accountid = a.accountid
-                JOIN category c ON t.Categoryid = c.Categoryid
-                ORDER BY t.transactiondate DESC, t.transactionid DESC
-                LIMIT %s OFFSET %s
-            """, (per_page, offset))
+        # order = 'ORDER BY t.transactiondate DESC, t.transactionid DESC'
+        search = 'WHERE t.dscr like %s'
+        limit = 'LIMIT %s OFFSET %s'
+        if all([per_page is not None, 
+                offset is not None, 
+                search_query is not None
+                ]):
+            transactions = db_fetchall(' '.join([cls.__base, search, cls.__order, limit]), (f'%{search_query}%', per_page, offset))
+        elif per_page is not None and offset is not None:
+            transactions = db_fetchall(' '.join([cls.__base, cls.__order, limit]), (per_page, offset))
         elif search_query is not None:
-            transactions = db_fetchall("""
-                SELECT t.*, a.accountname, c.categoryname 
-                FROM transact t
-                JOIN acct a ON t.accountid = a.accountid
-                JOIN category c ON t.Categoryid = c.Categoryid
-                WHERE t.dscr like %s
-                ORDER BY t.transactiondate DESC, t.transactionid DESC
-            """, (f'%{search_query}%',))
+            transactions = db_fetchall(' '.join([cls.__base, search, cls.__order]), (f'%{search_query}%',))
         else:
-            transactions = db_fetchall("""
-                SELECT *
-                FROM transact t
-                INNER JOIN acct a
-                ON t.accountid = a.accountid
-                INNER JOIN category c
-                ON t.categoryid = c.categoryid
-                ORDER BY t.transactiondate DESC, t.transactionid DESC
-            """)
+            transactions = db_fetchall(' '.join([cls.__base, cls.__order]))
 
         if return_total is True: # Get total count for pagination
             total = db_fetchone("""
@@ -41,21 +35,12 @@ class TransactModel:
         else:
             return transactions
         
-    @staticmethod
-    def filter_category(categories):
+    @classmethod
+    def filter_category(cls, categories):
         len_ = len(categories)
         assert len_ < 50, "Too many categories selected"
         placeholders = ','.join(['%s'] * len_)
-        query = f"""
-            SELECT *
-                FROM transact t
-                INNER JOIN category c
-                ON t.categoryid = c.categoryid
-                INNER JOIN acct a
-                ON a.accountid = t.accountid
-                WHERE c.categoryid IN ({placeholders})
-                ORDER BY t.transactiondate DESC, t.transactionid DESC
-        """
+        query = ' '.join([cls.__base, f'WHERE c.categoryid IN ({placeholders})', cls.__order])
         return db_fetchall(query, categories)
 
     @staticmethod
