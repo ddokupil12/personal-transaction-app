@@ -83,7 +83,8 @@ def edit_budget():
         year = request.form.get('budget_year', None, type=int)
         month = request.form.get('budget_month', None, type=int)
         budget_amount = request.form['amount']
-        BudgetController.edit_budget(category_id, year, month, budget_amount)
+        budget_id = request.form['id']
+        BudgetController.edit_budget(budget_id, category_id, year, month, budget_amount)
         return log_success(Model.budget, Action.edit, year=year, month=month)
     else:
         budget_id = request.args['id']

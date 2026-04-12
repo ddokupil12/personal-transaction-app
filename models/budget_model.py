@@ -1,4 +1,5 @@
-from db import db_commit, get_db_connection, db_fetchone
+from db import db_commit, get_db_connection, db_fetchone, db_fetchall
+from .utils import join
 
 class BudgetModel:
     @staticmethod
@@ -44,21 +45,27 @@ class BudgetModel:
                 INSERT INTO budget (categoryid, budget_year, 
                 budget_month, budget_amount) 
                 VALUES (%s, %s, %s, %s)
-            """,
-            (
-                category_id, budget_year, budget_month, budget_amount
-            )
+            """, (category_id, budget_year, budget_month, budget_amount)
         )
     
     @staticmethod
-    def edit_budget(category_id, budget_year, budget_month, budget_amount):
-        db_commit(
+    def edit_budget(budget_id, category_id, budget_year, budget_month, budget_amount):
+        update = 'UPDATE budget'
+        where_id = 'WHERE budget_id = %s'
+        others = db_fetchall(
             """
-            UPDATE budget
-            SET budget_amount = %s
+            SELECT *
+            FROM budget
             WHERE categoryid = %s AND budget_year = %s AND budget_month = %s
-            """, 
-            (
-                budget_amount, category_id, budget_year, budget_month
-            )
+            """, (category_id, budget_year, budget_month)
+        )
+        assert others is None, 'Budget is not unique'
+        db_commit(
+            join(update, 'SET budget_amount = %s', where_id), (budget_amount, budget_id),
+            join(update, 'SET category_id = %s', where_id),
+            (category_id, budget_id),
+            join(update, 'SET budget_year = %s', where_id),
+            (budget_year, budget_id),
+            join(update, 'SET budget_month = %s', where_id),
+            (budget_month, budget_id)
         )

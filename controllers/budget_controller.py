@@ -75,6 +75,6 @@ class BudgetController:
                                budget_amount)
         
     @classmethod
-    def edit_budget(cls, categoryid, budget_year, budget_month, amount):
+    def edit_budget(cls, budget_id, categoryid, budget_year, budget_month, amount):
         budget_amount = cls.assert_budget(budget_year, budget_month, amount)
-        BudgetModel.edit_budget(categoryid, budget_year, budget_month, budget_amount)
+        BudgetModel.edit_budget(budget_id, categoryid, budget_year, budget_month, budget_amount)
