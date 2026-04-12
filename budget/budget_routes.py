@@ -3,7 +3,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, request
 
 from category import CatController
-from message import log_error, log_success, header_action, Model, Action
+from utils.message import log_error, log_success, header_action, Model, Action
 from .budget_controller import BudgetController
 
 budget_bp = Blueprint('budget', __name__)

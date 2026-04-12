@@ -1,2 +1,2 @@
-from .controller import TransactController
-from .routes import transact_bp
+from .transact_controller import TransactController
+from .transact_routes import transact_bp

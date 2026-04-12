@@ -1,2 +1,2 @@
-from .controller import AcctController
-from .routes import acct_bp
+from .acct_controller import AcctController
+from .acct_routes import acct_bp

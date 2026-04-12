@@ -1,4 +1,4 @@
-from db import db_fetchone, db_fetchall, db_commit, join
+from utils.db import db_fetchone, db_fetchall, db_commit, join
 
 class TransactModel:
     __base = """

@@ -4,8 +4,8 @@ from flask import Blueprint, render_template, request
 
 from account import AcctController
 from category import CatController
-from message import log_error, log_success, header_action, Model, Action
-from .controller import TransactController
+from utils.message import log_error, log_success, header_action, Model, Action
+from .transact_controller import TransactController
 
 transact_bp = Blueprint('transact', __name__)
 

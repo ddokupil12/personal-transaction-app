@@ -5,7 +5,7 @@ from datetime import datetime
 
 from account import AcctController
 from category import CatController
-from .model import TransactModel
+from .transact_model import TransactModel
 
 class TransactController:
     @staticmethod

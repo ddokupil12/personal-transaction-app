@@ -4,7 +4,7 @@ from datetime import datetime
 from account import AcctController
 from category import CatController
 from transact import TransactController
-from message import log_error, log_success, header_action, Model, Action
+from utils.message import log_error, log_success, header_action, Model, Action
 from .cashflow_controller import CashflowController
 
 cashflow_bp = Blueprint('cashflow', __name__)

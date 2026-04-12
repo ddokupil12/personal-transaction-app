@@ -1,4 +1,4 @@
-from db import db_fetchall, db_commit, db_fetchone
+from utils.db import db_fetchall, db_commit, db_fetchone
 
 class CashflowModel:
     @staticmethod
