@@ -1,7 +1,7 @@
 __all__ = ['AcctController']
 
+# TransactController imported in accounts()
 from .account_model import AccountModel
-from transact.transact_model import TransactModel
 
 class AcctController:
     @staticmethod
@@ -10,10 +10,12 @@ class AcctController:
         # :param balance: bool | True
         #    Determines whether each account balance is returned
         # O(n) (where n = len(accounts))
+        from transact import TransactController
+
         accounts = AccountModel.get_accounts()
         if balance:
             for account in accounts:
-                account['balance'] = TransactModel.get_account_balance(
+                account['balance'] = TransactController.get_account_balance(
                     account['accountid'])
 
         return accounts

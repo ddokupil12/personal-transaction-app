@@ -3,7 +3,7 @@ __all__ = ['TransactController']
 from decimal import Decimal
 from datetime import datetime
 
-from account import AcctController
+# AcctController imported in dashboard()
 from category import CatController
 from .transact_model import TransactModel
 
@@ -69,6 +69,8 @@ class TransactController:
     @staticmethod
     def dashboard(limit):
         # Main dashboard showing accounts and recent transactions
+
+        from account import AcctController
         accounts = AcctController.accounts()
         
         # Get recent transactions
