@@ -59,7 +59,7 @@ def db_fetchall(*args): return _db_fetch(*args, all=True)
 def db_fetchone(*args): return  _db_fetch(*args, all=False)
     
 def db_commit(*args, return_id=True):
-    # Docstring for db_commit
+    # Update data in the database
     #
     # :param args: an even list of arguments of queries followed by
     #     the arguments for those queries.
@@ -89,3 +89,6 @@ def db_commit(*args, return_id=True):
 
     if return_id:
         return new_id
+    
+def join(*args):
+    return ' '.join(args)

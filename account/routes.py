@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 
-from controllers import AcctController
-from .message import log_error, log_success, header_action, Model, Action
+from message import log_error, log_success, header_action, Model, Action
+from .controller import AcctController
 
 acct_bp = Blueprint('acct', __name__)
 

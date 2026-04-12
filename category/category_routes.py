@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request
 
-from controllers import CatController
-from .message import log_error, log_success, header_action, Model, Action
+from message import log_error, log_success, header_action, Model, Action
+from .cat_controller import CatController
 
 category_bp = Blueprint('category', __name__)
 

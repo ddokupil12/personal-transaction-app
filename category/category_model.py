@@ -1,5 +1,4 @@
-from db import db_fetchall, db_commit, db_fetchone
-from .utils import join
+from db import db_fetchall, db_commit, db_fetchone, join
 
 class CategoryModel:
     __where_id = ' WHERE categoryid = %s'

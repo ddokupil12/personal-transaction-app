@@ -2,8 +2,8 @@ __all__ = ['CashflowController']
 
 from decimal import Decimal
 
-from models import CashflowModel
-from .transact_controller import TransactController
+from transact import TransactController
+from .cashflow_model import CashflowModel
 
 class CashflowController:
     @staticmethod

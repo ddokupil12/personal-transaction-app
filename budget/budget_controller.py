@@ -2,7 +2,7 @@ __all__ = ['BudgetController']
 
 from decimal import Decimal
 
-from models import BudgetModel
+from .budget_model import BudgetModel
 
 class BudgetController:
     @staticmethod

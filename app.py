@@ -22,7 +22,11 @@ basicConfig(
 )
 
 def create_app():
-    from routes import acct_bp, budget_bp, cashflow_bp, category_bp, transact_bp
+    from account import acct_bp
+    from budget import budget_bp
+    from cashflow import cashflow_bp
+    from category import category_bp
+    from transact import transact_bp
 
     app.register_blueprint(acct_bp)
     app.register_blueprint(budget_bp)

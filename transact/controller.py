@@ -3,9 +3,9 @@ __all__ = ['TransactController']
 from decimal import Decimal
 from datetime import datetime
 
-from models import TransactModel
-from .acct_controller import AcctController
-from .cat_controller import CatController
+from account import AcctController
+from category import CatController
+from .model import TransactModel
 
 class TransactController:
     @staticmethod
@@ -77,3 +77,7 @@ class TransactController:
             return_total=False
         )
         return accounts, recent_transactions
+    
+    @staticmethod
+    def get_account_balance(account_id):
+        return TransactModel.get_account_balance(account_id)
