@@ -1,4 +1,5 @@
 from db import db_fetchone, db_fetchall, db_commit
+from .utils import join
 
 class TransactModel:
     __base = """
@@ -20,24 +21,24 @@ class TransactModel:
                 offset is not None, 
                 search_query is not None
                 ]):
-            transactions = db_fetchall(' '.join([
+            transactions = db_fetchall(join(
                 cls.__base, 
                 search, 
                 cls.__order, 
                 limit
-            ]), (f'%{search_query}%', per_page, offset))
+            ), (f'%{search_query}%', per_page, offset))
         elif per_page is not None and offset is not None:
-            transactions = db_fetchall(' '.join([cls.__base, 
-                                                 cls.__order, 
-                                                 limit
-                                                 ]), (per_page, offset))
+            transactions = db_fetchall(join(cls.__base, 
+                                            cls.__order, 
+                                            limit
+                                            ), (per_page, offset))
         elif search_query is not None:
-            transactions = db_fetchall(' '.join([cls.__base, 
-                                                 search, 
-                                                 cls.__order
-                                                 ]), (f'%{search_query}%',))
+            transactions = db_fetchall(join(cls.__base, 
+                                            search, 
+                                            cls.__order
+                                            ), (f'%{search_query}%',))
         else:
-            transactions = db_fetchall(' '.join([cls.__base, cls.__order]))
+            transactions = db_fetchall(join(cls.__base, cls.__order))
 
         if return_total is True: # Get total count for pagination
             total = db_fetchone("""
@@ -52,16 +53,18 @@ class TransactModel:
         len_ = len(categories)
         assert len_ < 50, "Too many categories selected"
         placeholders = ','.join(['%s'] * len_)
-        query = ' '.join([
+        query = join(
             cls.__base, 
             f'WHERE c.categoryid IN ({placeholders})', 
             cls.__order
-        ])
+        )
         return db_fetchall(query, categories)
 
-    @staticmethod
-    def get_transaction(transaction_id):
-        return db_fetchone("""SELECT * FROM transact""", [transaction_id])
+    @classmethod
+    def get_transaction(cls, transaction_id):
+        return db_fetchone(join(
+            'SELECT * FROM transact', cls.__where_id
+        ), [transaction_id])
 
     @staticmethod
     def add_transaction(account_id, category_id, amount, date_, 
@@ -80,23 +83,16 @@ class TransactModel:
                          dscr, id):
         update = 'UPDATE transact'
         return db_commit(
-            ' '.join([
-                update, 
-                'SET accountid = %s', 
-                cls.__where_id
-            ]), (account_id, id),
-            ' '.join([
-                update, 
-                'SET categoryid = %s', 
-                cls.__where_id
-            ]), (category_id, id),
-            ' '.join([update, 'SET dscr = %s', cls.__where_id]), (dscr, id),
-            ' '.join([
-                update, 
-                'SET transactiondate = %s', 
-                cls.__where_id
-            ]), (date_, id),
-            ' '.join([update, 'SET amount = %s', cls.__where_id]), (amount, id)
+            join(update, 'SET accountid = %s', cls.__where_id), 
+            (account_id, id),
+            join(update, 'SET categoryid = %s', cls.__where_id), 
+            (category_id, id),
+            join(update, 'SET dscr = %s', cls.__where_id), 
+            (dscr, id),
+            join(update, 'SET transactiondate = %s', cls.__where_id), 
+            (date_, id),
+            join(update, 'SET amount = %s', cls.__where_id), 
+            (amount, id)
         )
     @staticmethod
     def get_account_balance(account_id):
