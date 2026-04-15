@@ -50,18 +50,20 @@ class BudgetModel:
     @staticmethod
     def edit_budget(budget_id, category_id, budget_year, budget_month, budget_amount):
         update = 'UPDATE budget'
-        where_id = 'WHERE budget_id = %s'
+        where_id = 'WHERE budgetid = %s'
         others = db_fetchall(
             """
-            SELECT *
-            FROM budget
-            WHERE categoryid = %s AND budget_year = %s AND budget_month = %s
+                SELECT *
+                FROM budget
+                WHERE categoryid = %s AND budget_year = %s AND budget_month = %s
             """, (category_id, budget_year, budget_month)
         )
-        assert others is None, 'Budget is not unique'
+        is_unique = all([i['budgetid'] != budget_id for i in others])
+        assert is_unique, 'Budget is not unique'
         db_commit(
-            join(update, 'SET budget_amount = %s', where_id), (budget_amount, budget_id),
-            join(update, 'SET category_id = %s', where_id),
+            join(update, 'SET budget_amount = %s', where_id), 
+            (budget_amount, budget_id),
+            join(update, 'SET categoryid = %s', where_id),
             (category_id, budget_id),
             join(update, 'SET budget_year = %s', where_id),
             (budget_year, budget_id),
