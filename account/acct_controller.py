@@ -1,6 +1,5 @@
 __all__ = ['AcctController']
 
-from logging import critical
 from decimal import Decimal
 
 # TransactController imported in accounts()
