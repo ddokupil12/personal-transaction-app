@@ -83,3 +83,7 @@ class TransactController:
     @staticmethod
     def get_account_balance(account_id):
         return TransactModel.get_account_balance(account_id)
+    
+    @staticmethod
+    def delete(id):
+        assert TransactModel.delete(id)

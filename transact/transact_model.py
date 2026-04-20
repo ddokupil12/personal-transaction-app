@@ -93,6 +93,7 @@ class TransactModel:
             join(update, 'SET amount = %s', cls.__where_id), 
             (amount, id)
         )
+    
     @staticmethod
     def get_account_balance(account_id):
         # Calculate account balance using transaction table
@@ -104,3 +105,10 @@ class TransactModel:
         # db_fetchone() returns dict with only key 'balance'
 
         return result
+    
+    @staticmethod
+    def delete(id):
+        return db_commit('DELETE FROM transact WHERE transactionid = %s', 
+                         (id,), 
+                         return_affected_count=True,
+                         return_id=False)

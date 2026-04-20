@@ -169,3 +169,10 @@ def filter():
     transactions = TransactController.filter_category(catSplit)
     return render_template('transactions.html', transactions=transactions,
                            p=1, has_next=False, has_prev=False, s='')
+
+@transact_bp.route('/transactions/delete', methods=['POST'])
+@log_error(model=Model.transact, action=Action.delete, transaction=[])
+def delete():
+    transaction_id = request.form['id']
+    TransactController.delete(transaction_id)
+    return log_success(Model.transact, Action.delete)
