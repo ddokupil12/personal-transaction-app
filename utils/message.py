@@ -148,7 +148,7 @@ def log_error(
     """
     Log errors and return a template
     
-    :param log_level: Logging level (debug, info, warning, error)
+    :param log_level: Logging level (debug, info, warning, error, critical)
         For future implementation
     :param action: the Action attempted
     :param pg_template: The page that will be loaded
