@@ -58,7 +58,7 @@ def db_fetchall(*args): return _db_fetch(*args, all=True)
     
 def db_fetchone(*args): return  _db_fetch(*args, all=False)
     
-def db_commit(*args, return_id=True):
+def db_commit(*args, return_id=True, return_affected_count=False):
     # Update data in the database
     #
     # :param args: an even list of arguments of queries followed by
@@ -84,11 +84,18 @@ def db_commit(*args, return_id=True):
 
         if return_id:
             new_id = cursor.lastrowid
+
+        if return_affected_count:
+            wasAffected = cursor.rowcount > 0
         
         conn.commit()
 
-    if return_id:
+    if return_affected_count and return_id:
+        return new_id, wasAffected
+    elif return_id:
         return new_id
+    elif return_affected_count:
+        return wasAffected
     
 def join(*args):
     return ' '.join(args)
