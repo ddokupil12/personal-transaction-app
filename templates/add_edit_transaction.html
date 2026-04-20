@@ -59,11 +59,16 @@
                     {% if mode == 'Edit' %}
                         <br>
                         <div id="del_wrapper">
-                            <div id="del_form" hidden>
-                                <form method="POST" action="{{url_for('transact.delete')}}">
-                                    <input type="hidden" name="id" value="{{transaction.transactionid}}">
-                                    <button type="submit" class="text-end btn btn-outline-secondary">Confirm Delete</button>
-                                </form>
+                            <div id="del_form" class="row" hidden>
+                                <div class="col-md-6 mb-3">
+                                    <h5>Are you sure?</h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <form method="POST" action="{{url_for('transact.delete')}}">
+                                        <input type="hidden" name="id" value="{{transaction.transactionid}}">
+                                        <button type="submit" class="text-end btn btn-outline-secondary">Confirm Delete</button>
+                                    </form>
+                                </div>
                             </div>
                             <button onclick="del()" id="del" class="btn btn-outline-secondary">Delete</button>
                         </div>
