@@ -6,19 +6,19 @@
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><i class="fas fa-exchange-alt me-2"></i>Transactions</h1>
-            <form method="GET" action="{{url_for('transact.transactions')}}">
-                <ul class="pagination" style="margin-top: 10px; margin-bottom: 11px;">
-                    <li class="page-item">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </li>
-                    <li class="page-item">
-                        <input class="search-bar" type="text" id="s" name="s" value="{{s}}">
-                    </li>
-                    <li class="page-item">
-                        <button type="submit" class="page-link">Search</button>
-                    </li>
-                </ul>
-            </form>
+        <form method="GET" action="{{url_for('transact.transactions')}}">
+            <ul class="pagination" style="margin-top: 10px; margin-bottom: 11px;">
+                <li class="page-item">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </li>
+                <li class="page-item">
+                    <input class="search-bar" type="text" id="s" name="s" value="{{s}}">
+                </li>
+                <li class="page-item">
+                    <button type="submit" class="page-link">Search</button>
+                </li>
+            </ul>
+        </form>
         {% include 'transaction_button.html' %}
     </div>
 
