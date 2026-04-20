@@ -14,8 +14,9 @@ def accounts():
     This function takes no arguments and returns the rendered template 
     showing all accounts in detail.
     """
-    accounts = AcctController.accounts()
-    return render_template('accounts.html', accounts=accounts)
+    accounts, net_cash = AcctController.accounts(show_net_cash=True)
+    return render_template('accounts.html', accounts=accounts, 
+                           net_cash=net_cash)
 
 @acct_bp.route('/accounts/add', methods=['GET', 'POST'])
 @log_error(model=Model.acct, action=Action.add, pg_template='add_edit_account.html')
