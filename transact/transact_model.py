@@ -110,5 +110,5 @@ class TransactModel:
     def delete(id):
         return db_commit('DELETE FROM transact WHERE transactionid = %s', 
                          (id,), 
-                         return_affected_count=True,
+                         return_was_affected=True,
                          return_id=False)
