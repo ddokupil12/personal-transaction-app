@@ -86,4 +86,5 @@ class TransactController:
     
     @staticmethod
     def delete(id):
-        assert TransactModel.delete(id)
+        if TransactModel.delete(id) is False:
+            raise ValueError(f'Transaction {id} does not exist')
