@@ -105,8 +105,8 @@ class CashflowController:
     
     @staticmethod
     def add_journal_entry(*args):
-        # Each transaction is a tuple
-        # Accepts an arbitrary number of tuples
+        # Each transaction is a dictionary
+        # Accepts an arbitrary number of dictionary
         # Salary example
         # Expenses
         # -50 McDonald's with friends
