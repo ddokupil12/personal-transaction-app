@@ -70,3 +70,10 @@ class BudgetModel:
             join(update, 'SET budget_month = %s', where_id),
             (budget_month, budget_id)
         )
+
+    @staticmethod
+    def delete(id):
+        return db_commit('DELETE FROM budget WHERE budgetid = %s', 
+                         (id,), 
+                         return_was_affected=True,
+                         return_id=False)

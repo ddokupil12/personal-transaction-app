@@ -94,3 +94,15 @@ def edit_budget():
         return render_template('add_edit_budget.html', 
                                categories=categories, 
                                datetime=datetime, mode=header_action(Action.edit), year=budget['budget_year'], month=budget['budget_month'], amount=budget['budget_amount'], categoryid=budget['categoryid'], budgetid=budget['budgetid'])
+
+@budget_bp.route('/budgets/delete', methods=['POST'])
+@log_error(model=Model.budget, action=Action.delete, categories=[], pg_template='add_edit_budget.html', datetime=datetime)
+def delete():
+    """
+    Delete a budget.
+
+    Takes a budget ID, permanently deletes the budget, and then sends the user back to the main budgets page.
+    """
+    id = request.form['id']
+    BudgetController.delete(id)
+    return log_success(Model.budget, Action.delete)

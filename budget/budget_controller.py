@@ -78,3 +78,8 @@ class BudgetController:
     def edit_budget(cls, budget_id, categoryid, budget_year, budget_month, amount):
         budget_amount = cls.assert_budget(budget_year, budget_month, amount)
         BudgetModel.edit_budget(budget_id, categoryid, budget_year, budget_month, budget_amount)
+
+    @staticmethod
+    def delete(id):
+        if BudgetModel.delete(id) is False:
+            raise ValueError(f'Budget {id} does not exist')
