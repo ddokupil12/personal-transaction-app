@@ -44,3 +44,11 @@ class AcctController:
     @staticmethod
     def edit_account(account_id, account_name, account_type):
         AccountModel.edit_account(account_id, account_name, account_type)
+
+    @classmethod
+    def delete(cls, id):
+        try:
+            x = AccountModel.delete(id) 
+        except Exception as e:
+            assert cls.get_account(id) is None, 'Account is still being used somewhere else'
+            raise Exception(e)
