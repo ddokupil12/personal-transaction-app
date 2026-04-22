@@ -13,7 +13,6 @@ def get_db_connection():
         connection = connect(**DB_CONFIG)
         yield connection
     except Error as e:
-        print(f'Error connecting to MySQL: {e}')
         if connection:
             connection.rollback()
         raise Exception(e)
@@ -56,7 +55,7 @@ def _db_fetch(*args, all=True):
 
 def db_fetchall(*args): return _db_fetch(*args, all=True)
     
-def db_fetchone(*args): return  _db_fetch(*args, all=False)
+def db_fetchone(*args): return _db_fetch(*args, all=False)
     
 def db_commit(*args, return_id=True, return_was_affected=False):
     # Update data in the database
@@ -97,5 +96,4 @@ def db_commit(*args, return_id=True, return_was_affected=False):
     elif return_was_affected:
         return was_affected
     
-def join(*args):
-    return ' '.join(args)
+def join(*args): return ' '.join(args)
