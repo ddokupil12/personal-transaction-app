@@ -106,9 +106,7 @@ class TransactModel:
 
         return result
     
-    @staticmethod
-    def delete(id):
-        return db_commit('DELETE FROM transact WHERE transactionid = %s', 
-                         (id,), 
-                         return_was_affected=True,
-                         return_id=False)
+    @classmethod
+    def delete(cls, id):
+        return db_commit(join('DELETE FROM transact', cls.__where_id), (id,), 
+                         return_was_affected=True, return_id=False)
