@@ -1,6 +1,9 @@
 from utils.db import db_commit, get_db_connection, db_fetchone, db_fetchall, join
 
 class BudgetModel:
+    __select_all = 'SELECT * FROM budget'
+    __where_id = 'WHERE budgetid = %s'
+
     @staticmethod
     def get_budgets(year, month):
         with get_db_connection() as conn:
@@ -29,13 +32,9 @@ class BudgetModel:
 
             return budgets
         
-    @staticmethod
-    def get_budget(budget_id):
-        return db_fetchone("""
-                           SELECT *
-                           FROM budget
-                           WHERE budgetid = %s
-                           """, (budget_id,))
+    @classmethod
+    def get_budget(cls, budget_id):
+        return db_fetchone(join(cls.__select_all, cls.__where_id), (budget_id,))
 
     @staticmethod
     def add_budget(category_id, budget_year, budget_month, budget_amount):
@@ -47,33 +46,28 @@ class BudgetModel:
             """, (category_id, budget_year, budget_month, budget_amount)
         )
     
-    @staticmethod
-    def edit_budget(budget_id, category_id, budget_year, budget_month, budget_amount):
+    @classmethod
+    def edit_budget(cls, budget_id, category_id, budget_year, budget_month, budget_amount):
         update = 'UPDATE budget'
-        where_id = 'WHERE budgetid = %s'
-        others = db_fetchall(
-            """
-                SELECT *
-                FROM budget
-                WHERE categoryid = %s AND budget_year = %s AND budget_month = %s
-            """, (category_id, budget_year, budget_month)
+        query = join(
+            cls.__select_all, 
+            'WHERE categoryid = %s AND budget_year = %s AND budget_month = %s'
         )
+        others = db_fetchall(query, (category_id, budget_year, budget_month))
         is_unique = all([i['budgetid'] != budget_id for i in others])
         assert is_unique, 'Budget is not unique'
         db_commit(
-            join(update, 'SET budget_amount = %s', where_id), 
+            join(update, 'SET budget_amount = %s', cls.__where_id), 
             (budget_amount, budget_id),
-            join(update, 'SET categoryid = %s', where_id),
+            join(update, 'SET categoryid = %s', cls.__where_id),
             (category_id, budget_id),
-            join(update, 'SET budget_year = %s', where_id),
+            join(update, 'SET budget_year = %s', cls.__where_id),
             (budget_year, budget_id),
-            join(update, 'SET budget_month = %s', where_id),
+            join(update, 'SET budget_month = %s', cls.__where_id),
             (budget_month, budget_id)
         )
 
-    @staticmethod
-    def delete(id):
-        return db_commit('DELETE FROM budget WHERE budgetid = %s', 
-                         (id,), 
-                         return_was_affected=True,
-                         return_id=False)
+    @classmethod
+    def delete(cls, id):
+        return db_commit(join('DELETE FROM budget', cls.__where_id), (id,), 
+                         return_was_affected=True, return_id=False)
