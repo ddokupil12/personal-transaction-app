@@ -81,5 +81,8 @@ class BudgetController:
 
     @staticmethod
     def delete(id):
-        if BudgetModel.delete(id) is False:
-            raise ValueError(f'Budget {id} does not exist')
+        try:
+            x = BudgetModel.delete(id) 
+        except Exception as e:
+            assert BudgetModel.get_budget(id) is None, 'Budget is still being used somewhere else'
+            raise Exception(e)
