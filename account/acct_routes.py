@@ -84,7 +84,7 @@ def edit_account():
                                mode=header_action(Action.edit))
 
 @acct_bp.route('/accounts/delete', methods=['POST'])
-@log_error(model=Model.acct, action=Action.delete)
+@log_error(model=Model.acct, action=Action.delete, pg_template='add_edit_account.html')
 def delete():
     id = request.form['id']
     AcctController.delete(id)
