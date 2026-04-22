@@ -62,9 +62,9 @@ class TransactController:
     def edit_transaction(cls, account_id, category_id, amount, 
                          transaction_date, description, transaction_id):
         cls.__check_date(transaction_date)
-        return TransactModel.edit_transaction(account_id, category_id, amount,
-                                       transaction_date, description, 
-                                       transaction_id)
+        return TransactModel.edit_transaction(account_id, category_id, amount, 
+                                              transaction_date, description, 
+                                              transaction_id)
         
     @staticmethod
     def dashboard(limit):
@@ -84,7 +84,10 @@ class TransactController:
     def get_account_balance(account_id):
         return TransactModel.get_account_balance(account_id)
     
-    @staticmethod
-    def delete(id):
-        if TransactModel.delete(id) is False:
-            raise ValueError(f'Transaction {id} does not exist')
+    @classmethod
+    def delete(cls, id):
+        try:
+            x = TransactModel.delete(id) 
+        except Exception as e:
+            assert cls.get_transaction(id) is None, 'Transaction is still being used somewhere else'
+            raise Exception(e)
