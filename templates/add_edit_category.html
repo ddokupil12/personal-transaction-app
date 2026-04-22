@@ -34,6 +34,40 @@
                             <a href="{{ url_for('category.categories') }}" class="btn btn-outline-secondary">Cancel</a>
                         </div>
                     </form>
+                    {% if mode == 'Edit' %}
+                        <br>
+                        <div id="del_wrapper">
+                            <div id="del_form" class="row" hidden>
+                                <div class="col-md-6 mb-3">
+                                    <h5>Are you sure?</h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <form method="POST" action="{{url_for('category.delete')}}">
+                                        <input type="hidden" name="id" value="{{category.categoryid}}">
+                                        <button type="submit" class="text-end btn btn-outline-secondary">Confirm Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <button onclick="del()" id="del" class="btn btn-outline-secondary">Delete</button>
+                        </div>
+                        <div>
+                        </div>
+                        <script>
+                            'use strict';
+                            const del = () => {
+                                const btn = document.getElementById('del');
+                                btn.hidden = true;
+                                const form = document.getElementById('del_form');
+                                form.hidden = false;
+                            }
+                            const cancel = () => {
+                                const btn = document.getElementById('del');
+                                btn.hidden = false;
+                                const form = document.getElementById('del_form');
+                                form.hidden = true;
+                            }
+                        </script>
+                    {% endif %}
                 </div>
             </div>
         </div>
