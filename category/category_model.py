@@ -36,3 +36,10 @@ class CategoryModel:
             join(update, 'SET type_ = %s', cls.__where_id), 
             (cat_type, id)
         )
+    
+    @classmethod
+    def delete(cls, id):
+        return db_commit(join('DELETE FROM category', cls.__where_id), 
+                         (id,), 
+                         return_was_affected=True,
+                         return_id=False)

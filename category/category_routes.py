@@ -80,3 +80,17 @@ def edit_category():
         return render_template('add_edit_category.html', 
                                mode=header_action(Action.edit), 
                                category=category)
+    
+@category_bp.route('/categories/delete', methods=['POST'])
+@log_error(model=Model.category, action=Action.delete, pg_template='add_edit_category.html')
+def delete():
+    """
+    Delete a category.
+
+    Takes a category ID, permanently deletes the category, and then sends the user back to the main cateogries page.
+    This will not work if a transaction or budget uses the category.
+    """
+    id = request.form['id']
+    print('delete', id)
+    CatController.delete(id)
+    return log_success(Model.category, Action.delete)

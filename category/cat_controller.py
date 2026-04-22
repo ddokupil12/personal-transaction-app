@@ -35,3 +35,11 @@ class CatController:
     def edit_category(cls, id, name, cat_type):
         cls.check_type(cat_type)
         return CategoryModel.edit_category(id, name, cat_type)
+    
+    @classmethod
+    def delete(cls, id):
+        try:
+            x = CategoryModel.delete(id) 
+        except Exception as e:
+            assert cls.get_category(id) is None, 'Category is still being used somewhere else'
+            raise Exception(e)
