@@ -82,3 +82,10 @@ def edit_account():
         account = AcctController.get_account(account_id)
         return render_template('add_edit_account.html', account=account, 
                                mode=header_action(Action.edit))
+
+@acct_bp.route('/accounts/delete', methods=['POST'])
+@log_error(model=Model.acct, action=Action.delete)
+def delete():
+    id = request.form['id']
+    AcctController.delete(id)
+    return log_success(Model.acct, Action.delete)
