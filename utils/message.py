@@ -140,7 +140,7 @@ def log_success(model, action, **kwargs):
 
 def log_error(
     action,
-    log_level=CRITICAL,
+    log_level=ERROR,
     model=None,
     pg_template='dashboard.html',
     **pg_kwargs
@@ -163,15 +163,18 @@ def log_error(
                 if isinstance(e, AssertionError):
                     error_message = e
                 elif isinstance(action, Action):
+                    # What should normally happen
+
+                    # Make the model plural when the action is reading
                     plural = action == Action.read
                     model_msg, _ = _match_model(model, plural=plural)
+
                     action_msg = _match_action(action) # returns participle
                     error_message = f'Error {action_msg} {model_msg}'
                 else:
                     error_message = 'An unexpected error occurred'
 
                 flash(error_message, 'error')
-                print_exc()
                 if log_level == CRITICAL:
                     critical(error_message, exc_info=True)
                 else:
