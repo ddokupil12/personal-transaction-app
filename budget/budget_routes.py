@@ -9,8 +9,8 @@ from .budget_controller import BudgetController
 budget_bp = Blueprint('budget', __name__)
 
 @budget_bp.route('/budgets')
-@log_error(model=Model.budget, action=Action.read, pg_template='budgets.html', budgets=[],  
-           datetime=datetime)
+@log_error(model=Model.budget, action=Action.read, pg_template='budgets.html', 
+           budgets=[], datetime=datetime)
 def budgets():
     """
     View all budgets.
@@ -25,8 +25,8 @@ def budgets():
                            month=month, datetime=datetime, summary=summary)
 
 @budget_bp.route('/budgets/add', methods=['GET', 'POST'])
-@log_error(model=Model.budget, action=Action.add, pg_template='add_edit_budget.html', categories=[], 
-           datetime=datetime)
+@log_error(model=Model.budget, action=Action.add, categories=[], 
+           pg_template='add_edit_budget.html', datetime=datetime)
 def add_budget():
     """
     Add a new budget.
@@ -96,7 +96,8 @@ def edit_budget():
                                datetime=datetime, mode=header_action(Action.edit), year=budget['budget_year'], month=budget['budget_month'], amount=budget['budget_amount'], categoryid=budget['categoryid'], budgetid=budget['budgetid'])
 
 @budget_bp.route('/budgets/delete', methods=['POST'])
-@log_error(model=Model.budget, action=Action.delete, categories=[], pg_template='add_edit_budget.html', datetime=datetime)
+@log_error(model=Model.budget, action=Action.delete, categories=[], 
+           pg_template='add_edit_budget.html', datetime=datetime)
 def delete():
     """
     Delete a budget.

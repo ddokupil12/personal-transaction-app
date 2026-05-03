@@ -6,7 +6,8 @@ from .cat_controller import CatController
 category_bp = Blueprint('category', __name__)
 
 @category_bp.route('/categories')
-@log_error(model=Model.category, action=Action.read, pg_template='categories.html', categories=[])
+@log_error(model=Model.category, action=Action.read, 
+           pg_template='categories.html', categories=[])
 def categories():
     """
     View all categories.
@@ -27,7 +28,8 @@ def categories():
                            expense_categories=expense)
 
 @category_bp.route('/categories/add', methods=['GET', 'POST'])
-@log_error(model=Model.category, action=Action.add, pg_template='add_edit_category.html')
+@log_error(model=Model.category, action=Action.add, 
+           pg_template='add_edit_category.html')
 def add_category():
     """
     Add a new category.
@@ -63,7 +65,8 @@ def add_category():
                                mode=header_action(Action.add))
 
 @category_bp.route('/categories/edit', methods=['GET', 'POST'])
-@log_error(model=Model.category, action=Action.edit, pg_template='add_edit_category.html')
+@log_error(model=Model.category, action=Action.edit, 
+           pg_template='add_edit_category.html')
 def edit_category():
     """
     Edit a selected category.
@@ -82,7 +85,8 @@ def edit_category():
                                category=category)
     
 @category_bp.route('/categories/delete', methods=['POST'])
-@log_error(model=Model.category, action=Action.delete, pg_template='add_edit_category.html')
+@log_error(model=Model.category, action=Action.delete, 
+           pg_template='add_edit_category.html')
 def delete():
     """
     Delete a category.
