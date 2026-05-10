@@ -25,7 +25,7 @@ class CashflowModel:
         
         if return_total is True:
             total = db_fetchone("""
-                SELECT COUNT(*) as total FROM transact
+                SELECT COUNT(*) as total FROM cashflow
             """)['total']
             return cashflows, total
         else:
