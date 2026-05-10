@@ -60,7 +60,7 @@ def verify():
     t_verified, t_update = CashflowController.verify_transfers()
     # For each transfer, make sure the amounts on both sides are equal (Controller)
 
-    b_verified, b_update = CashflowController.verify_transfers()
+    b_verified, b_update = CashflowController.verify_business_cashflows()
 
     # Make sure that all transfers are cashflows, and raise exceptions for the ones that aren't (Controller)
     t_missing, b_missing = CashflowController.get_missing_cashflows()
@@ -70,10 +70,14 @@ def verify():
     # Display transfers that are paired, but aren't accurate (View)
     # Suggest additions and revisions to the user (View)
 
+    t_total = CashflowController.sum_cashflows('Account Transfer')
+    b_total = CashflowController.sum_cashflows('Business')
+
     adjustment_id = CatController.get_category_by_name('Balance Adjustment')['categoryid']
     adjustments = TransactController.filter_category([adjustment_id])
+    adjustment_total = sum([i['amount'] for i in adjustments])
 
-    return render_template('verify_cashflows.html', t_update=t_update, t_missing=t_missing, b_update=b_update, b_missing=b_missing, adjustments=adjustments)
+    return render_template('verify_cashflows.html', t_update=t_update, t_missing=t_missing, b_update=b_update, b_missing=b_missing, adjustments=adjustments, t_total=t_total, b_total=b_total, adjustment_total=adjustment_total)
 
 @cashflow_bp.route('/cashflows/add_transfer', methods=['GET', 'POST'])
 @log_error(model=Model.cashflow, action=Action.read, pg_template='add_transfer.html', cashflows=[])
