@@ -3,6 +3,7 @@ __all__ = ['CashflowController']
 from decimal import Decimal
 
 from transact import TransactController
+from category import CatController
 from .cashflow_model import CashflowModel
 
 class CashflowController:
@@ -117,3 +118,11 @@ class CashflowController:
         # Log each transaction independently, then log the cashflows
         # 
         pass
+
+    @staticmethod
+    def sum_cashflows(category_name):
+        return TransactController.sum_transacts_from_cat(category_name)
+        category = CatController.get_category_by_name(category_name)['categoryid']
+        transactions = TransactController.filter_category((category,))
+        total = sum([i['amount'] for i in transactions])
+        return total

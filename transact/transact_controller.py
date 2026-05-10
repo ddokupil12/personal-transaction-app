@@ -91,3 +91,10 @@ class TransactController:
         except Exception as e:
             assert cls.get_transaction(id) is None, 'Transaction is still being used somewhere else'
             raise Exception(e)
+
+    @classmethod
+    def sum_transacts_from_cat(cls, category_name):
+        category = CatController.get_category_by_name(category_name)['categoryid']
+        transactions = cls.filter_category((category,))
+        total = sum([i['amount'] for i in transactions])
+        return total
