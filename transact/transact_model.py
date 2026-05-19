@@ -40,9 +40,12 @@ class TransactModel:
             transactions = db_fetchall(join(cls.__base, cls.__order))
 
         if return_total is True: # Get total count for pagination
-            total = db_fetchone("""
-                                SELECT COUNT(*) as total FROM transact
-                                """)['total']
+            total_query = 'SELECT COUNT(*) as total FROM transact t'
+            if search_query is None:
+                total = db_fetchone(total_query)['total']
+            else:
+                total = db_fetchone(join(total_query, search), 
+                                    (search_query,))['total']
             return transactions, total
         else:
             return transactions
