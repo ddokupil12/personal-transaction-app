@@ -43,12 +43,9 @@ class TransactModel:
             total_query = 'SELECT COUNT(*) as total FROM transact t'
             if search_query is None:
                 total = db_fetchone(total_query)['total']
-                print('no search query', total)
             else:
                 total = db_fetchone(join(total_query, search), 
                                     (search_query,))['total']
-                print('search query', total)
-                print('search query', search_query)
             return transactions, total
         else:
             return transactions
