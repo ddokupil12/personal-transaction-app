@@ -17,6 +17,7 @@ class _Config: # Default app configuration
         'password': environ.get('DB_PASSWORD'),
         'port': int(environ.get('DB_PORT', 3306)) # The database's port
     }
+    ALLOWED_HOSTS = environ.get('ALLOWED_HOSTS').split(',')
 
 class _ProductionConfig(_Config): # Production app configuration
     DEBUG = False

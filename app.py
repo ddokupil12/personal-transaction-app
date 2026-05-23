@@ -2,7 +2,7 @@ __all__ = ['app', 'DB_CONFIG', 'create_app']
 
 from os import environ
 
-from flask import Flask
+from flask import Flask, request, abort
 from logging import basicConfig, INFO
 
 from utils.config import config, is_dotenv_loaded
@@ -20,6 +20,11 @@ basicConfig(
     level=INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
+
+@app.before_request
+def check_allowed_hosts():
+    if request.host not in app.config['ALLOWED_HOSTS']:
+        abort(403)
 
 def create_app():
     from account import acct_bp
