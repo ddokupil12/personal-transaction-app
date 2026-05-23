@@ -10,7 +10,9 @@ from .transact_model import TransactModel
 class TransactController:
     @staticmethod
     def transactions(per_page=None, offset=None, search_query=None, return_total=True):
-        return TransactModel.get_transactions(per_page, offset, search_query, return_total)
+        query = None if search_query == '' else search_query
+        return TransactModel.get_transactions(per_page, offset, query, 
+                                              return_total)
     
     @staticmethod
     def filter_category(categories):
