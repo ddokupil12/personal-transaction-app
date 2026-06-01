@@ -4,48 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Budget Manager{% endblock %}</title>
-    <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap.css')}}">
-    <link rel="stylesheet" href="{{url_for('static', filename='css/all.min.css')}}">
-    <style>
-        .navbar-brand { font-weight: bold; }
-        .balance-positive { color: #28a745; }
-        .balance-negative { color: #dc3545; }
-        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }
-        .btn-primary:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
-        .sidebar { background: #f8f9fa; min-height: 100vh; padding-top: 20px; }
-        .main-content { padding: 20px; }
-        
-        /* Updated Footer Styles */
-        footer {
-            color: black;
-            text-align: center;
-            padding: 20px;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-            border: none;
-        }
-        .footer-button {
-            color: #676767;
-            font-size: 14px;
-            margin-left: 10px;
-            padding: 1px;
-        }
-        .footer-button:hover {
-            color: blue;
-            text-decoration: underline;
-        }
-        .footer-text {
-            font-size: 14px;
-            padding: 1px;
-            margin-right: 20px;
-            border: none;
-        }
-        .search-bar {
-            margin: 0 10px;
-        }
-    </style>
+    <link rel="stylesheet" href="{{url_for('static', filename='bootstrap.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='fontawesome/css/all.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
 </head>
 <body>
     <!-- Navigation -->
@@ -115,7 +76,7 @@
             </main>
         </div>
     </div>
-    <script src="{{url_for('static', filename='js/bootstrap.js')}}"></script>
+    <script src="{{url_for('static', filename='bootstrap.js')}}"></script>
     {% block scripts %}{% endblock %}
     <footer>
         <span class="footer-text text-muted">Version 6</span>
