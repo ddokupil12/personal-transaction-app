@@ -26,6 +26,15 @@ def check_allowed_hosts():
     if request.host not in app.config['ALLOWED_HOSTS']:
         abort(403)
 
+@app.after_request
+def set_security_headers(response): # Allow Bootstrap and Font Awesome
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    # response.headers['Content-Security-Policy'] = "default-src 'self';"
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    return response
+
 def create_app():
     from account import acct_bp
     from budget import budget_bp
