@@ -1,4 +1,3 @@
-<!-- add_budget.html -->
 {% extends "base.html" %}
 
 {% block title %}Add Budget - Budget Manager{% endblock %}
@@ -9,7 +8,7 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>Add New Budget</h5>
+                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>{{mode}} Budget</h5>
                 </div>
                 <div class="card-body">
                     <form method="POST">
@@ -19,6 +18,7 @@
                             </div>
                             <div class="col-md-6 mb-3">
                                 {% set pg = 'budget' %}
+                                {% set amount_value = amount if amount else '' %}
                                 {% include 'amount_input.html' %}
                             </div>
                         </div>
@@ -27,8 +27,8 @@
                             <div class="col-md-6 mb-3">
                                 <label for="budget_year" class="form-label">Year</label>
                                 <select class="form-select" id="budget_year" name="budget_year" required>
-                                    {% for year in range(2020, 2030) %}
-                                        <option value="{{ year }}" {% if year == datetime.now().year %}selected{% endif %}>{{ year }}</option>
+                                    {% for i in range(2020, 2030) %}
+                                        <option value="{{ i }}" {% if i == year %}selected{% endif %}>{{ i }}</option>
                                     {% endfor %}
                                 </select>
                             </div>
@@ -37,14 +37,14 @@
                                 <label for="budget_month" class="form-label">Month</label>
                                 <select class="form-select" id="budget_month" name="budget_month" required>
                                     {% for i in range(1, 13) %}
-                                        <option value="{{ i }}" {% if i == datetime.now().month %}selected{% endif %}>
+                                        <option value="{{ i }}" {% if i == month %}selected{% endif %}>
                                             {{ datetime(2024, i, 1).strftime('%B') }}
                                         </option>
                                     {% endfor %}
                                 </select>
                             </div>
                         </div>
-                        
+                        <input type="hidden" value="{{budgetid}}" id="id" name="id">
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save me-1"></i>Save Budget
@@ -52,6 +52,40 @@
                             <a href="{{ url_for('budget.budgets') }}" class="btn btn-outline-secondary">Cancel</a>
                         </div>
                     </form>
+                    {% if mode == 'Edit' %}
+                        <br>
+                        <div id="del_wrapper">
+                            <div id="del_form" class="row" hidden>
+                                <div class="col-md-6 mb-3">
+                                    <h5>Are you sure?</h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <form method="POST" action="{{url_for('budget.delete')}}">
+                                        <input type="hidden" name="id" value="{{budgetid}}">
+                                        <button type="submit" class="text-end btn btn-outline-secondary">Confirm Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <button onclick="del()" id="del" class="btn btn-outline-secondary">Delete</button>
+                        </div>
+                        <div>
+                        </div>
+                        <script>
+                            'use strict';
+                            const del = () => {
+                                const btn = document.getElementById('del');
+                                btn.hidden = true;
+                                const form = document.getElementById('del_form');
+                                form.hidden = false;
+                            }
+                            const cancel = () => {
+                                const btn = document.getElementById('del');
+                                btn.hidden = false;
+                                const form = document.getElementById('del_form');
+                                form.hidden = true;
+                            }
+                        </script>
+                    {% endif %}
                 </div>
             </div>
         </div>

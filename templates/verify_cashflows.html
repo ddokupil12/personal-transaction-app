@@ -1,0 +1,292 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify Integrity{% endblock %}
+{% block content %}
+<div class="main-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-check"></i> Verify Integrity</h1>
+        {% include 'cashflow_button.html' %}
+    </div>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3>Update Transfers</h3>
+        <a href="{{ url_for('cashflow.add_transfer') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-1"></i>Add transfer
+        </a>
+    </div>
+    {% if t_update %}
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr>
+                            <th></th>
+                            <th></th>
+                            <th>Expense</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th>Income</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th class=""></th>
+                        </thead></tr>
+                        <thead><tr>
+                            <th>Edit</th>
+                            <th>Type</th>
+                            <th> Date</th>
+                            <th> Account</th>
+                            <th> Category</th>
+                            <th> Description</th>
+                            <th> Amount</th>
+                            <th> Date</th>
+                            <th> Account</th>
+                            <th> Category</th>
+                            <th> Description</th>
+                            <th class="text-end"> Amount</th>
+                        </tr></thead>
+                        <tbody>
+                            {% for cashflow in t_update %}
+                                <tr>
+                                    <td>
+                                        {% set edit_url = url_for('cashflow.edit_cashflow') %}
+                                        {% set edit_value = None %}
+                                        {% include 'edit_button.html' %}
+                                    </td>
+                                    <td>{{cashflow.type_}}</td>
+                                    <td>{{ cashflow.expensedate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ cashflow.expenseacct }}</td>
+                                    <td>{{ cashflow.expensecat }}</td>
+                                    <td>{{ cashflow.expensedscr }}</td>
+                                    <td>
+                                        <span class="{{ 'balance-positive' if cashflow.expenseamount > 0 else 'balance-negative' }}">
+                                            {{ '+' if cashflow.expenseamount > 0 else '' }}${{ "{:,.2f}".format(cashflow.expenseamount) }}
+                                        </span>
+                                    </td>
+                                    <td>{{ cashflow.incomedate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ cashflow.incomeacct }}</td>
+                                    <td>{{ cashflow.incomecat }}</td>
+                                    <td>{{ cashflow.incomedscr }}</td>
+                                    <td class="text-end">
+                                        <span class="{{ 'balance-positive' if cashflow.incomeamount > 0 else 'balance-negative' }}">
+                                            {{ '+' if cashflow.incomeamount > 0 else '' }}${{ "{:,.2f}".format(cashflow.incomeamount) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <h5>All transfers are up to date.</h5>
+        </div>
+    {% endif %}
+    <h3>Missing Transfer Cashflows</h3>
+    {% if t_missing %}
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr>
+                            <th>Edit</th>
+                            <th>Date</th>
+                            <th>Account</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th class="text-end">Amount</th>
+                        </tr></thead>
+                        <tbody>
+                            {% for transaction in t_missing %}
+                                <tr>
+                                    <td>
+                                        {% set edit_url = url_for('transact.edit_transaction') %}
+                                        {% set edit_value = transaction.transactionid %}
+                                        {% include 'edit_button.html' %}
+                                    </td>
+                                    <td>{{ transaction.transactiondate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ transaction.accountname }}</td>
+                                    <td>{{ transaction.categoryname }}</td>
+                                    <td>{{ transaction.dscr or '-' }}</td>
+                                    <td class="text-end">
+                                        <span class="{{ 'balance-positive' if transaction.amount > 0 else 'balance-negative' }}">
+                                            {{ '+' if transaction.amount > 0 else '' }}${{ "{:,.2f}".format(transaction.amount) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <h5>No missing transfer cashflows</h5>
+        </div>
+    {% endif %}
+        {% if b_update %}
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr>
+                            <th></th>
+                            <th></th>
+                            <th>Expense</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th>Income</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th class=""></th>
+                        </thead></tr>
+                        <thead><tr>
+                            <th>Edit</th>
+                            <th>Type</th>
+                            <th> Date</th>
+                            <th> Account</th>
+                            <th> Category</th>
+                            <th> Description</th>
+                            <th> Amount</th>
+                            <th> Date</th>
+                            <th> Account</th>
+                            <th> Category</th>
+                            <th> Description</th>
+                            <th class="text-end"> Amount</th>
+                        </tr></thead>
+                        <tbody>
+                            {% for cashflow in b_update %}
+                                <tr>
+                                    <td>
+                                        {% set edit_url = url_for('cashflow.edit_cashflow') %}
+                                        {% set edit_value = None %}
+                                        {% include 'edit_button.html' %}
+                                    </td>
+                                    <td>{{cashflow.type_}}</td>
+                                    <td>{{ cashflow.expensedate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ cashflow.expenseacct }}</td>
+                                    <td>{{ cashflow.expensecat }}</td>
+                                    <td>{{ cashflow.expensedscr }}</td>
+                                    <td>
+                                        <span class="{{ 'balance-positive' if cashflow.expenseamount > 0 else 'balance-negative' }}">
+                                            {{ '+' if cashflow.expenseamount > 0 else '' }}${{ "{:,.2f}".format(cashflow.expenseamount) }}
+                                        </span>
+                                    </td>
+                                    <td>{{ cashflow.incomedate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ cashflow.incomeacct }}</td>
+                                    <td>{{ cashflow.incomecat }}</td>
+                                    <td>{{ cashflow.incomedscr }}</td>
+                                    <td class="text-end">
+                                        <span class="{{ 'balance-positive' if cashflow.incomeamount > 0 else 'balance-negative' }}">
+                                            {{ '+' if cashflow.incomeamount > 0 else '' }}${{ "{:,.2f}".format(cashflow.incomeamount) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <h5>All business cashflows are up to date.</h5>
+        </div>
+    {% endif %}
+    <h3>Missing Business Cashflows</h3>
+    {% if b_missing %}
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr>
+                            <th>Edit</th>
+                            <th>Date</th>
+                            <th>Account</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th class="text-end">Amount</th>
+                        </tr></thead>
+                        <tbody>
+                            {% for transaction in b_missing %}
+                                <tr>
+                                    <td>
+                                        {% set edit_url = url_for('transact.edit_transaction') %}
+                                        {% set edit_value = transaction.transactionid %}
+                                        {% include 'edit_button.html' %}
+                                    </td>
+                                    <td>{{ transaction.transactiondate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ transaction.accountname }}</td>
+                                    <td>{{ transaction.categoryname }}</td>
+                                    <td>{{ transaction.dscr or '-' }}</td>
+                                    <td class="text-end">
+                                        <span class="{{ 'balance-positive' if transaction.amount > 0 else 'balance-negative' }}">
+                                            {{ '+' if transaction.amount > 0 else '' }}${{ "{:,.2f}".format(transaction.amount) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="text-center">
+            <h5>No missing business cashflows</h5>
+        </div>
+    {% endif %}
+    {% if adjustments %}
+    <h3>Balance Adjustments</h3>
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead><tr>
+                            <th>Edit</th>
+                            <th>Date</th>
+                            <th>Account</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th class="text-end">Amount</th>
+                        </tr></thead>
+                        <tbody>
+                            {% for transaction in adjustments %}
+                                <tr>
+                                    <td>
+                                        {% set edit_url = url_for('transact.edit_transaction') %}
+                                        {% set edit_value = transaction.transactionid %}
+                                        {% include 'edit_button.html' %}
+                                    </td>
+                                    <td>{{ transaction.transactiondate.strftime('%m/%d/%Y') }}</td>
+                                    <td>{{ transaction.accountname }}</td>
+                                    <td>{{ transaction.categoryname }}</td>
+                                    <td>{{ transaction.dscr or '-' }}</td>
+                                    <td class="text-end">
+                                        <span class="{{ 'balance-positive' if transaction.amount > 0 else 'balance-negative' }}">
+                                            {{ '+' if transaction.amount > 0 else '' }}${{ "{:,.2f}".format(transaction.amount) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <h2>Totals</h2>
+    <p>Transfers: {{t_total}}</p>
+    <p>Business: {{b_total}}</p>
+    <p>Balance adjustments: {{adjustment_total}}</p>
+</div>
+{% endblock %}

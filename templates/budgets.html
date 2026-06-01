@@ -1,4 +1,3 @@
-<!-- budgets.html -->
 {% extends "base.html" %}
 
 {% block title %}Budgets - Budget Manager{% endblock %}
@@ -6,9 +5,7 @@
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><i class="fas fa-chart-pie me-2"></i>Budgets</h1>
-        <a href="{{ url_for('budget.add_budget') }}" class="btn btn-primary">
-            <i class="fas fa-plus me-1"></i>Add Budget
-        </a>
+        {% include 'budget_button.html' %}
     </div>
 
     <!-- Month/Year Selector -->
@@ -16,6 +13,7 @@
         <div class="card-body">
             <form method="GET" class="row g-3">
                 <div class="col-md-4">
+                    {% set month = month if month else 1 %}
                     <label for="month" class="form-label">Month</label>
                     <select class="form-select" id="month" name="month" onchange="this.form.submit()">
                         {% for i in range(1, 13) %}
@@ -26,6 +24,7 @@
                     </select>
                 </div>
                 <div class="col-md-4">
+                    {% set year = year if year else 1 %}
                     <label for="year" class="form-label">Year</label>
                     <select class="form-select" id="year" name="year" onchange="this.form.submit()">
                         {% for y in range(2020, 2030) %}
@@ -74,7 +73,7 @@
                             {% set percentage = (budget.actual / budget.budget_amount * 100) if budget.budget_amount > 0 else 0 %}
                             {% if budget.type_ == "Expense" %}
                                 <div class="progress mb-2" style="height: 10px;">
-                                    <div class="progress-bar {{ 'bg-danger' if percentage > 100 else 'bg-success' if percentage < 80 else 'bg-warning' }}" 
+                                    <div class="progress-bar {{ 'bg-danger' if percentage > 100 else 'bg-warning' if percentage > 80 else 'bg-success' }}" 
                                     style="width: {{ [percentage, 100]|min }}%"></div>
                                 </div>
                                 <small class="text-muted">{{ "{:.1f}".format(percentage) }}% used</small>
@@ -85,6 +84,12 @@
                                 </div>
                                 <small class="text-muted">{{ "{:.1f}".format(percentage) }}% paid</small>
                             {% endif %}
+                            
+                            <div class="mb-2" style="margin-top: 10px;">
+                                {% set edit_value = budget.budgetid %}
+                                {% set edit_url = url_for('budget.edit_budget') %}
+                                {% include 'edit_button.html' %}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -95,10 +100,8 @@
                     <div class="card-body text-center">
                         <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
                         <h5>No budgets found</h5>
-                        <p class="text-muted">Create budgets for {{ datetime(year, month, 1).strftime('%B %Y') }}.</p>
-                        <a href="{{ url_for('budget.add_budget') }}" class="btn btn-primary">
-                            <i class="fas fa-plus me-1"></i>Add Budget
-                        </a>
+                        <p class="text-muted">Create a new budget.</p>
+                        {% include 'budget_button.html' %}
                     </div>
                 </div>
             </div>
@@ -126,6 +129,33 @@
                             <div class="col-md-4">
                                 <h4 class="{{ 'text-success' if summary.total_remaining >= 0 else 'text-danger' }}">
                                     ${{ "{:,.2f}".format(summary.total_remaining) }}
+                                </h4>
+                                <small class="text-muted">Remaining</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Income Summary - {{ datetime(year, month, 1).strftime('%B %Y') }}</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-md-4">
+                                <h4 class="text-primary">${{ "{:,.2f}".format(summary.budget_income) }}</h4>
+                                <small class="text-muted">Total Budgeted</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="text-warning">${{ "{:,.2f}".format(summary.total_income) }}</h4>
+                                <small class="text-muted">Total Income</small>
+                            </div>
+                            <div class="col-md-4">
+                                <h4 class="{{ 'text-success' if 0 >= summary.total_remaining_income else 'text-warning' }}">
+                                    ${{ "{:,.2f}".format(summary.total_remaining_income) }}
                                 </h4>
                                 <small class="text-muted">Remaining</small>
                             </div>

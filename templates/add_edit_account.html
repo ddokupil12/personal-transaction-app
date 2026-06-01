@@ -8,10 +8,9 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>{{'Add New' if mode == 'Add' else 'Edit' if mode == 'Edit' else ''}} Account</h5>
+                    <h5 class="mb-0"><i class="fas fa-plus me-2"></i>{{mode}} Account</h5>
                 </div>
                 <div class="card-body">
-
                     <form method="POST">
                         <input type="hidden" value="{{account.accountid if account else ''}}" id="accountid" name="accountid">
                         <div class="mb-3">
@@ -32,6 +31,40 @@
                             <a href="{{ url_for('acct.accounts') }}" class="btn btn-outline-secondary">Cancel</a>
                         </div>
                     </form>
+                    {% if mode == 'Edit' %}
+                        <br>
+                        <div id="del_wrapper">
+                            <div id="del_form" class="row" hidden>
+                                <div class="col-md-6 mb-3">
+                                    <h5>Are you sure?</h5>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <form method="POST" action="{{url_for('acct.delete')}}">
+                                        <input type="hidden" name="id" value="{{account.accountid}}">
+                                        <button type="submit" class="text-end btn btn-outline-secondary">Confirm Delete</button>
+                                    </form>
+                                </div>
+                            </div>
+                            <button onclick="del()" id="del" class="btn btn-outline-secondary">Delete</button>
+                        </div>
+                        <div>
+                        </div>
+                        <script>
+                            'use strict';
+                            const del = () => {
+                                const btn = document.getElementById('del');
+                                btn.hidden = true;
+                                const form = document.getElementById('del_form');
+                                form.hidden = false;
+                            }
+                            const cancel = () => {
+                                const btn = document.getElementById('del');
+                                btn.hidden = false;
+                                const form = document.getElementById('del_form');
+                                form.hidden = true;
+                            }
+                        </script>
+                    {% endif %}
                 </div>
             </div>
         </div>

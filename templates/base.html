@@ -1,49 +1,12 @@
-<!-- base.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Budget Manager{% endblock %}</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .navbar-brand { font-weight: bold; }
-        .balance-positive { color: #28a745; }
-        .balance-negative { color: #dc3545; }
-        .card-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; }
-        .btn-primary:hover { background: linear-gradient(135deg, #764ba2 0%, #667eea 100%); }
-        .sidebar { background: #f8f9fa; min-height: 100vh; padding-top: 20px; }
-        .main-content { padding: 20px; }
-        
-        /* Updated Footer Styles */
-        footer {
-            color: black;
-            text-align: center;
-            padding: 20px;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-            border: none;
-        }
-        .footer-button {
-            color: #676767;
-            font-size: 14px;
-            margin-left: 10px;
-            padding: 1px;
-        }
-        .footer-button:hover {
-            color: blue;
-            text-decoration: underline;
-        }
-        .footer-text {
-            font-size: 14px;
-            padding: 1px;
-            margin-right: 20px;
-            border: none;
-        }
-    </style>
+    <link rel="stylesheet" href="{{url_for('static', filename='bootstrap.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='fontawesome/css/all.min.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
 </head>
 <body>
     <!-- Navigation -->
@@ -83,8 +46,8 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link">
-                            <i class="fa fa-check"></i> Verify (future)
+                        <a class="nav-link" href="{{ url_for('cashflow.verify')}}">
+                            <i class="fa fa-check"></i> Verify
                         </a>
                     </li>
                 </ul>
@@ -113,11 +76,11 @@
             </main>
         </div>
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
+    <script src="{{url_for('static', filename='bootstrap.js')}}"></script>
     {% block scripts %}{% endblock %}
     <footer>
-        <span class="footer-text text-muted">Version 5</span>
-        <span class="footer-text text-muted">Copyright (C) 2026 David Dokupil</span>
+        <span class="footer-text text-muted">Version 6</span>
+        <span class="footer-text text-muted">Copyright (C) 2025-2026 David Dokupil</span>
         <span class="footer-text text-muted">Open source under AGPLv3</span>
         <span>
             <button class="btn footer-button" onclick="window.open('https:/\/github.com/ddokupil12/personal-transaction-app')">GitHub</button>

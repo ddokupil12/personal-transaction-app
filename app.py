@@ -1,32 +1,49 @@
-"""
-    This appplication allows users to keep track of personal finances.
-    
-    Copyright (C) 2026 David Dokupil
+__all__ = ['app', 'DB_CONFIG', 'create_app']
 
-    Users can add multiple accounts and categories to sort 
-    transactions. Additionally, users can add budgets to keep track of 
-    spending in important areas.
+from os import environ
 
-    This program is free software: you can redistribute it and/or 
-    modify it under the terms of the GNU Affero General Public License 
-    as published by the Free Software Foundation, either version 3 of 
-    the License, or (at your option) any later version.
+from flask import Flask, request, abort
+from logging import basicConfig, INFO
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU 
-    Affero General Public License for more details.
+from utils.config import config, is_dotenv_loaded
 
-    You should have received a copy of the GNU Affero General Public 
-    License along with this program in `LICENSE.txt'. 
-    If not, see <https://www.gnu.org/licenses/>.
-"""
+# dotenv should be loaded in config
+assert is_dotenv_loaded, 'Load dotenv before running app'
 
-__all__ = []
+_config_name = environ.get('CONFIG_NAME')
+app = Flask(__name__)
+app.config.from_object(config.get(_config_name, config['default']))
+DB_CONFIG = app.config['DB_CONFIG']
 
-from context import app, create_app
+basicConfig(
+    filename='error.log',
+    level=INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
-if __name__ == '__main__':
-    create_app()
-    app.run(debug=app.config['DEBUG'], port=app.config['PORT'], 
-            load_dotenv=False)
+@app.before_request
+def check_allowed_hosts():
+    if request.host not in app.config['ALLOWED_HOSTS']:
+        abort(403)
+
+@app.after_request
+def set_security_headers(response): # Allow Bootstrap and Font Awesome
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    # response.headers['Content-Security-Policy'] = "default-src 'self';"
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    return response
+
+def create_app():
+    from account import acct_bp
+    from budget import budget_bp
+    from cashflow import cashflow_bp
+    from category import category_bp
+    from transact import transact_bp
+
+    app.register_blueprint(acct_bp)
+    app.register_blueprint(budget_bp)
+    app.register_blueprint(cashflow_bp)
+    app.register_blueprint(category_bp)
+    app.register_blueprint(transact_bp)
