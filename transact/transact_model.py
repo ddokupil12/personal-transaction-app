@@ -13,8 +13,10 @@ class TransactModel:
     @classmethod
     def get_transactions(cls, per_page=None, offset=0, 
                          search_query=None, return_total=True):
-        # order = 'ORDER BY t.transactiondate DESC, t.transactionid DESC'
         search = 'WHERE t.dscr like %s'
+        fmt_search = f'%{search_query}%' 
+        # Searches are: WHERE t.dscr LIKE '%sample%'
+
         limit = 'LIMIT %s OFFSET %s'
         if all([per_page is not None, 
                 offset is not None, 
@@ -25,7 +27,7 @@ class TransactModel:
                 search, 
                 cls.__order, 
                 limit
-            ), (f'%{search_query}%', per_page, offset))
+            ), (fmt_search, per_page, offset))
         elif per_page is not None and offset is not None:
             transactions = db_fetchall(join(cls.__base, 
                                             cls.__order, 
@@ -35,7 +37,7 @@ class TransactModel:
             transactions = db_fetchall(join(cls.__base, 
                                             search, 
                                             cls.__order
-                                            ), (f'%{search_query}%',))
+                                            ), (fmt_search,))
         else:
             transactions = db_fetchall(join(cls.__base, cls.__order))
 
@@ -45,7 +47,7 @@ class TransactModel:
                 total = db_fetchone(total_query)['total']
             else:
                 total = db_fetchone(join(total_query, search), 
-                                    (search_query,))['total']
+                                    (fmt_search,))['total']
             return transactions, total
         else:
             return transactions

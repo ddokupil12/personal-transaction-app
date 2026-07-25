@@ -29,7 +29,7 @@ def dashboard():
            p=1, has_next=False, has_prev=False, str=str)
 def transactions():
     """
-    View all transactions.
+    View all transactions, or filter using a query.
     
     This function takes no arguments and returns the rendered template 
     showing all transactions in detail. There is a Next button at the
@@ -39,7 +39,7 @@ def transactions():
     query = request.args.get('s', '', type=str)
     per_page = 20
     offset = (page - 1) * per_page
-    transactions, total = TransactController.transactions(per_page, offset, search_query=query)
+    transactions, total = TransactController.transactions(per_page, offset, query)
     has_next = offset + per_page < total
     has_prev = page > 1
     return render_template('transactions.html', transactions=transactions,
