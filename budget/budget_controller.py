@@ -48,7 +48,7 @@ class BudgetController:
         return BudgetModel.get_budget(budget_id)
 
     @staticmethod
-    def assert_budget(budget_year, budget_month, amount):
+    def _assert_budget(budget_year, budget_month, amount):
         budget_amount = Decimal(amount)
         assert budget_amount != 0, 'amount must be nonzero'
         budget_month_msg = 'month must be between 1-12'
@@ -70,13 +70,13 @@ class BudgetController:
         #     amount == 0
         #     budget_month is not one of the 12 months
         #     budget_year is not in the 2020s
-        budget_amount = cls.assert_budget(budget_year, budget_month, amount)
+        budget_amount = cls._assert_budget(budget_year, budget_month, amount)
         BudgetModel.add_budget(category_id, budget_year, budget_month, 
                                budget_amount)
         
     @classmethod
     def edit_budget(cls, budget_id, categoryid, budget_year, budget_month, amount):
-        budget_amount = cls.assert_budget(budget_year, budget_month, amount)
+        budget_amount = cls._assert_budget(budget_year, budget_month, amount)
         BudgetModel.edit_budget(budget_id, categoryid, budget_year, budget_month, budget_amount)
 
     @staticmethod
