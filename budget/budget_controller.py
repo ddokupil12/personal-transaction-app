@@ -50,7 +50,6 @@ class BudgetController:
     @staticmethod
     def _assert_budget(budget_year, budget_month, amount):
         budget_amount = Decimal(amount)
-        assert budget_amount != 0, 'amount must be nonzero'
         budget_month_msg = 'month must be between 1-12'
         assert budget_month >= 1 and budget_month <= 12, budget_month_msg
         budget_year_msg = 'year must be between 2020-2030'

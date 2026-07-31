@@ -25,7 +25,7 @@ CREATE TABLE budget (
     categoryid INT NOT NULL,
     budget_year INT NOT NULL,
     budget_month TINYINT NOT NULL CHECK (budget_month BETWEEN 1 AND 12),
-    budget_amount DECIMAL(12,2) NOT NULL CHECK (budget_amount > 0),
+    budget_amount DECIMAL(12,2) NOT NULL,
     FOREIGN KEY (categoryid) REFERENCES category(categoryid),
     UNIQUE (categoryid, budget_year, budget_month)
 );
