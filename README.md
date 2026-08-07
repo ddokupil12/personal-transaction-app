@@ -76,8 +76,7 @@ print('err:', e)
     - When using the hanging indent, follow the PEP 8 guidelines for multiline constructs.
 ```python
 # Correct:
-account = db_fetchone("""
-                      SELECT * 
+account = db_fetchone("""SELECT * 
                       FROM acct
                       WHERE accountid = %s
                       """, [account_id])
