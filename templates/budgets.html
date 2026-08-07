@@ -5,11 +5,10 @@
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><i class="fas fa-chart-pie me-2"></i>Budgets</h1>
-        {% include 'budget_button.html' %}
     </div>
 
-    <!-- Month/Year Selector -->
-    <div class="card mb-4">
+    {# Month/Year Selector #}
+    <div class="mb-4">
         <div class="card-body">
             <form method="GET" class="row g-3">
                 <div class="col-md-4">
@@ -36,7 +35,7 @@
         </div>
     </div>
 
-    <!-- Budget Overview -->
+    {# Budget Overview #}
     <div class="row">
         {% if budgets %}
             {% for budget in budgets %}
@@ -69,8 +68,8 @@
                                 {% endif %}
                             </div>
                             
-                            <!-- Progress Bar -->
-                            {% set percentage = (budget.actual / budget.budget_amount * 100) if budget.budget_amount > 0 else 0 %}
+                            {# Progress Bar #}
+                            {% set percentage = (budget.actual / budget.budget_amount * 100) if budget.budget_amount > 0 else (budget.actual * 100) %}
                             {% if budget.type_ == "Expense" %}
                                 <div class="progress mb-2" style="height: 10px;">
                                     <div class="progress-bar {{ 'bg-danger' if percentage > 100 else 'bg-warning' if percentage > 80 else 'bg-success' }}" 
@@ -108,7 +107,7 @@
         {% endif %}
     </div>
 
-    <!-- Spending Summary -->
+    {# Spending Summary #}
     {% if summary %}
         <div class="row mt-4">
             <div class="col-12">
@@ -163,6 +162,11 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{url_for('budget.clear_cache')}}">
+                <button class="page-link" type="submit">Clear cache</button>
+            </form>
         </div>
     {% endif %}
 </div>

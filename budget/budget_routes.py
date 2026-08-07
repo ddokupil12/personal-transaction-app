@@ -15,7 +15,7 @@ def budgets():
     """
     View all budgets.
     
-    O(n) (where n = len(budgets))
+    Takes no arguments and shows all budgets on the budget page.
     """
     now = datetime.now()
     year = request.args.get('year', now.year, type=int)
@@ -24,52 +24,53 @@ def budgets():
     return render_template('budgets.html', budgets=budgets, year=year, 
                            month=month, datetime=datetime, summary=summary)
 
-@budget_bp.route('/budgets/add', methods=['GET', 'POST'])
-@log_error(model=Model.budget, action=Action.add, categories=[], 
-           pg_template='add_edit_budget.html', datetime=datetime)
-def add_budget():
-    """
-    Add a new budget.
+"""Might be useful when developing an API"""
+# @budget_bp.route('/budgets/add', methods=['GET', 'POST'])
+# @log_error(model=Model.budget, action=Action.add, categories=[], 
+#            pg_template='add_edit_budget.html', datetime=datetime)
+# def add_budget():
+#     """
+#     Add a new budget.
 
-    On a GET request, this function takes no arguments and returns a
-    page that allows a user to add a new budget. The user can
-    select a year, month, and category, and then enter an amount.
+    # On a GET request, this function takes no arguments and returns a
+    # page that allows a user to add a new budget. The user can
+    # select a year, month, and category, and then enter an amount.
 
-    On a POST request, this function takes a category ID, month, year,
-    and amount as arguments. The user will get a success or error 
-    message depending on whether the budget could be added.
+#     On a POST request, this function takes a category ID, month, year,
+#     and amount as arguments. The user will get a success or error 
+#     message depending on whether the budget could be added.
 
-    Method parameters: None
+#     Method parameters: None
 
-    GET request parameters: None
+#     GET request parameters: None
 
-    POST request parameters:
-    categoryid: int
-    budget_year: int
-    budget_month: int
-    amount: Decimal
+#     POST request parameters:
+#     categoryid: int
+#     budget_year: int
+#     budget_month: int
+#     amount: Decimal
 
-    Raises: 
-    GET request: None
-    POST request:
-    AssertionError when: (see `BudgetController.add_budget()`)
-        amount == 0
-        budget_month is not one of the 12 months
-        budget_year is not in the 2020s
-    """
-    if request.method == 'POST':
-        category_id = request.form['categoryid']
-        year = request.form.get('budget_year', None, type=int)
-        month = request.form.get('budget_month', None, type=int)
-        budget_amount = request.form['amount']
-        BudgetController.add_budget(category_id, year, month, budget_amount)
-        return log_success(Model.budget, Action.add, year=year, month=month)
-    else:
-        categories = CatController.categories()
-        now = datetime.now()
-        return render_template('add_edit_budget.html', 
-                               categories=categories, 
-                               datetime=datetime, mode=header_action(Action.add), year=now.year, month=now.month)
+#     Raises: 
+#     GET request: None
+#     POST request:
+#     AssertionError when: (see `BudgetController.add_budget()`)
+#         amount == 0
+#         budget_month is not one of the 12 months
+#         budget_year is not in the 2020s
+#     """
+#     if request.method == 'POST':
+#         category_id = request.form['categoryid']
+#         year = request.form.get('budget_year', None, type=int)
+#         month = request.form.get('budget_month', None, type=int)
+#         budget_amount = request.form['amount']
+#         BudgetController.add_budget(category_id, year, month, budget_amount)
+#         return log_success(Model.budget, Action.add, year=year, month=month)
+#     else:
+#         categories = CatController.categories()
+#         now = datetime.now()
+#         return render_template('add_edit_budget.html', 
+#                                categories=categories, 
+#                                datetime=datetime, mode=header_action(Action.add), year=now.year, month=now.month)
 
 
 @budget_bp.route('/budgets/edit', methods=['GET', 'POST'])
@@ -78,6 +79,12 @@ def add_budget():
 def edit_budget():
     """
     Edit a selected budget.
+
+    On a GET request, this function takes a budget ID and returns a
+    page that allows a user to edit that budget. The user can
+    select a year, month, and category, and then enter an amount.
+
+    On a POST request, this function takes a category ID, year, month, budget amount, and budget ID as arguments. The user will get a success or error message depending on whether the budget could be edited.
     """
     if request.method == 'POST':
         category_id = request.form['categoryid']
@@ -102,8 +109,23 @@ def delete():
     """
     Delete a budget.
 
-    Takes a budget ID, permanently deletes the budget, and then sends the user back to the main budgets page.
+    Takes a budget ID, permanently deletes the budget, and then sends 
+    the user back to the main budgets page.
     """
     id = request.form['id']
     BudgetController.delete(id)
     return log_success(Model.budget, Action.delete)
+
+@budget_bp.route('/budgets/clear_cache', methods=['POST'])
+@log_error(model=Model.budget, action=Action.read, pg_template='budgets.html', 
+           budgets=[], datetime=datetime)
+def clear_cache():
+    """
+    Delete all budgets with a budget amount of 0.
+
+    Takes no arguments and permanently deletes all budgets with a 
+    budget amount of 0.
+    """
+    BudgetController.clear_cache()
+    return log_success(Model.budget, Action.delete)
+    # Implies that a single budget has been deleted

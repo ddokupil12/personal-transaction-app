@@ -38,8 +38,10 @@ class CatController:
     
     @classmethod
     def delete(cls, id):
+        from budget import BudgetController
+        assert BudgetController.clear_cache()
         try:
-            x = CategoryModel.delete(id) 
+            x = CategoryModel.delete(id)
         except Exception as e:
             assert cls.get_category(id) is None, 'Category is still being used somewhere else'
             raise Exception(e)
