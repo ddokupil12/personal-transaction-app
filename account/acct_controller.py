@@ -2,7 +2,6 @@ __all__ = ['AcctController']
 
 from decimal import Decimal
 
-# TransactController imported in accounts()
 from .account_model import AccountModel
 
 class AcctController:
@@ -11,12 +10,17 @@ class AcctController:
         # Controller for returning all current accounts from the database
         # :param balance: bool | True
         #    Determines whether each account balance is returned
+        # :param show_net_cash: bool | False
+        #    Determines whether net cash is returned
         # O(n) (where n = len(accounts))
 
-        if show_net_cash:
-            assert balance, 'An internal error occurred'
-        from transact import TransactController
+        if show_net_cash is True and balance is False: 
+            # Net cash can't be shown without balance
+            print('Warning: balance must be True when show_net_cash is True.')
+            print('Warning: Setting balance to True.')
+            balance = True
 
+        from transact import TransactController
         accounts = AccountModel.get_accounts()
         if balance is True:
             net_cash = Decimal(0)
@@ -24,12 +28,12 @@ class AcctController:
                 account['balance'] = TransactController.get_account_balance(
                     account['accountid'])
                 
-                if show_net_cash:
+                if show_net_cash is True:
                     net_cash += account['balance']
             
 
     
-        if show_net_cash:
+        if show_net_cash is True:
             return accounts, net_cash
         else:
             return accounts
@@ -50,5 +54,6 @@ class AcctController:
         try:
             x = AccountModel.delete(id) 
         except Exception as e:
-            assert cls.get_account(id) is None, 'Account is still being used somewhere else'
+            msg = 'Account is still being used somewhere else'
+            assert cls.get_account(id) is None, msg
             raise Exception(e)
