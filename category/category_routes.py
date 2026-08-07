@@ -95,6 +95,5 @@ def delete():
     This will not work if a transaction or budget uses the category.
     """
     id = request.form['id']
-    print('delete', id)
     CatController.delete(id)
     return log_success(Model.category, Action.delete)
