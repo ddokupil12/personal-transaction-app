@@ -13,6 +13,8 @@ assert is_dotenv_loaded, 'Load dotenv before running app'
 _config_name = environ.get('CONFIG_NAME')
 app = Flask(__name__)
 app.config.from_object(config.get(_config_name, config['default']))
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
 DB_CONFIG = app.config['DB_CONFIG']
 
 basicConfig(
