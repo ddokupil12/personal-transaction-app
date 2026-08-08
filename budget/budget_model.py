@@ -1,4 +1,4 @@
-from utils.db import db_commit, get_db_connection, db_fetchone, db_fetchall, join
+from utils.db import commit, get_db_connection, Fetch, join
 
 class BudgetModel:
     __select_all = 'SELECT * FROM budget'
@@ -87,12 +87,12 @@ class BudgetModel:
 
     @classmethod
     def get_budget(cls, budget_id):
-        return db_fetchone(join(cls.__select_all, cls.__where_id), (budget_id,))
+        return Fetch.one(join(cls.__select_all, cls.__where_id), (budget_id,))
 
     @staticmethod
     def __add_budget(category_id, budget_year, budget_month, budget_amount, 
                     return_id=False):
-        return db_commit(
+        return commit(
             """
                 INSERT INTO budget (categoryid, budget_year, 
                 budget_month, budget_amount) 
@@ -120,12 +120,12 @@ class BudgetModel:
                 cls.__select_all, 
                 'WHERE categoryid = %s AND budget_year = %s AND budget_month = %s'
             )
-            others = db_fetchall(query, (category_id, budget_year, budget_month))
+            others = Fetch.all(query, (category_id, budget_year, budget_month))
             is_unique = all([i['budgetid'] != budget_id for i in others])
             assert is_unique, 'Budget is not unique' # Helpful error message
 
             # Now save everything to the database
-            db_commit( # This is ok being separate because it usually won't run
+            commit( # This is ok being separate because it usually won't run
                 join(update, 'SET categoryid = %s', cls.__where_id),
                 (category_id, budget_id),
                 join(update, 'SET budget_year = %s', cls.__where_id),
@@ -134,19 +134,19 @@ class BudgetModel:
                 (budget_month, budget_id)            
             )
 
-        db_commit(
+        commit(
             join(update, 'SET budget_amount = %s', cls.__where_id), 
             (budget_amount, budget_id),
         )
 
     @classmethod
     def delete(cls, id):
-        return db_commit(join('DELETE FROM budget', cls.__where_id), (id,), 
-                         return_was_affected=True, return_id=False)
+        return commit(join('DELETE FROM budget', cls.__where_id), (id,), 
+                      return_was_affected=True, return_id=False)
     
     @classmethod
     def clear_cache(cls):
         # Delete all budgets with a budget amount of 0.
-        budgets = db_fetchall('SELECT * FROM budget WHERE budget_amount = 0')
+        budgets = Fetch.all('SELECT * FROM budget WHERE budget_amount = 0')
         for i in budgets:
             yield cls.delete(i['budgetid'])

@@ -1,9 +1,9 @@
-from utils.db import db_fetchall, db_commit, db_fetchone
+from utils.db import Fetch, commit
 
 class CashflowModel:
     @staticmethod
     def get_cashflows(per_page=None, offset=None, return_total=True):
-        cashflows = db_fetchall("""
+        cashflows = Fetch.all("""
             SELECT t.transactionid as expensetransactionid, 
                 a.accountname as expenseacct, c.categoryname as expensecat, 
                 t.transactiondate as expensedate, t.amount as expenseamount, 
@@ -24,7 +24,7 @@ class CashflowModel:
         """, (per_page, offset))
         
         if return_total is True:
-            total = db_fetchone("""
+            total = Fetch.one("""
                 SELECT COUNT(*) as total FROM cashflow
             """)['total']
             return cashflows, total
@@ -33,14 +33,14 @@ class CashflowModel:
 
     @staticmethod
     def add_cashflow(expenseid, incomeid, type_):
-        db_commit("""
+        commit("""
             INSERT INTO cashflow (expense, income, type_) 
             VALUES (%s, %s, %s)
         """, (expenseid, incomeid, type_), return_id=False)
 
     @staticmethod
     def get_cashflows_by_type(type_):
-        return db_fetchall("""
+        return Fetch.all("""
             SELECT t.transactionid as expensetransactionid,
                 t.transactiondate as expensedate, t.amount as expenseamount, 
                 t.dscr as expensedscr, t.categoryid as expensecategory,
@@ -56,8 +56,8 @@ class CashflowModel:
     
     @staticmethod
     def get_expense_ids():
-        return db_fetchall('SELECT expense FROM cashflow')
+        return Fetch.all('SELECT expense FROM cashflow')
     
     @staticmethod
     def get_income_ids():
-        return db_fetchall('SELECT income FROM cashflow')
+        return Fetch.all('SELECT income FROM cashflow')

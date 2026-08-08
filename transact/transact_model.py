@@ -1,4 +1,4 @@
-from utils.db import db_fetchone, db_fetchall, db_commit, join
+from utils.db import Fetch, commit, join
 
 class TransactModel:
     __base = """
@@ -22,32 +22,32 @@ class TransactModel:
                 offset is not None, 
                 search_query is not None
                 ]):
-            transactions = db_fetchall(join(
+            transactions = Fetch.all(join(
                 cls.__base, 
                 search, 
                 cls.__order, 
                 limit
             ), (fmt_search, per_page, offset))
         elif per_page is not None and offset is not None:
-            transactions = db_fetchall(join(cls.__base, 
-                                            cls.__order, 
-                                            limit
-                                            ), (per_page, offset))
+            transactions = Fetch.all(join(cls.__base, 
+                                          cls.__order,
+                                          limit
+                                          ), (per_page, offset))
         elif search_query is not None:
-            transactions = db_fetchall(join(cls.__base, 
-                                            search, 
-                                            cls.__order
-                                            ), (fmt_search,))
+            transactions = Fetch.all(join(cls.__base, 
+                                          search, 
+                                          cls.__order
+                                          ), (fmt_search,))
         else:
-            transactions = db_fetchall(join(cls.__base, cls.__order))
+            transactions = Fetch.all(join(cls.__base, cls.__order))
 
         if return_total is True: # Get total count for pagination
             total_query = 'SELECT COUNT(*) as total FROM transact t'
             if search_query is None:
-                total = db_fetchone(total_query)['total']
+                total = Fetch.one(total_query)['total']
             else:
-                total = db_fetchone(join(total_query, search), 
-                                    (fmt_search,))['total']
+                total = Fetch.one(join(total_query, search), 
+                                       (fmt_search,))['total']
             return transactions, total
         else:
             return transactions
@@ -57,23 +57,21 @@ class TransactModel:
         len_ = len(categories)
         assert len_ < 50, "Too many categories selected"
         placeholders = ','.join(['%s'] * len_)
-        query = join(
-            cls.__base, 
-            f'WHERE c.categoryid IN ({placeholders})', 
-            cls.__order
-        )
-        return db_fetchall(query, categories)
+        query = join(cls.__base, 
+                     f'WHERE c.categoryid IN ({placeholders})', 
+                     cls.__order)
+        return Fetch.all(query, categories)
 
     @classmethod
     def get_transaction(cls, transaction_id):
-        return db_fetchone(join(
+        return Fetch.one(join(
             'SELECT * FROM transact', cls.__where_id
         ), [transaction_id])
 
     @staticmethod
     def add_transaction(account_id, category_id, amount, date_, 
                         description):
-        return db_commit(
+        return commit(
             """
                 INSERT INTO transact (accountid, categoryid, amount, 
                     transactiondate, dscr) 
@@ -86,7 +84,7 @@ class TransactModel:
     def edit_transaction(cls, account_id, category_id, amount, date_,
                          dscr, id):
         update = 'UPDATE transact'
-        return db_commit(
+        return commit(
             join(update, 'SET accountid = %s', cls.__where_id), 
             (account_id, id),
             join(update, 'SET categoryid = %s', cls.__where_id), 
@@ -102,8 +100,7 @@ class TransactModel:
     @staticmethod
     def get_account_balance(account_id):
         # Calculate account balance using transaction table
-        result = db_fetchone("""
-                             SELECT COALESCE(SUM(amount), 0) as balance
+        result = Fetch.one("""SELECT COALESCE(SUM(amount), 0) as balance
                              FROM transact
                              WHERE accountid = %s
                              """, (account_id,))['balance'] 
@@ -113,5 +110,5 @@ class TransactModel:
     
     @classmethod
     def delete(cls, id):
-        return db_commit(join('DELETE FROM transact', cls.__where_id), (id,), 
+        return commit(join('DELETE FROM transact', cls.__where_id), (id,), 
                          return_was_affected=True, return_id=False)
