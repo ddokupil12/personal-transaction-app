@@ -40,7 +40,7 @@ This code has not been tested with any other versions.
 - I was inspired by the standard POS transaction database schema and adapted it to better track my own finances. I encourage you to find a system that works for you.
 
 # Contributions
-- I try to update this repository regularly and follow [PEP 8](https://peps.python.org/pep-0008/) for readability.
+- I try to update this repository regularly and follow [PEP 8](https://peps.python.org/pep-0008/) for readability whenever possible.
     - Specific style information below
 - Use a fork to suggest new functionality, readability improvements, bug fixes, or security updates.
 - All pull requests should use the style guidelines below. Follow PEP 8 unless otherwise specified.
@@ -76,7 +76,8 @@ print('err:', e)
     - When using the hanging indent, follow the PEP 8 guidelines for multiline constructs.
 ```python
 # Correct:
-account = db_fetchone("""SELECT * 
+account = db_fetchone("""
+                      SELECT * 
                       FROM acct
                       WHERE accountid = %s
                       """, [account_id])
@@ -117,6 +118,70 @@ db_commit("""
            description))
 ```
 
+### Imports
+I prefer using the `from file import something` syntax since name clashes in this project are  between methods of classes and not between functions. This is not required.
+
+I haven't figured out a way to put all the imports at the top of the file without preventing circular imports. That's just the way this project is designed. Using more files or restructuring the project would be very confusing.
+
+Given this, I've decided (until there's a better solution) to keep all imports between the controller files in the methods where they're used, unless an import is used in two or more controller methods. When this happens, specify the import in a comment at the top of the file below all other project imports.
+
+```python
+"""Correct:"""""""""""""""""""""""""""""""""
+
+"""In package table1:"""
+
+import datetime
+
+import local_pkg
+# from table2 import Table2Controller in method()
+
+class Table1Controller:
+    @staticmethod
+    def method():
+        from table2 import Table2Controller # Not technically a circular import
+        ...
+
+"""In package table2"""
+import decimal
+
+import local_pkg
+# from table1 import Table1Controller in method()
+
+class Table2Controller:
+    @staticmethod
+    def method():
+        from table1 import Table1Controller # Not technically a circular import
+        ...
+```
+```python
+"""Wrong:"""""""""""""""""""""""""""""""""
+
+"""In package table1:"""
+
+import datetime
+
+import local_pkg
+from table2 import Table2Controller # Circular import
+
+class Table1Controller:
+    @staticmethod
+    def method():
+        Table2Controller.method()
+
+"""In package table2:"""
+
+import decimal
+
+import local_pkg
+from table1 import Table1Controller # Circular import
+
+class Table2Controller:
+    @staticmethod
+    def method():
+        Table1Controller.method()
+```
+
+Circular imports between other files can be avoided. Therefore, use the PEP 8 guidelines for all other imports.
 
 # License
 Copyright (C) 2025-2026 David Dokupil
