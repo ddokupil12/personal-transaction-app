@@ -1,6 +1,5 @@
 __all__ = ['Model', 'Action', 'log_success', 'log_error']
 
-from traceback import print_exc
 from functools import wraps
 from enum import Enum, auto
 from logging import error, ERROR, critical, CRITICAL, info
@@ -23,15 +22,29 @@ class Action(Enum):
     delete = auto()
 
 def _match_model(model, plural=False):
+    # Convert the model name from a Model to a str; return the route.
+    #
+    # This function takes a Model and a bool as arguments. The bool 
+    # indicates whether to return the model name in plural form.
+    # The Model represents the model being used. It's converted into a 
+    # string so it can be used in success/ error messages. This
+    # function returns the model name as a string and its associated 
+    # route.
+    # 
     # Helper function for `_log_success()`
-    # Determines how to show the model name to the user
-    # Determines the route based on what model was changed
     
-    # :param model: The model that was changed
+    # :param model: Model
+    #   The model that was changed
+    # :param plural: bool | True
+    #   Indicates whether the model is plural
 
     # Returns:
     # message: how the model name appears to the user
     # rte: the route that should be passed to `url_for()`
+
+    msg_singular = None
+    msg_plural = None
+    rte = None
     match model:
         case Model.acct:
             msg_singular = 'account'
@@ -65,7 +78,7 @@ def _match_model(model, plural=False):
             return msg_singular, rte
 
 def header_action(action):
-    verb = _match_action(action, tense='present')
+    verb = _match_action(action, Tense.present)
     match action:
         case Action.add:
             msg = f'{verb} New'
@@ -76,12 +89,20 @@ def header_action(action):
         
     return msg.title()
 
-def _match_action(action, tense='participle'):
+class Tense(Enum):
+    present = auto()
+    past = auto()
+    participle = auto()
+
+def _match_action(action, tense):
     # Helper function for `_log_success()`
     # Determines how to show the action name to the user
-
-    # :param action: The successful action
-
+    # 
+    # :param action: Action
+    #   The successful action
+    # :param tense: Tense
+    #   The verb tense of the action
+    # 
     # Returns one of:
     # present: action verb in simple present tense (ex. 'add')
     # past: action verb in past tense (ex. 'added')
@@ -108,11 +129,11 @@ def _match_action(action, tense='participle'):
             raise ValueError("Specify an action")
 
     match tense:
-        case 'participle':
+        case Tense.participle:
             return participle
-        case 'past':
+        case Tense.past:
             return past
-        case 'present':
+        case Tense.present:
             return present
         case _ :
             raise ValueError("Use an available tense")
@@ -122,9 +143,12 @@ def log_success(model, action, **kwargs):
     Sends a success message to the user and redirects them
     based on what page they're coming from
 
-    :param model: The model that was changed
-    :param action: The successful action
-    :param kwargs: any (passed to `url_for()`)
+    :param model: Model
+        The model that was changed
+    :param action: Action
+        The successful action
+    :param kwargs: any
+        passed to url_for()
 
     Returns:
     Response (flask.Flask.redirect)
@@ -132,27 +156,31 @@ def log_success(model, action, **kwargs):
     O(1) (with constant route length)
     """
     model_msg, rte = _match_model(model)
-    action_msg = _match_action(action, 'past')
+    action_msg = _match_action(action, Tense.past)
     msg = f'{model_msg} {action_msg} successfully!'.capitalize()
     flash(msg, 'success')
     info(msg)
     return redirect(url_for(rte, **kwargs))
 
 def log_error(
-    action,
-    log_level=ERROR,
-    model=None,
-    pg_template='dashboard.html',
-    **pg_kwargs
-):
+        action, 
+        log_level=ERROR, 
+        model=None, 
+        pg_template='dashboard.html', 
+        **pg_kwargs):
     """
     Log errors and return a template
     
-    :param log_level: Logging level (debug, info, warning, error, critical)
+    :param log_level: Logging level 
+        (debug, info, warning, error, critical)
         For future implementation
-    :param action: the Action attempted
-    :param pg_template: The page that will be loaded
-    :param pg_kwargs: The kwargs for the template
+    :param action: Action
+        The Action attempted
+    :param pg_template: str
+        The page that will be loaded
+        *.html
+    :param pg_kwargs: any
+        The kwargs for the template
     """
     def decorator(func):
         @wraps(func)
@@ -169,7 +197,7 @@ def log_error(
                     plural = action == Action.read
                     model_msg, _ = _match_model(model, plural=plural)
 
-                    action_msg = _match_action(action) # returns participle
+                    action_msg = _match_action(action, Tense.participle)
                     error_message = f'Error {action_msg} {model_msg}'
                 else:
                     error_message = 'An unexpected error occurred'
