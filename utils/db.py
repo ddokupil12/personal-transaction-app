@@ -1,4 +1,4 @@
-__all__ = ['get_db_connection', 'db_fetchall', 'db_fetchone', 'db_commit']
+__all__ = ['get_db_connection', 'Fetch', 'commit', 'join']
 
 from contextlib import contextmanager
 from mysql.connector import Error, connect
@@ -7,7 +7,18 @@ from app import DB_CONFIG
 
 @contextmanager
 def get_db_connection():
-    # Context manager for database connections
+    # Connect to the database, and disconnect when finished.
+    # 
+    # This function takes no arguments and uses the current database 
+    # configuration to connect to the database. This function yields
+    # the database connection, and closes the connection when finished.
+    # 
+    # Yields:
+    # connection: database connection
+    # 
+    # Raises:
+    # Exception: converts any database errors to Exception
+    
     connection = None
     try:
         connection = connect(**DB_CONFIG)
@@ -20,44 +31,49 @@ def get_db_connection():
         if connection and connection.is_connected():
             connection.close()
 
-def _db_fetch(*args, all=True):
-    # Fetch queries from the database
-    #
-    # Fetch one row or all rows from the database connected to the server.
-    # 
-    # :param all: bool (True: returns all rows | False: returns one)
-    # :param args: str[, tuple] (The first argument is the query,
-    #     and the second argument is the arguments for that query)
-    #
-    # Returns:
-    # All matching rows (when all=True)
-    # One matching row (when all=False)
-    #
-    # Raises:
-    # ValueError when there are more than two arguments
-    lenArgs = len(args)
-    if lenArgs > 2:
-        raise ValueError("Can't accept multiple queries")
-    
-    with get_db_connection() as conn:
-        cursor = conn.cursor(dictionary=True)
-        query = args[0]
-        if lenArgs == 1:
-            cursor.execute(query)
-        else:
-            dbArgs = args[1]
-            cursor.execute(query, dbArgs)
+class Fetch:
+    @staticmethod
+    def __db_fetch(*args, all=True):
+        # Fetch queries from the database
+        #
+        # Fetch one row or all rows from the database connected to the server.
+        # 
+        # :param all: bool (True: returns all rows | False: returns one)
+        # :param args: str[, tuple] (The first argument is the query,
+        #     and the second argument is the arguments for that query)
+        #
+        # Returns:
+        # All matching rows (when all=True)
+        # One matching row (when all=False)
+        #
+        # Raises:
+        # ValueError when there are more than two arguments
+        lenArgs = len(args)
+        if lenArgs > 2:
+            raise ValueError("Can't accept multiple queries")
+        
+        with get_db_connection() as conn:
+            cursor = conn.cursor(dictionary=True)
+            query = args[0]
+            if lenArgs == 1:
+                cursor.execute(query)
+            else:
+                dbArgs = args[1]
+                cursor.execute(query, dbArgs)
 
-        if all:
-            return cursor.fetchall()
-        else:
-            return cursor.fetchone()
+            if all:
+                return cursor.fetchall()
+            else:
+                return cursor.fetchone()
 
-def db_fetchall(*args): return _db_fetch(*args, all=True)
+    @classmethod
+    def all(cls, *args): return cls.__db_fetch(*args, all=True)
+        
+    @classmethod
+    def one(cls, *args): return cls.__db_fetch(*args, all=False)
     
-def db_fetchone(*args): return _db_fetch(*args, all=False)
-    
-def db_commit(*args, return_id=True, return_was_affected=False):
+
+def commit(*args, return_id=True, return_was_affected=False):
     # Update data in the database
     #
     # :param args: an even list of arguments of queries followed by
