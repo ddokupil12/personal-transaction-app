@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from flask import Blueprint, render_template, request
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 
 from category import CatController
 from utils.message import log_error, log_success, header_action, Model, Action
@@ -127,5 +127,8 @@ def clear_cache():
     budget amount of 0.
     """
     BudgetController.clear_cache()
-    return log_success(Model.budget, Action.delete)
-    # Implies that a single budget has been deleted
+    flash('Budgets deleted successfully!', 'success')
+    return redirect(url_for('transact.dashboard'))
+    # Doesn't imply that a single budget has been deleted, doesn't
+    # load the budgets again for the current month (i.e. the table
+    # could actually be empty)
