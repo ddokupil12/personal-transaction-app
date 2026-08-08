@@ -3,9 +3,9 @@ __all__ = ['TransactController']
 from decimal import Decimal
 from datetime import datetime
 
-# AcctController imported in dashboard()
 from category import CatController
 from .transact_model import TransactModel
+# from account import AcctController already in dashboard()
 
 class TransactController:
     @staticmethod

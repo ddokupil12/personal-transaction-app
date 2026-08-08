@@ -3,6 +3,7 @@ __all__ = ['BudgetController']
 from decimal import Decimal
 
 from .budget_model import BudgetModel
+# from category import CatController already in budgets()
 
 class BudgetController:
     @staticmethod
@@ -49,10 +50,7 @@ class BudgetController:
     def get_budget(budget_id):
         return BudgetModel.get_budget(budget_id)
 
-    """
-    Commented this out since it's not being used, but it might be useful for 
-    a future API
-    """
+    """Might be useful when developing an API"""
     # @staticmethod
     # def __assert_budget(budget_year, budget_month, amount):
     #     budget_amount = Decimal(amount)
