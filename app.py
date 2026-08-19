@@ -29,7 +29,9 @@ def check_allowed_hosts():
         abort(403)
 
 @app.after_request
-def set_security_headers(response): # Allow Bootstrap and Font Awesome
+def set_security_headers(response): 
+    # Higest security
+    # Block as much content from other sites as possible
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
