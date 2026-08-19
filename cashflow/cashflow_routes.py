@@ -74,7 +74,7 @@ def verify():
     b_total = CashflowController.sum_cashflows('Business')
 
     adjustment_id = CatController.get_category_by_name('Balance Adjustment')['categoryid']
-    adjustments = TransactController.filter_category([adjustment_id])
+    adjustments = TransactController.filter([adjustment_id], Model.category)
     adjustment_total = sum([i['amount'] for i in adjustments])
 
     return render_template('verify_cashflows.html', t_update=t_update, t_missing=t_missing, b_update=b_update, b_missing=b_missing, adjustments=adjustments, t_total=t_total, b_total=b_total, adjustment_total=adjustment_total)
