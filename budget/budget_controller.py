@@ -51,14 +51,14 @@ class BudgetController:
         return BudgetModel.get_budget(budget_id)
 
     """Might be useful when developing an API"""
-    # @staticmethod
-    # def __assert_budget(budget_year, budget_month, amount):
-    #     budget_amount = Decimal(amount)
-    #     budget_month_msg = 'month must be between 1-12'
-    #     assert budget_month >= 1 and budget_month <= 12, budget_month_msg
-    #     budget_year_msg = 'year must be between 2020-2030'
-    #     assert budget_year >= 2020 and budget_year <= 2030, budget_year_msg
-    #     return budget_amount
+    @staticmethod
+    def __assert_budget(budget_year, budget_month, amount):
+        budget_amount = Decimal(amount)
+        budget_month_msg = 'month must be between 1-12'
+        assert budget_month >= 1 and budget_month <= 12, budget_month_msg
+        budget_year_msg = 'year must be between 2020-2030'
+        assert budget_year >= 2020 and budget_year <= 2030, budget_year_msg
+        return budget_amount
 
     # @classmethod
     # def add_budget(cls, category_id, budget_year, budget_month, amount):
@@ -79,7 +79,7 @@ class BudgetController:
         
     @classmethod
     def edit_budget(cls, budget_id, categoryid, budget_year, budget_month, amount):
-        budget_amount = cls._assert_budget(budget_year, budget_month, amount)
+        budget_amount = cls.__assert_budget(budget_year, budget_month, amount)
         BudgetModel.edit_budget(budget_id, categoryid, budget_year, budget_month, budget_amount)
 
     @staticmethod
