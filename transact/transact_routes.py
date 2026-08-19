@@ -164,9 +164,20 @@ def edit_transaction():
 @log_error(model=Model.transact, action=Action.read, pg_template='transactions.html', transactions=[], 
            p=1, has_next=False, has_prev=False, str=str)
 def filter():
-    categories = request.args['categories']
-    catSplit = categories.split(',')
-    transactions = TransactController.filter_category(catSplit)
+    categories = request.args.get('categories')
+    accounts = request.args.get('accounts')
+    err_msg = 'Can only filter accounts and categories one at a time'
+    assert (accounts is None) ^ (categories is None), err_msg
+    if accounts is not None:
+        ids = accounts.split(',')
+        model = Model.acct
+    elif categories is not None:
+        ids = categories.split(',')
+        model = Model.category
+    else:
+        ValueError('AssertionError failed')
+
+    transactions = TransactController.filter(ids, model)
     return render_template('transactions.html', transactions=transactions,
                            p=1, has_next=False, has_prev=False, s='')
 

@@ -1,4 +1,5 @@
 from utils.db import Fetch, commit, join
+from utils.message import Model
 
 class TransactModel:
     __base = """
@@ -53,14 +54,29 @@ class TransactModel:
             return transactions
         
     @classmethod
-    def filter_category(cls, categories):
-        len_ = len(categories)
-        assert len_ < 50, "Too many categories selected"
+    def filter(cls, ids, model):
+        len_ = len(ids)
+
+        # Specify model
+        # 50 is a magic number?
+        # assert len_ < 50, 'Too many selected'
+
+        # What changes based on how many filters there are
+        db_var = None
+        if model == Model.acct:
+            db_var = 't.accountid'
+        elif model == Model.category:
+            db_var = 't.categoryid'
+        else:
+            raise ValueError()
+
         placeholders = ','.join(['%s'] * len_)
-        query = join(cls.__base, 
-                     f'WHERE c.categoryid IN ({placeholders})', 
-                     cls.__order)
-        return Fetch.all(query, categories)
+        query = join(
+            cls.__base,
+            f'WHERE {db_var} IN ({placeholders})',
+            cls.__order
+        )
+        return Fetch.all(query, ids)
 
     @classmethod
     def get_transaction(cls, transaction_id):

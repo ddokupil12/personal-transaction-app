@@ -4,6 +4,7 @@ from decimal import Decimal
 from datetime import datetime
 
 from category import CatController
+from utils.message import Model
 from .transact_model import TransactModel
 # from account import AcctController already in dashboard()
 
@@ -14,19 +15,37 @@ class TransactController:
         return TransactModel.get_transactions(per_page, offset, query, 
                                               return_total)
     
+    # Individual filters
+    # @staticmethod
+    # def filter_category(categories):
+    #     return TransactModel.filter(categories, Model.category)
+    # Acct
+    # @staticmethod
+    # def filter_acct(accounts):
+    #     return TransactModel.filter(accounts, Model.acct)
+    # amount
+    # @staticmethod
+    # def filter_amount(lower, upper):
+    #     return TransactModel.filter_amount(lower, upper)
+    # date
+    # @staticmethod
+    # def filter_date(lower, upper):
+    #     return TransactModel.filter_date(lower, upper)
+
+    # General filter
     @staticmethod
-    def filter_category(categories):
-        return TransactModel.filter_category(categories)
+    def filter(ids, model):
+        return TransactModel.filter(ids, model)
 
     @classmethod
     def get_transfers(cls):
         transfer_cat = CatController.get_category_by_name('Account Transfer')
-        return cls.filter_category([transfer_cat['categoryid']])
+        return cls.filter([transfer_cat['categoryid']], Model.category)
     
     @classmethod
     def get_business_transacts(cls):
         business_cat = CatController.get_category_by_name('Business')
-        return cls.filter_category([business_cat['categoryid']])
+        return cls.filter([business_cat['categoryid']], Model.category)
 
     @staticmethod
     def get_transaction(transaction_id):
@@ -97,6 +116,6 @@ class TransactController:
     @classmethod
     def sum_transacts_from_cat(cls, category_name):
         category = CatController.get_category_by_name(category_name)['categoryid']
-        transactions = cls.filter_category((category,))
+        transactions = cls.filter((category,), Model.category)
         total = sum([i['amount'] for i in transactions])
         return total
