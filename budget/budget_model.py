@@ -67,6 +67,8 @@ class BudgetModel:
                     budget_id = cls.__add_budget(id, year, month, 0.0,
                                                return_id=True)
                     budget = cls.get_budget(budget_id)
+
+                    # Join the budget to the associated category
                     category = categories_by_id[id]
                     budget['type_'] = category['type_']
                     budget['categoryname'] = category['categoryname']
