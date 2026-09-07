@@ -12,14 +12,15 @@ This code has not been tested with any other versions.
 
 # Installation
 - Clone the repository
-- `pip install -r requirements.txt`
-    - Check for Python version compatibility
-    - Installs all required modules
-- Install [MySQL Community Server](https://dev.mysql.com/downloads/mysql/) 9.4.0
+- Run `pip install -r requirements.txt`
+    - This checks for version compatibility and installs all required modules
+- Install [MySQL Community Server](https://dev.mysql.com/downloads/mysql/) 9.4.0 using their instructions
     - This is the version I use, but other versions might be compatible as well
     - Version 9.4.0 is the latest at the time of this writing.
-- Add a new database and use `budget.sql` to create the tables.
-- Create a `.env` file with:
+- Using MySQL, add a new database and use `budget.sql` to create the tables.
+    - Run `CREATE DATABASE db_name;`
+    - Copy and paste `budget.sql` and run it
+- In the same folder as this repository, create a `.env` file with:
     - DB_HOST -- name of the server, usually `localhost`
     - DB_PORT -- the server's port, usually 3306
     - DB_NAME -- name of the database
@@ -27,13 +28,26 @@ This code has not been tested with any other versions.
     - DB_PASSWORD -- your password, which should be secure
     - SECRET_KEY -- a 256-bit string to keep your server secure
     - PORT -- the port your server will run on, default 5000
-    - CONFIG_NAME -- the name of the configuration you want to use, default `production` (see `config.py` for options)
-- Launch server using `python run.py` (use `python3` if applicable)
+    - CONFIG_NAME -- the name of the configuration you want to use
+        - Options:
+            - `production` - default
+            - `development` - turns on debug mode
+    - ALLOWED_HOSTS -- the computers that are allowed to access the server
+        - Use comma-separated values: ex. localhost,127.0.0.1
+- To launch the server, open a terminal/ command prompt window. Run `python3 run.py` (use `python` if applicable)
 
 # Usage
-- Use nav bar to switch between sections of the website
-- Click the "Edit" buttons to edit those particular rows of their respective tables.
-    - For example, click "Edit" on the `/transactions` page next to a transaction to edit that transaction.
+- Use the navigation bar to switch between sections of the website
+- Click Add on most pages to add data.
+    - For example, click Add Account on the Accounts page to add an account.
+    - The Budgets page does not have an Add button because budgets are added automatically.
+- Click the Edit buttons to edit the data shown next to it.
+    - For example, click Edit on the Transactions page next to a transaction to edit that transaction.
+- After clicking Edit, you will see a Delete button.
+    - You will be asked to confirm that you want to delete the data. 
+    - Data is deleted immediately and permanently.
+- The Cashflows page has several unimplemented features.
+    - For example, the Edit buttons don't work yet.
 
 # Acknowledgements
 - Made with Claude, ChatGPT, and Copilot, although most of the abstraction and some features were entirely written by me.
@@ -123,7 +137,9 @@ I prefer using the `from file import something` syntax since name clashes in thi
 
 I haven't figured out a way to put all the imports at the top of the file without preventing circular imports. That's just the way this project is designed. Using more files or restructuring the project would be very confusing.
 
-Given this, I've decided (until there's a better solution) to keep all imports between the controller files in the methods where they're used, unless an import is used in two or more controller methods. When this happens, specify the import in a comment at the top of the file below all other project imports.
+Given this, I've decided to keep all imports between the controller files in the methods where they're used, unless an import is used in two or more controller methods. When this happens, specify the import in a comment at the top of the file below all other project imports.
+
+See [Contributions](#contributions) for instructions on how to suggest a better solution.
 
 ```python
 """Correct:"""""""""""""""""""""""""""""""""
@@ -132,7 +148,7 @@ Given this, I've decided (until there's a better solution) to keep all imports b
 
 import datetime
 
-import local_pkg
+import local_file
 # from table2 import Table2Controller in method()
 
 class Table1Controller:
@@ -144,7 +160,7 @@ class Table1Controller:
 """In package table2"""
 import decimal
 
-import local_pkg
+import local_file
 # from table1 import Table1Controller in method()
 
 class Table2Controller:
