@@ -12,43 +12,51 @@ class TransactModel:
     __where_id = 'WHERE transactionid = %s'
     
     @classmethod
-    def get_transactions(cls, per_page=None, offset=0, 
-                         search_query=None, return_total=True):
-        search = 'WHERE t.dscr like %s'
-        fmt_search = f'%{search_query}%' 
-        # Searches are: WHERE t.dscr LIKE '%sample%'
+    def get_transactions(cls, per_page=None, offset=0, search_query=None,
+                         account_ids=None, category_ids=None, return_total=True):
+        # Build a WHERE clause from whichever filters are supplied. Every
+        # active filter is ANDed together, so search, account, and category
+        # can all narrow the result set at once.
+        conditions = []
+        where_params = []
+        if search_query:
+            conditions.append('t.dscr LIKE %s')
+            where_params.append(f'%{search_query}%')
+            # Searches are: WHERE t.dscr LIKE '%sample%'
+        if account_ids:
+            placeholders = ','.join(['%s'] * len(account_ids))
+            conditions.append(f't.accountid IN ({placeholders})')
+            where_params.extend(account_ids)
+        if category_ids:
+            placeholders = ','.join(['%s'] * len(category_ids))
+            conditions.append(f't.categoryid IN ({placeholders})')
+            where_params.extend(category_ids)
+        # where_conditions = ' AND '.join(where_params)
+        # where_clause = (' '.join(['WHERE'], where_conditions))
+        # where = where_clause if conditions else ''
+        where = 'WHERE ' + ' AND '.join(conditions) if conditions else ''
 
-        limit = 'LIMIT %s OFFSET %s'
-        if all([per_page is not None, 
-                offset is not None, 
-                search_query is not None
-                ]):
-            transactions = Fetch.all(join(
-                cls.__base, 
-                search, 
-                cls.__order, 
-                limit
-            ), (fmt_search, per_page, offset))
-        elif per_page is not None and offset is not None:
-            transactions = Fetch.all(join(cls.__base, 
-                                          cls.__order,
-                                          limit
-                                          ), (per_page, offset))
-        elif search_query is not None:
-            transactions = Fetch.all(join(cls.__base, 
-                                          search, 
-                                          cls.__order
-                                          ), (fmt_search,))
+        parts = [cls.__base]
+        if where:
+            parts.append(where)
+        parts.append(cls.__order)
+        fetch_params = list(where_params)
+        if per_page is not None and offset is not None:
+            parts.append('LIMIT %s OFFSET %s')
+            fetch_params.extend([per_page, offset])
+
+        if fetch_params:
+            transactions = Fetch.all(join(*parts), tuple(fetch_params))
         else:
-            transactions = Fetch.all(join(cls.__base, cls.__order))
+            transactions = Fetch.all(join(*parts))
 
         if return_total is True: # Get total count for pagination
             total_query = 'SELECT COUNT(*) as total FROM transact t'
-            if search_query is None:
-                total = Fetch.one(total_query)['total']
+            if where:
+                total = Fetch.one(join(total_query, where),
+                                  tuple(where_params))['total']
             else:
-                total = Fetch.one(join(total_query, search), 
-                                       (fmt_search,))['total']
+                total = Fetch.one(total_query)['total']
             return transactions, total
         else:
             return transactions

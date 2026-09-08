@@ -6,7 +6,10 @@
 <div class="main-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><i class="fas fa-exchange-alt me-2"></i>Transactions</h1>
-        <form method="GET" action="{{url_for('transact.transactions')}}">
+        <form method="GET" action="{{ url_for('transact.filter') }}">
+            {# Keep any active account/category filter when searching #}
+            <input type="hidden" name="accounts" value="{{ sel_account }}">
+            <input type="hidden" name="categories" value="{{ sel_category }}">
             <ul class="pagination" style="margin-top: 10px; margin-bottom: 11px;">
                 <li class="page-item">
                     <i class="fa-solid fa-magnifying-glass"></i>
@@ -27,15 +30,45 @@
 
             {% if transactions %}
                 <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead><tr>
-                            <th>Edit</th>
-                            <th>Date</th>
-                            <th>Account</th>
-                            <th>Category</th>
-                            <th>Description</th>
-                            <th class="text-end">Amount</th>
-                        </tr></thead>
+                    <table class="table table-hover" id="dataTable">
+                        <thead>
+                            <tr>
+                                <th>Edit</th>
+                                <th>Date</th>
+                                <th>Account</th>
+                                <th>Category</th>
+                                <th>Description</th>
+                                <th class="text-end">Amount</th>
+                            </tr>
+                            <tr class="filter-row">
+                                <th></th>
+                                <th></th>
+                                <th>
+                                    <select class="form-select form-select-sm" id="filterAccount">
+                                        <option value="">All accounts</option>
+                                        {% for account in accounts %}
+                                            <option value="{{ account.accountid }}"
+                                                {%- if sel_account and account.accountid|string in sel_account.split(',') %} selected{% endif %}>
+                                                {{ account.accountname }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </th>
+                                <th>
+                                    <select class="form-select form-select-sm" id="filterCategory">
+                                        <option value="">All categories</option>
+                                        {% for category in categories %}
+                                            <option value="{{ category.categoryid }}"
+                                                {%- if sel_category and category.categoryid|string in sel_category.split(',') %} selected{% endif %}>
+                                                {{ category.categoryname }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
                         <tbody>
                             {% for transaction in transactions %}
                                 <tr>
@@ -64,7 +97,7 @@
                     <ul class="pagination justify-content-center">
                         {% if has_prev %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('transact.transactions', p=p-1, s=s) }}">Previous</a>
+                                <a class="page-link" href="{{ url_for('transact.filter', p=p-1, s=s, accounts=sel_account or none, categories=sel_category or none) }}">Previous</a>
                             </li>
                         {% else %}
                             <li class="page-item disabled">
@@ -78,7 +111,7 @@
                         
                         {% if has_next %}
                             <li class="page-item">
-                                <a class="page-link" href="{{ url_for('transact.transactions', p=p+1, s=s) }}">Next</a>
+                                <a class="page-link" href="{{ url_for('transact.filter', p=p+1, s=s, accounts=sel_account or none, categories=sel_category or none) }}">Next</a>
                             </li>
                         {% else %}
                             <li class="page-item disabled">
@@ -91,11 +124,41 @@
                 <div class="text-center">
                     <i class="fas fa-exchange-alt fa-3x text-muted mb-3"></i>
                     <h5>No transactions found</h5>
-                    <p class="text-muted">Start by adding your first transaction.</p>
-                    {% include 'transaction_button.html' %}
+                    {% if s or sel_account or sel_category %}
+                        <p class="text-muted">No transactions match the current filters.</p>
+                        <a href="{{ url_for('transact.transactions') }}" class="btn btn-outline-secondary">Clear filters</a>
+                    {% else %}
+                        <p class="text-muted">Start by adding your first transaction.</p>
+                        {% include 'transaction_button.html' %}
+                    {% endif %}
                 </div>
             {% endif %}
         </div>
     </div>
 </div>
+
+<script>
+    // Changing either dropdown reloads /transactions/filter with the search
+    // query and both filters combined, starting back at page 1.
+    (function () {
+        const account = document.getElementById('filterAccount');
+        const category = document.getElementById('filterCategory');
+        if (!account || !category) return;
+
+        const base = "{{ url_for('transact.filter') }}";
+        const search = {{ (s or '') | tojson }};
+
+        function reload() {
+            const params = new URLSearchParams();
+            if (search) params.set('s', search);
+            if (account.value) params.set('accounts', account.value);
+            if (category.value) params.set('categories', category.value);
+            const qs = params.toString();
+            window.location = qs ? base + '?' + qs : base;
+        }
+
+        account.addEventListener('change', reload);
+        category.addEventListener('change', reload);
+    })();
+</script>
 {% endblock %}

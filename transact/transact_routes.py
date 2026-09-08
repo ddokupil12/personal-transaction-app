@@ -25,25 +25,19 @@ def dashboard():
                            recent_transactions=recent_transactions)
 
 @transact_bp.route('/transactions')
-@log_error(model=Model.transact, action=Action.read, pg_template='transactions.html', transactions=[], 
-           p=1, has_next=False, has_prev=False, str=str)
+@log_error(model=Model.transact, action=Action.read, pg_template='transactions.html', transactions=[],
+           p=1, has_next=False, has_prev=False, str=str, s='', accounts=[], categories=[],
+           sel_account='', sel_category='')
 def transactions():
     """
-    View all transactions, or filter using a query.
-    
-    This function takes no arguments and returns the rendered template 
-    showing all transactions in detail. There is a Next button at the
-    bottom of the page to show more transactions.
+    View all transactions.
+
+    This function takes no arguments and returns the rendered template
+    showing all transactions in detail, paginated. Filtering by search
+    query, account, and category is handled by `filter()`, which renders
+    the same page.
     """
-    page = request.args.get('p', 1, type=int)
-    query = request.args.get('s', '', type=str)
-    per_page = 20
-    offset = (page - 1) * per_page
-    transactions, total = TransactController.transactions(per_page, offset, query)
-    has_next = offset + per_page < total
-    has_prev = page > 1
-    return render_template('transactions.html', transactions=transactions,
-                           p=page, has_next=has_next, has_prev=has_prev, s=query)
+    return filter()
 
 @transact_bp.route('/transactions/add', methods=['GET', 'POST'])
 @log_error(model=Model.transact, action=Action.add, pg_template='add_edit_transaction.html', 
@@ -161,25 +155,43 @@ def edit_transaction():
                                accounts=accounts, categories=categories, mode=header_action(Action.edit))
     
 @transact_bp.route('/transactions/filter')
-@log_error(model=Model.transact, action=Action.read, pg_template='transactions.html', transactions=[], 
-           p=1, has_next=False, has_prev=False, str=str)
+@log_error(model=Model.transact, action=Action.read, pg_template='transactions.html', transactions=[],
+           p=1, has_next=False, has_prev=False, str=str, s='', accounts=[], categories=[],
+           sel_account='', sel_category='')
 def filter():
-    categories = request.args.get('categories')
-    accounts = request.args.get('accounts')
-    err_msg = 'Can only filter accounts and categories one at a time'
-    assert (accounts is None) ^ (categories is None), err_msg
-    if accounts is not None:
-        ids = accounts.split(',')
-        model = Model.acct
-    elif categories is not None:
-        ids = categories.split(',')
-        model = Model.category
-    else:
-        ValueError('AssertionError failed')
+    """
+    View transactions narrowed by any combination of search query,
+    account, and category, paginated.
 
-    transactions = TransactController.filter(ids, model)
+    Query parameters:
+    p: int -- 1-based page number
+    s: str -- substring matched against the transaction description
+    accounts: str -- comma-separated account IDs
+    categories: str -- comma-separated category IDs
+
+    Every supplied filter is applied together (ANDed). Omitting them all
+    is equivalent to the plain transactions listing.
+    """
+    page = request.args.get('p', 1, type=int)
+    query = request.args.get('s', '', type=str)
+    sel_account = request.args.get('accounts', '', type=str)
+    sel_category = request.args.get('categories', '', type=str)
+    account_ids = [i for i in sel_account.split(',') if i]
+    category_ids = [i for i in sel_category.split(',') if i]
+
+    per_page = 20
+    offset = (page - 1) * per_page
+    transactions, total = TransactController.transactions(
+        per_page, offset, query, account_ids, category_ids)
+    has_next = offset + per_page < total
+    has_prev = page > 1
+
+    accounts = AcctController.accounts(balance=False)
+    categories = CatController.categories()
     return render_template('transactions.html', transactions=transactions,
-                           p=1, has_next=False, has_prev=False, s='')
+                           p=page, has_next=has_next, has_prev=has_prev, s=query,
+                           accounts=accounts, categories=categories,
+                           sel_account=sel_account, sel_category=sel_category)
 
 @transact_bp.route('/transactions/delete', methods=['POST'])
 @log_error(model=Model.transact, action=Action.delete, transaction=[])
